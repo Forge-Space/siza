@@ -10,8 +10,8 @@ export const BUILT_IN_THEMES: SizaTheme[] = [
     name: 'Siza Default',
     builtIn: true,
     colorMode: 'dark',
-    primaryColor: '#7C3AED',
-    secondaryColor: '#6366F1',
+    primaryColor: '#8B5CF6',
+    secondaryColor: '#A78BFA',
     accentColor: '#22C55E',
     animation: 'subtle',
     spacing: 'default',
@@ -94,7 +94,7 @@ export const BUILT_IN_THEMES: SizaTheme[] = [
     typography: 'sans',
     brandMeta: {
       brandName: identity.name || 'Forge Space',
-      headingFont: sizaFonts?.headingFont || 'Plus Jakarta Sans',
+      headingFont: sizaFonts?.headingFont || 'Sora',
       bodyFont: sizaFonts?.bodyFont || 'DM Sans',
       semanticColors: {
         success: identity.colors.semantic.success.hex,

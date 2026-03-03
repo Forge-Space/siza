@@ -46,13 +46,13 @@ export function LandingNav({ user }: LandingNavProps) {
     <nav
       className={`sticky top-0 z-50 h-16 border-b transition-all duration-300 ${
         isScrolled
-          ? 'backdrop-blur-xl bg-[#121214]/80 border-[#27272A] shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
+          ? 'backdrop-blur-xl bg-background/80 border-border shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
           : 'bg-transparent border-transparent'
       }`}
     >
       <div className={`${CONTAINER} h-full flex items-center justify-between`}>
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/siza-icon.png" alt="Siza" width={24} height={24} priority />
+          <Image src="/monogram.svg" alt="Siza" width={24} height={24} priority />
           <span className="font-display font-bold text-lg">siza</span>
         </Link>
 
@@ -61,7 +61,7 @@ export function LandingNav({ user }: LandingNavProps) {
             <Link
               key={link.label}
               href={link.href}
-              className="text-sm text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
             </Link>
@@ -72,7 +72,7 @@ export function LandingNav({ user }: LandingNavProps) {
           {user ? (
             <Link
               href="/generate"
-              className="bg-brand hover:bg-brand-light text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+              className="bg-primary hover:bg-primary-hover text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             >
               Dashboard
             </Link>
@@ -80,13 +80,13 @@ export function LandingNav({ user }: LandingNavProps) {
             <>
               <Link
                 href="/signin"
-                className="hidden sm:inline-block text-sm text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors px-4 py-2"
+                className="hidden sm:inline-block text-sm text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
               >
                 Sign in
               </Link>
               <Link
                 href="/signup"
-                className="bg-brand hover:bg-brand-light text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                className="bg-primary hover:bg-primary-hover text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               >
                 Get Started
               </Link>
@@ -96,18 +96,18 @@ export function LandingNav({ user }: LandingNavProps) {
           <Sheet>
             <SheetTrigger
               aria-label="Open menu"
-              className="md:hidden p-2 text-[#A1A1AA] hover:text-[#FAFAFA]"
+              className="md:hidden p-2 text-muted-foreground hover:text-foreground"
             >
               <Menu size={20} />
             </SheetTrigger>
-            <SheetContent className="bg-[#121214] border-[#27272A]">
+            <SheetContent className="bg-background border-border">
               <SheetTitle className="font-display text-lg mb-6">Menu</SheetTitle>
               <div className="flex flex-col gap-4">
                 {navLinks.map((link) => (
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="text-[#A1A1AA] hover:text-[#FAFAFA] transition-colors py-2"
+                    className="text-muted-foreground hover:text-foreground transition-colors py-2"
                   >
                     {link.label}
                   </Link>

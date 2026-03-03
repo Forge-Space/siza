@@ -23,6 +23,9 @@
 - Projects routes: `@/lib/supabase/server`, `@/lib/api/auth`, `@/lib/api/rate-limit`, `@/lib/usage/limits`, `@/lib/usage/tracker`
 - Let pure modules work naturally: `@/lib/api/response`, `@/lib/api/errors`, `@/lib/api/validation/*`
 
+## Generate page keyboard shortcuts (Issue #266)
+- `use-generate-page-shortcuts.test.tsx`: 8 tests for Cmd+Enter (submit), Cmd+S (save), Cmd+K (focus prompt), Escape (close modals), useShortcutLabel. Fire both metaKey and ctrlKey in tests so they pass on Mac and non-Mac (hook uses metaKey on Mac, ctrlKey otherwise).
+
 ## PR #91: Unskip 4 API Route Test Suites
 - Branch: feat/unskip-api-route-tests
 - Status: MERGED (2026-02-25)

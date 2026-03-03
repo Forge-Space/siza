@@ -61,4 +61,17 @@ describe('usePageMeta', () => {
     const { result } = renderHook(() => usePageMeta());
     expect(result.current.title).toBe('Dashboard');
   });
+
+  it('includes admin metadata when isAdmin is true', () => {
+    mockPathname.mockReturnValue('/admin');
+    const { result } = renderHook(() => usePageMeta(true));
+    expect(result.current.title).toBe('Admin');
+    expect(result.current.breadcrumbs[1].label).toBe('Admin');
+  });
+
+  it('does not expose admin metadata when isAdmin is false', () => {
+    mockPathname.mockReturnValue('/admin');
+    const { result } = renderHook(() => usePageMeta(false));
+    expect(result.current.title).toBe('Dashboard');
+  });
 });

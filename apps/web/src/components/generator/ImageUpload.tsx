@@ -98,7 +98,7 @@ export function ImageUpload({ image, onImageChange }: ImageUploadProps) {
             <button
               type="button"
               onClick={removeImage}
-              className="text-text-muted hover:text-red-500"
+              className="text-text-muted-foreground hover:text-red-500"
             >
               <XIcon className="h-4 w-4" />
             </button>
@@ -118,11 +118,11 @@ export function ImageUpload({ image, onImageChange }: ImageUploadProps) {
             isDragOver ? 'border-blue-400 bg-brand/10' : 'border-surface-3 hover:border-surface-3'
           }`}
         >
-          <ImageIcon className="h-8 w-8 text-text-muted" />
+          <ImageIcon className="h-8 w-8 text-text-muted-foreground" />
           <p className="text-sm text-text-secondary">
             Drop a screenshot here, or <span className="text-brand">browse</span>
           </p>
-          <p className="text-xs text-text-muted">PNG, JPEG, or WebP up to 5MB</p>
+          <p className="text-xs text-text-muted-foreground">PNG, JPEG, or WebP up to 5MB</p>
           <input
             ref={fileInputRef}
             type="file"

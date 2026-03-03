@@ -227,7 +227,7 @@ export const useThemeStore = create<ThemeState & ThemeActions>()(
           const safeTheme = {
             name: String(parsed.name).slice(0, 50),
             colorMode: parsed.colorMode || 'dark',
-            primaryColor: parsed.primaryColor || '#7C3AED',
+            primaryColor: parsed.primaryColor || '#8B5CF6',
             secondaryColor: parsed.secondaryColor || '#6366F1',
             accentColor: parsed.accentColor || '#22C55E',
             animation: parsed.animation || 'subtle',

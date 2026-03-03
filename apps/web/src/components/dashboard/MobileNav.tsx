@@ -2,36 +2,21 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  XIcon,
-  FolderIcon,
-  FileTextIcon,
-  SettingsIcon,
-  PlusIcon,
-  ClockIcon,
-  KeyIcon,
-  CreditCardIcon,
-} from 'lucide-react';
+import { XIcon, PlusIcon } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { getDashboardNavigation } from './navigation';
 
 interface MobileNavProps {
   open: boolean;
   onClose: () => void;
+  isAdmin: boolean;
 }
 
-const navigation = [
-  { name: 'Projects', href: '/projects', icon: FolderIcon },
-  { name: 'Templates', href: '/templates', icon: FileTextIcon },
-  { name: 'History', href: '/history', icon: ClockIcon },
-  { name: 'AI Keys', href: '/ai-keys', icon: KeyIcon },
-  { name: 'Billing', href: '/billing', icon: CreditCardIcon },
-  { name: 'Settings', href: '/settings', icon: SettingsIcon },
-];
-
-export default function MobileNav({ open, onClose }: MobileNavProps) {
+export default function MobileNav({ open, onClose, isAdmin }: MobileNavProps) {
   const pathname = usePathname();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const navigationItems = getDashboardNavigation(isAdmin);
 
   useEffect(() => {
     if (!open) return;
@@ -107,7 +92,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="p-2 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
+            className="p-2 rounded-md text-text-muted-foreground hover:text-text-primary hover:bg-surface-2 transition-colors"
             aria-label="Close navigation"
           >
             <XIcon className="h-5 w-5" />
@@ -122,7 +107,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
             <PlusIcon className="mr-3 h-5 w-5" />
             Generate Component
           </Link>
-          {navigation.map((item) => {
+          {navigationItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             return (
               <Link
@@ -139,7 +124,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
                   className={`mr-3 h-5 w-5 ${
                     isActive
                       ? 'text-brand-light'
-                      : 'text-text-muted group-hover:text-text-secondary'
+                      : 'text-text-muted-foreground group-hover:text-text-secondary'
                   }`}
                 />
                 {item.name}

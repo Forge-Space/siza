@@ -60,6 +60,21 @@ export async function cleanupTestData(userId?: string): Promise<void> {
   }
 }
 
+export async function setUserRole(userId: string, role: 'user' | 'admin'): Promise<void> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY for role management');
+  }
+
+  const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+  const { error } = await adminSupabase.from('profiles').update({ role }).eq('id', userId);
+  if (error) {
+    throw new Error(`Failed to set role for ${userId}: ${error.message}`);
+  }
+}
+
 export async function signOut(page: Page): Promise<void> {
   const userMenuButton = page
     .locator('button[aria-label*="user"]')

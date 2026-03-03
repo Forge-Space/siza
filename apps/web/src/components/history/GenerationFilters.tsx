@@ -38,7 +38,7 @@ const STATUSES = [
 export function GenerationFilters({ filters, onChange }: GenerationFiltersProps) {
   return (
     <div className="flex flex-wrap gap-3 items-center">
-      <Filter className="w-4 h-4 text-text-muted" />
+      <Filter className="w-4 h-4 text-text-muted-foreground" />
       <select
         value={filters.framework}
         onChange={(e) => onChange({ ...filters, framework: e.target.value })}

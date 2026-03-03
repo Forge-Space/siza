@@ -19,6 +19,7 @@ import GitHubPanel from '@/components/dashboard/GitHubPanel';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { generateUserEncryptionKey, deriveEncryptionKey } from '@/lib/encryption';
 import { AI_PROVIDERS } from '@/lib/encryption';
+import { DashboardSection } from '@/components/migration/migration-primitives';
 
 export function SettingsClient() {
   const {
@@ -129,18 +130,11 @@ export function SettingsClient() {
 
   return (
     <div className="container mx-auto py-8 space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Settings className="h-8 w-8" />
-            Settings
-          </h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and AI provider preferences
-          </p>
-        </div>
-      </div>
+      <DashboardSection
+        title="Settings"
+        description="Manage your account settings, providers, and integration preferences."
+        actions={<Settings className="h-5 w-5 text-text-muted-foreground" />}
+      />
 
       {/* Navigation Tabs */}
       <div className="flex gap-2 border-b">

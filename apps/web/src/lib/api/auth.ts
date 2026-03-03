@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { getLocalAuthBypassUser, isLocalAuthBypassEnabled } from '@/lib/auth/local-auth-bypass';
 import { UnauthorizedError, ForbiddenError } from './errors';
 import type { User } from '@supabase/supabase-js';
 
@@ -16,6 +17,10 @@ export interface Session {
  * @throws {UnauthorizedError} if session is invalid
  */
 export async function verifySession(): Promise<Session> {
+  if (isLocalAuthBypassEnabled()) {
+    return { user: getLocalAuthBypassUser() };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -34,6 +39,10 @@ export async function verifySession(): Promise<Session> {
  */
 export async function getSession(): Promise<Session | null> {
   try {
+    if (isLocalAuthBypassEnabled()) {
+      return { user: getLocalAuthBypassUser() };
+    }
+
     const supabase = await createClient();
     const {
       data: { user },

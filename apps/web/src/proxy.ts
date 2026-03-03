@@ -1,15 +1,26 @@
-export const runtime = 'experimental-edge';
-
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { isLocalAuthBypassEnabled } from '@/lib/auth/local-auth-bypass';
 import { securityHeaders } from '@/lib/security/headers';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
+
+  if (isLocalAuthBypassEnabled()) {
+    const requestId = crypto.randomUUID();
+    response.headers.set('X-Request-ID', requestId);
+
+    const headers = securityHeaders();
+    for (const [key, value] of Object.entries(headers)) {
+      response.headers.set(key, value);
+    }
+
+    return response;
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

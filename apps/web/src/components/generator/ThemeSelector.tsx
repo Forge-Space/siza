@@ -176,7 +176,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
           <span className="text-text-primary truncate">{activeTheme?.name || 'Select Theme'}</span>
         </span>
         <ChevronDownIcon
-          className={`h-4 w-4 text-text-muted transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 text-text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -203,7 +203,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                   />
                   <span className="truncate text-text-primary">{theme.name}</span>
                   {theme.builtIn && (
-                    <span className="text-xs text-text-muted shrink-0">built-in</span>
+                    <span className="text-xs text-text-muted-foreground shrink-0">built-in</span>
                   )}
                   {theme.brandMeta && <span className="text-xs text-brand shrink-0">brand</span>}
                 </span>
@@ -269,7 +269,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                     className="h-4 w-4 rounded-full shrink-0"
                     style={{ backgroundColor: currentValues.accentColor }}
                   />
-                  <span className="text-xs text-text-muted">
+                  <span className="text-xs text-text-muted-foreground">
                     {currentValues.colorMode} · {currentValues.animation} ·{' '}
                     {currentValues.typography}
                   </span>
@@ -297,7 +297,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                   <button
                     type="button"
                     onClick={() => setSaving(false)}
-                    className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-0 transition-colors"
+                    className="p-1.5 rounded-md text-text-muted-foreground hover:text-text-primary hover:bg-surface-0 transition-colors"
                     title="Cancel"
                   >
                     <XIcon className="h-4 w-4" />

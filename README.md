@@ -42,6 +42,19 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 - **Multi-LLM** — Swap between Gemini, Claude, GPT without code changes
 - **Production Ready** — Monaco editor, live preview, Stripe billing, feature flags
 
+## UI Migration Status (March 2026)
+
+- Design-system implementation pass now unifies app theming with canonical `--siza-*` tokens while keeping legacy aliases for backward compatibility
+- Dashboard shell chrome aligned to design-system structure (56px top bar, breadcrumbs, command search, notifications indicator, token-consistent backgrounds/borders)
+- Auth shell rebuilt to centered 440px card + radial glow/pattern and updated sign-in/sign-up/forgot/reset form controls to design-system styling
+- Landing page hero/nav/footer moved closer to flagship design-system hierarchy (public beta badge, production-grade hero line, docs secondary CTA, product/resources/company/legal footer columns)
+- Projects surface now includes design-system-inspired grid/list toggle and upgraded card presentation with framework badges and progress bars
+- Unified dashboard route metadata for `Sidebar`, `MobileNav`, and breadcrumb/page title resolution
+- Added migration primitives (`AuthCardShell`, `MarketingSection`, `DashboardSection`) and shared style utilities in `globals.css`
+- Migrated mapped route visuals across landing/about/auth/dashboard surfaces while preserving behavior contracts (middleware, OAuth callback, query-param pages)
+- Redesigned gap routes (`reset-password`, legal pages, maintenance, billing success) into the current Siza visual language
+- Added role-aware dashboard navigation and a new Admin page for feature flag management
+
 ## Quick Start
 
 ```bash
@@ -62,9 +75,20 @@ Create `apps/web/.env.local`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-local-service-role-key
 NEXT_PUBLIC_ENABLE_BYOK=true
 NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 ```
+
+### Grant admin access locally
+
+Create/sign in the target user first, then run:
+
+```bash
+npm run admin:grant -- lucas.diassantana@gmail.com
+```
+
+This updates `public.profiles.role` to `admin` for that email.
 
 ## Architecture
 

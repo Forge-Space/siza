@@ -3,19 +3,19 @@ import { Github, Linkedin } from 'lucide-react';
 
 export function LandingFooter() {
   return (
-    <footer className="bg-[#18181B] border-t border-[#27272A]">
+    <footer className="border-t border-border/20 bg-surface">
       <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-20 py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
-            <div className="font-display font-bold text-lg text-[#FAFAFA]">siza</div>
-            <p className="text-sm text-[#71717A] mt-2">The open full-stack AI workspace.</p>
+            <div className="font-display font-bold text-lg text-foreground">Siza</div>
+            <p className="mt-2 text-sm text-subtle">The open full-stack AI workspace.</p>
             <div className="flex items-center gap-4 mt-4">
               <Link
                 href="https://github.com/Forge-Space"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Siza on GitHub"
-                className="text-[#71717A] hover:text-[#FAFAFA] transition-colors"
+                className="text-subtle hover:text-foreground transition-colors"
               >
                 <Github className="w-4 h-4" />
               </Link>
@@ -24,7 +24,7 @@ export function LandingFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Lucas Santana on LinkedIn"
-                className="text-[#71717A] hover:text-[#FAFAFA] transition-colors"
+                className="text-subtle hover:text-foreground transition-colors"
               >
                 <Linkedin className="w-4 h-4" />
               </Link>
@@ -32,38 +32,38 @@ export function LandingFooter() {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-[#FAFAFA] mb-4">Platform</h3>
+            <h3 className="mb-4 text-sm font-medium text-foreground">Product</h3>
             <Link
-              href="/generate"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              href="/"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
-              Generate
+              Platform
             </Link>
             <Link
-              href="/generate"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              href="/pricing"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
-              Components
+              Pricing
             </Link>
             <Link
-              href="/generate"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              href="/templates"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Templates
             </Link>
             <Link
-              href="/pricing"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              href="/roadmap"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
-              Pricing
+              Roadmap
             </Link>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-[#FAFAFA] mb-4">Developers</h3>
+            <h3 className="mb-4 text-sm font-medium text-foreground">Resources</h3>
             <Link
               href="/docs"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Documentation
             </Link>
@@ -71,7 +71,7 @@ export function LandingFooter() {
               href="https://github.com/Forge-Space"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               GitHub
             </Link>
@@ -79,29 +79,29 @@ export function LandingFooter() {
               href="https://github.com/Forge-Space/ui-mcp"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               MCP Tools
             </Link>
             <Link
               href="/docs"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               API Reference
             </Link>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-[#FAFAFA] mb-4">Company</h3>
+            <h3 className="mb-4 text-sm font-medium text-foreground">Company</h3>
             <Link
               href="/about"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               About
             </Link>
             <Link
               href="/roadmap"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Roadmap
             </Link>
@@ -109,7 +109,7 @@ export function LandingFooter() {
               href="https://github.com/orgs/Forge-Space/discussions"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Community
             </Link>
@@ -117,23 +117,23 @@ export function LandingFooter() {
               href="https://github.com/Forge-Space/siza/releases"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Changelog
             </Link>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-[#FAFAFA] mb-4">Legal</h3>
+            <h3 className="mb-4 text-sm font-medium text-foreground">Legal</h3>
             <Link
               href="/legal/privacy"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Privacy
             </Link>
             <Link
               href="/legal/terms"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Terms
             </Link>
@@ -141,15 +141,15 @@ export function LandingFooter() {
               href="https://github.com/Forge-Space/siza/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
+              className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               License
             </Link>
           </div>
         </div>
 
-        <div className="border-t border-[#27272A] mt-10 pt-8">
-          <p className="text-center text-xs text-[#71717A]">&copy; 2026 Siza. MIT License.</p>
+        <div className="mt-10 border-t border-border/20 pt-8">
+          <p className="text-center text-xs text-subtle">&copy; 2026 Siza. MIT License.</p>
         </div>
       </div>
     </footer>

@@ -5,7 +5,7 @@ import type { DesignAnalysis } from '@/lib/services/image-analysis';
 const mockAnalysis: DesignAnalysis = {
   layout: 'Two-column layout with sidebar',
   components: ['Button', 'Card', 'Navbar', 'Input', 'Avatar', 'Badge'],
-  colors: ['#7C3AED', '#6366F1', '#22C55E', '#EF4444'],
+  colors: ['#8B5CF6', '#A78BFA', '#22C55E', '#EF4444'],
   typography: 'Sans-serif, 16px base, bold headings',
   spacing: 'Spacious with 24px gaps',
   interactions: ['Hover effects on cards', 'Fade-in animations'],
@@ -102,7 +102,7 @@ describe('DesignAnalysisPanel', () => {
 
     const swatches = screen.getAllByTitle(/#[0-9A-Fa-f]{6}/);
     expect(swatches.length).toBe(4);
-    expect(swatches[0]).toHaveAttribute('title', '#7C3AED');
+    expect(swatches[0]).toHaveAttribute('title', '#8B5CF6');
   });
 
   it('should show suggested prompt preview', async () => {

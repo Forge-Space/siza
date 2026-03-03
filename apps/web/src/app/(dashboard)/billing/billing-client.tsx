@@ -7,6 +7,7 @@ import { SubscriptionStatus } from '@/components/billing/SubscriptionStatus';
 import { UsageChart } from '@/components/billing/UsageChart';
 import { PLANS } from '@/lib/stripe/plans';
 import { ExternalLink } from 'lucide-react';
+import { DashboardSection } from '@/components/migration/migration-primitives';
 
 export function BillingClient() {
   const { subscription, usage, isLoading } = useSubscription();
@@ -43,11 +44,13 @@ export function BillingClient() {
   const currentPlan = PLANS[plan as keyof typeof PLANS] ?? PLANS.free;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-bold">Billing</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Manage your subscription and usage</p>
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      <DashboardSection
+        title="Billing"
+        description="Manage your subscription, monitor monthly limits, and update your billing preferences."
+      />
 
-      <div className="mt-8 space-y-6">
+      <div className="space-y-6">
         <div className="rounded-lg border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -74,7 +77,7 @@ export function BillingClient() {
                   className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  {portalLoading ? 'Loading...' : 'Manage'}
+                  {portalLoading ? 'Loading...' : 'Manage plan'}
                 </button>
               )}
               {plan === 'free' && (
@@ -82,7 +85,7 @@ export function BillingClient() {
                   href="/pricing"
                   className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
-                  Upgrade
+                  Upgrade plan
                 </Link>
               )}
             </div>
@@ -106,7 +109,7 @@ export function BillingClient() {
         </div>
 
         <div className="rounded-lg border bg-card p-6">
-          <h2 className="text-lg font-semibold">Plan features</h2>
+          <h2 className="text-lg font-semibold">Included features</h2>
           <ul className="mt-3 space-y-1.5">
             {currentPlan.features.map((feature) => (
               <li key={feature} className="text-sm text-muted-foreground">

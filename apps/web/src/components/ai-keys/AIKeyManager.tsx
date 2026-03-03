@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import {
   Plus,
   Key,
@@ -118,6 +118,14 @@ export function AIKeyManager() {
 
   return (
     <div className="space-y-6">
+      <Alert className="border-primary/30 bg-primary/5">
+        <Shield className="h-4 w-4" />
+        <AlertTitle>Secure storage</AlertTitle>
+        <AlertDescription>
+          API keys are encrypted with your password and stored locally. They never leave your
+          browser unencrypted. Siza uses client-side encryption for maximum security.
+        </AlertDescription>
+      </Alert>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

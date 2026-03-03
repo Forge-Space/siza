@@ -101,8 +101,6 @@ const FRAMEWORK_LABELS: Record<string, string> = {
 
 type OwnershipFilter = 'all' | 'official' | 'mine';
 
-const ITEMS_PER_PAGE = 12;
-
 function useDebounce(value: string, delay: number): string {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
@@ -124,6 +122,7 @@ export function TemplatesClient() {
   const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>('all');
   const [sortBy, setSortBy] = useState('recent');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -176,10 +175,10 @@ export function TemplatesClient() {
     });
   }, [templates, ownershipFilter]);
 
-  const totalPages = Math.ceil(filteredTemplates.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredTemplates.length / itemsPerPage);
   const paginatedTemplates = filteredTemplates.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const navigateToGenerate = (template: Template, projectId: string) => {
@@ -232,79 +231,81 @@ export function TemplatesClient() {
         </p>
       </div>
 
-      <div className="mb-4 flex items-center gap-1 border-b border-surface-3">
-        {ownershipTabs.map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            onClick={() => setOwnershipFilter(key)}
-            className={
-              'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ' +
-              (ownershipFilter === key
-                ? 'border-brand text-brand-light'
-                : 'border-transparent text-text-secondary hover:text-text-primary')
-            }
-          >
-            <Icon className="w-4 h-4" />
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <div className="mb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Search templates by name or description..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-surface-3 rounded-lg bg-surface-1 text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand"
-          />
+      <div className="sticky top-0 z-20 mb-6 bg-surface-0/95 pb-4 backdrop-blur supports-[backdrop-filter]:bg-surface-0/80">
+        <div className="mb-4 flex items-center gap-1 border-b border-surface-3">
+          {ownershipTabs.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setOwnershipFilter(key)}
+              className={
+                'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ' +
+                (ownershipFilter === key
+                  ? 'border-brand text-brand-light'
+                  : 'border-transparent text-text-secondary hover:text-text-primary')
+              }
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
         </div>
-      </div>
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        {CATEGORIES.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={
-              'px-3 py-1.5 text-sm rounded-full border transition-colors ' +
-              (selectedCategory === category
-                ? 'border-brand bg-brand/10 text-brand-light font-medium'
-                : 'border-surface-3 text-text-secondary hover:border-surface-3 hover:text-text-primary')
-            }
-          >
-            {category}
-          </button>
-        ))}
-      </div>
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted-foreground w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search templates by name or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-surface-3 rounded-lg bg-surface-1 text-text-primary placeholder:text-text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand"
+            />
+          </div>
+        </div>
 
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        {FRAMEWORKS.map((fw) => (
-          <button
-            key={fw}
-            onClick={() => setSelectedFramework(fw)}
-            className={
-              'px-3 py-1.5 text-xs rounded-md border transition-colors ' +
-              (selectedFramework === fw
-                ? 'border-brand bg-brand/10 text-brand-light font-medium'
-                : 'border-surface-3 text-text-muted hover:text-text-secondary')
-            }
-          >
-            {FRAMEWORK_LABELS[fw]}
-          </button>
-        ))}
-        <div className="ml-auto flex items-center gap-2">
-          <SortAscIcon className="w-4 h-4 text-text-muted" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-1.5 border border-surface-3 rounded-md text-sm bg-surface-1 text-text-primary focus:outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option value="recent">Recently Added</option>
-            <option value="name">Name A-Z</option>
-          </select>
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          {CATEGORIES.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={
+                'px-3 py-1.5 text-sm rounded-full border transition-colors ' +
+                (selectedCategory === category
+                  ? 'border-brand bg-brand/10 text-brand-light font-medium'
+                  : 'border-surface-3 text-text-secondary hover:border-surface-3 hover:text-text-primary')
+              }
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {FRAMEWORKS.map((fw) => (
+            <button
+              key={fw}
+              onClick={() => setSelectedFramework(fw)}
+              className={
+                'px-3 py-1.5 text-xs rounded-md border transition-colors ' +
+                (selectedFramework === fw
+                  ? 'border-brand bg-brand/10 text-brand-light font-medium'
+                  : 'border-surface-3 text-text-muted-foreground hover:text-text-secondary')
+              }
+            >
+              {FRAMEWORK_LABELS[fw]}
+            </button>
+          ))}
+          <div className="ml-auto flex items-center gap-2">
+            <SortAscIcon className="w-4 h-4 text-text-muted-foreground" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-1.5 border border-surface-3 rounded-md text-sm bg-surface-1 text-text-primary focus:outline-none focus:ring-2 focus:ring-brand"
+            >
+              <option value="recent">Recently Added</option>
+              <option value="name">Name A-Z</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -359,7 +360,7 @@ export function TemplatesClient() {
 
             {filteredTemplates.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <Search className="w-12 h-12 text-text-muted mb-4" />
+                <Search className="w-12 h-12 text-text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold text-text-primary mb-2">No templates found</h3>
                 <p className="text-sm text-text-secondary">
                   Try adjusting your search or filters to find what you&apos;re looking for.
@@ -375,7 +376,20 @@ export function TemplatesClient() {
           <p className="text-sm text-text-secondary">
             Page {currentPage} of {totalPages}
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="h-9 rounded-md border border-surface-3 bg-surface-1 px-2 text-xs text-text-secondary"
+              aria-label="Items per page"
+            >
+              <option value={8}>8 / page</option>
+              <option value={12}>12 / page</option>
+              <option value={24}>24 / page</option>
+            </select>
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}

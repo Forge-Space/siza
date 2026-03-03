@@ -45,7 +45,7 @@ function AppError({ error, reset }: { error: Error & { digest?: string }; reset:
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/50 px-4">
       <div className="mx-auto max-w-2xl text-center">
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
-          <Image src="/siza-icon.png" alt="Siza" width={40} height={40} className="flex-shrink-0" />
+          <Image src="/monogram.svg" alt="Siza" width={40} height={40} className="flex-shrink-0" />
           <span className="text-2xl font-bold">Siza</span>
         </Link>
 

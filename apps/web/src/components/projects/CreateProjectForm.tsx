@@ -155,7 +155,7 @@ export default function CreateProjectForm() {
             </div>
           ) : (
             <label className="w-32 h-32 flex flex-col items-center justify-center border-2 border-dashed border-surface-3 rounded-md cursor-pointer hover:border-brand/50">
-              <UploadIcon className="h-8 w-8 text-text-muted" />
+              <UploadIcon className="h-8 w-8 text-text-muted-foreground" />
               <span className="mt-2 text-xs text-text-secondary">Upload</span>
               <input
                 type="file"

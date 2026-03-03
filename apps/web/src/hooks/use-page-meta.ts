@@ -1,33 +1,13 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import {
-  FolderIcon,
-  FileTextIcon,
-  PlusIcon,
-  ClockIcon,
-  SettingsIcon,
-  CreditCardIcon,
-  KeyIcon,
-  LayoutDashboardIcon,
-} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { getDashboardPages } from '@/components/dashboard/navigation';
 
 interface PageMeta {
   title: string;
   icon?: LucideIcon;
 }
-
-const PAGE_META: Record<string, PageMeta> = {
-  '/dashboard': { title: 'Dashboard', icon: LayoutDashboardIcon },
-  '/projects': { title: 'Projects', icon: FolderIcon },
-  '/templates': { title: 'Templates', icon: FileTextIcon },
-  '/generate': { title: 'Generator', icon: PlusIcon },
-  '/history': { title: 'History', icon: ClockIcon },
-  '/settings': { title: 'Settings', icon: SettingsIcon },
-  '/billing': { title: 'Billing', icon: CreditCardIcon },
-  '/ai-keys': { title: 'AI Keys', icon: KeyIcon },
-};
 
 interface Breadcrumb {
   label: string;
@@ -40,11 +20,13 @@ interface PageMetaResult {
   breadcrumbs: Breadcrumb[];
 }
 
-export function usePageMeta(): PageMetaResult {
+export function usePageMeta(isAdmin = false): PageMetaResult {
   const pathname = usePathname();
+  const dashboardPages = getDashboardPages(isAdmin);
 
-  const matchedKey = Object.keys(PAGE_META).find((key) => pathname.startsWith(key));
-  const meta = matchedKey ? PAGE_META[matchedKey] : null;
+  const matched = dashboardPages.find((page) => pathname.startsWith(page.href));
+  const matchedKey = matched?.href ?? null;
+  const meta: PageMeta | null = matched ? { title: matched.name, icon: matched.icon } : null;
 
   const breadcrumbs: Breadcrumb[] = [{ label: 'Home', href: '/dashboard' }];
 

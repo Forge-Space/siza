@@ -10,6 +10,11 @@ export function filterItemsByStatus(phase: Phase, status: ItemStatus | 'all') {
   return phase.items.filter((i) => i.status === status);
 }
 
+export function filterItemsByScope(items: Phase['items'], scope: 'all' | 'desktop') {
+  if (scope === 'all') return items;
+  return items.filter((item) => /desktop|electron|tauri/i.test(item.label));
+}
+
 export function countByStatus(phases: Phase[], status: ItemStatus | 'all'): number {
   const all = phases.flatMap((p) => p.items);
   if (status === 'all') return all.length;

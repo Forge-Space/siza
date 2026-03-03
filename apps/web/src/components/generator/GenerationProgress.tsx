@@ -67,7 +67,7 @@ export default function GenerationProgress({
                     ? 'text-success bg-success/10'
                     : isActive
                       ? 'text-brand-light bg-brand/10'
-                      : 'text-text-muted bg-surface-3/50'
+                      : 'text-text-muted-foreground bg-surface-3/50'
                 )}
               >
                 {isActive ? (
@@ -165,7 +165,7 @@ export default function GenerationProgress({
                             ? event.message || 'Error occurred'
                             : 'Processing...'}
                 </span>
-                <span className="text-text-muted">
+                <span className="text-text-muted-foreground">
                   {new Date(event.timestamp).toLocaleTimeString()}
                 </span>
               </div>

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { MarketingSection } from '@/components/migration/migration-primitives';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | Siza',
@@ -7,15 +8,15 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="max-w-3xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
-      <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-2">
+    <MarketingSection className="max-w-3xl py-16 sm:py-24">
+      <h1 className="mb-2 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
         Privacy Policy
       </h1>
-      <p className="text-sm text-[#71717A] mb-12">Last updated: February 28, 2026</p>
+      <p className="mb-12 text-sm text-text-muted-foreground">Last updated: February 28, 2026</p>
 
-      <div className="space-y-8 text-[#A1A1AA] text-sm leading-relaxed">
+      <div className="siza-prose space-y-8">
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">Overview</h2>
+          <h2 className="mb-3">Overview</h2>
           <p>
             Siza (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is an open-source AI workspace
             for code generation. We respect your privacy and are committed to protecting your
@@ -24,25 +25,25 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">Data we collect</h2>
+          <h2 className="mb-3">Data we collect</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li>
-              <strong className="text-[#FAFAFA]">Account data:</strong> Email address and display
+              <strong className="text-text-primary">Account data:</strong> Email address and display
               name when you create an account via email, Google, or GitHub OAuth.
             </li>
             <li>
-              <strong className="text-[#FAFAFA]">Usage data:</strong> Generation requests, feature
-              usage, and error logs to improve the platform.
+              <strong className="text-text-primary">Usage data:</strong> Generation requests,
+              feature usage, and error logs to improve the platform.
             </li>
             <li>
-              <strong className="text-[#FAFAFA]">Payment data:</strong> Processed securely by
+              <strong className="text-text-primary">Payment data:</strong> Processed securely by
               Stripe. We never store card numbers or financial credentials.
             </li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">How we use your data</h2>
+          <h2 className="mb-3">How we use your data</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li>To provide and maintain the Siza platform</li>
             <li>To process payments and manage subscriptions</li>
@@ -55,26 +56,26 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">Third-party services</h2>
+          <h2 className="mb-3">Third-party services</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li>
-              <strong className="text-[#FAFAFA]">Supabase:</strong> Authentication and database
+              <strong className="text-text-primary">Supabase:</strong> Authentication and database
               (hosted in AWS us-east-1)
             </li>
             <li>
-              <strong className="text-[#FAFAFA]">Stripe:</strong> Payment processing
+              <strong className="text-text-primary">Stripe:</strong> Payment processing
             </li>
             <li>
-              <strong className="text-[#FAFAFA]">Cloudflare:</strong> Hosting and CDN
+              <strong className="text-text-primary">Cloudflare:</strong> Hosting and CDN
             </li>
             <li>
-              <strong className="text-[#FAFAFA]">Resend:</strong> Transactional emails
+              <strong className="text-text-primary">Resend:</strong> Transactional emails
             </li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">Your rights</h2>
+          <h2 className="mb-3">Your rights</h2>
           <p>
             You can request access to, correction of, or deletion of your personal data at any time
             by contacting{' '}
@@ -86,7 +87,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">Open source</h2>
+          <h2 className="mb-3">Open source</h2>
           <p>
             Siza is MIT-licensed open-source software. You can inspect exactly how your data is
             handled by reviewing our{' '}
@@ -103,7 +104,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">Contact</h2>
+          <h2 className="mb-3">Contact</h2>
           <p>
             Questions about this policy? Email{' '}
             <a href="mailto:support@forgespace.co" className="text-brand-light hover:underline">
@@ -113,6 +114,6 @@ export default function PrivacyPage() {
           </p>
         </section>
       </div>
-    </div>
+    </MarketingSection>
   );
 }

@@ -2,35 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  FolderIcon,
-  FileTextIcon,
-  SettingsIcon,
-  PlusIcon,
-  KeyIcon,
-  CreditCardIcon,
-  ClockIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
-} from 'lucide-react';
+import { PlusIcon, ChevronsLeftIcon, ChevronsRightIcon } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@siza/ui';
 import { useUIStore } from '@/stores/ui-store';
+import { getDashboardNavigation } from './navigation';
 
-const navigation = [
-  { name: 'Projects', href: '/projects', icon: FolderIcon, shortcut: '⌘1' },
-  { name: 'Templates', href: '/templates', icon: FileTextIcon, shortcut: '⌘2' },
-  { name: 'History', href: '/history', icon: ClockIcon, shortcut: '⌘3' },
-  { name: 'AI Keys', href: '/ai-keys', icon: KeyIcon },
-  { name: 'Billing', href: '/billing', icon: CreditCardIcon },
-  { name: 'Settings', href: '/settings', icon: SettingsIcon, shortcut: '⌘4' },
-];
+interface SidebarProps {
+  isAdmin: boolean;
+}
 
-export default function Sidebar() {
+export default function Sidebar({ isAdmin }: SidebarProps) {
   const pathname = usePathname();
   const collapsed = useUIStore((s) => s.sidebarCollapsed);
   const toggleCollapsed = useUIStore((s) => s.toggleSidebarCollapsed);
+  const navigationItems = getDashboardNavigation(isAdmin);
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -43,7 +30,7 @@ export default function Sidebar() {
             className={`flex items-center flex-shrink-0 gap-3 hover:opacity-80 transition-opacity ${collapsed ? 'justify-center px-2' : 'px-4'}`}
           >
             <Image
-              src="/siza-icon.png"
+              src="/monogram.svg"
               alt="Siza"
               width={32}
               height={32}
@@ -74,7 +61,7 @@ export default function Sidebar() {
                   </Link>
                 </Button>
               )}
-              {navigation.map((item) => {
+              {navigationItems.map((item) => {
                 const isActive = pathname.startsWith(item.href);
                 const cls = isActive
                   ? 'bg-brand/15 text-brand-light hover:bg-brand/20 hover:text-brand-light before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand-light'
@@ -96,7 +83,9 @@ export default function Sidebar() {
                       <TooltipContent side="right">
                         {item.name}
                         {item.shortcut && (
-                          <span className="ml-2 text-text-muted text-xs">{item.shortcut}</span>
+                          <span className="ml-2 text-text-muted-foreground text-xs">
+                            {item.shortcut}
+                          </span>
                         )}
                       </TooltipContent>
                     </Tooltip>
@@ -113,7 +102,7 @@ export default function Sidebar() {
                       <item.icon className="mr-2 h-4 w-4 flex-shrink-0" />
                       <span className="overflow-hidden whitespace-nowrap">{item.name}</span>
                       {item.shortcut && (
-                        <span className="ml-auto text-xs text-text-muted opacity-60">
+                        <span className="ml-auto text-xs text-text-muted-foreground opacity-60">
                           {item.shortcut}
                         </span>
                       )}
@@ -129,7 +118,7 @@ export default function Sidebar() {
                 <button
                   type="button"
                   onClick={toggleCollapsed}
-                  className="flex items-center justify-center w-full rounded-lg p-2 text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
+                  className="flex items-center justify-center w-full rounded-lg p-2 text-text-muted-foreground hover:text-text-primary hover:bg-surface-2 transition-colors"
                   aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                 >
                   {collapsed ? (

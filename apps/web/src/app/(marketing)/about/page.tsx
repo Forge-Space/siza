@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useReducedMotion } from 'motion/react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import {
   Github,
   ExternalLink,
 } from 'lucide-react';
+import { AmbientVideoBackground } from '@/components/migration/ambient-video-background';
 
 const EASE_SIZA = [0.16, 1, 0.3, 1] as const;
 
@@ -30,13 +31,16 @@ function FadeIn({
 }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 24 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, ease: EASE_SIZA, delay }}
+      transition={
+        prefersReducedMotion ? { duration: 0 } : { duration: 0.5, ease: EASE_SIZA, delay }
+      }
       className={className}
     >
       {children}
@@ -116,9 +120,10 @@ const techStack = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative isolate min-h-screen bg-background overflow-hidden">
+      <AmbientVideoBackground src="/f555b164-a132-4354-8ff5-afc0336c3baf-ezgif.com-gif-maker.webm" />
       <FadeIn className="pt-24 pb-16 px-6">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
             About{' '}
             <span className="bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
@@ -135,7 +140,7 @@ export default function AboutPage() {
       </FadeIn>
 
       <section className="py-16 px-6">
-        <div className="max-w-5xl mx-auto">
+        <div className="relative z-10 max-w-5xl mx-auto">
           <FadeIn>
             <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-8 text-center">
               Philosophy
@@ -158,7 +163,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-16 px-6">
-        <div className="max-w-5xl mx-auto">
+        <div className="relative z-10 max-w-5xl mx-auto">
           <FadeIn className="text-center mb-10">
             <h2 className="text-3xl font-bold tracking-tight mb-3">The Forge Space Ecosystem</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
@@ -199,7 +204,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-16 px-6">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
           <FadeIn>
             <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-8">
               Tech Stack
@@ -221,7 +226,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-16 px-6 border-t border-border">
-        <FadeIn className="max-w-3xl mx-auto text-center">
+        <FadeIn className="relative z-10 max-w-3xl mx-auto text-center">
           <p className="text-muted-foreground mb-6">
             Siza is built by <span className="text-foreground font-medium">Lucas Santana</span> as
             part of the Forge Space initiative.
@@ -247,7 +252,7 @@ export default function AboutPage() {
         </FadeIn>
       </section>
 
-      <div className="py-20 px-6 text-center">
+      <div className="relative z-10 py-20 px-6 text-center">
         <p className="text-2xl font-light tracking-tight text-muted-foreground italic">
           &ldquo;Design that thinks. Code that lasts.&rdquo;
         </p>

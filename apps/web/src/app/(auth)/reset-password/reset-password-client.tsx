@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Code2 } from 'lucide-react';
+import Image from 'next/image';
+import { AuthCardShell } from '@/components/migration/migration-primitives';
 
 export function ResetPasswordClient() {
   const [password, setPassword] = useState('');
@@ -53,7 +54,7 @@ export function ResetPasswordClient() {
 
   if (hasSession === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/50">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-sm text-muted-foreground">Loading...</div>
       </div>
     );
@@ -61,63 +62,63 @@ export function ResetPasswordClient() {
 
   if (!hasSession) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
-        <div className="w-full max-w-md space-y-8">
+      <AuthCardShell>
+        <div className="w-full space-y-8">
           <div className="text-center">
             <Link href="/" className="inline-flex items-center gap-2">
-              <Code2 className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">Siza</span>
+              <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
+              <span className="text-2xl font-display font-bold">Siza</span>
             </Link>
-            <h2 className="mt-6 text-3xl font-bold">Invalid or expired link</h2>
+            <h2 className="mt-6 text-2xl font-semibold text-foreground">Invalid or expired link</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               This password reset link is no longer valid.
             </p>
           </div>
-          <div className="rounded-lg border bg-card p-8 shadow-sm text-center">
+          <div className="text-center">
             <Link
               href="/forgot-password"
-              className="inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
             >
               Request a new link
             </Link>
           </div>
         </div>
-      </div>
+      </AuthCardShell>
     );
   }
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
-        <div className="w-full max-w-md space-y-8">
+      <AuthCardShell>
+        <div className="w-full space-y-8">
           <div className="text-center">
             <Link href="/" className="inline-flex items-center gap-2">
-              <Code2 className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">Siza</span>
+              <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
+              <span className="text-2xl font-display font-bold">Siza</span>
             </Link>
-            <h2 className="mt-6 text-3xl font-bold">Password updated</h2>
+            <h2 className="mt-6 text-2xl font-semibold text-foreground">Password updated</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Your password has been reset. Redirecting to sign in...
             </p>
           </div>
         </div>
-      </div>
+      </AuthCardShell>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
-      <div className="w-full max-w-md space-y-8">
+    <AuthCardShell>
+      <div className="w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2">
-            <Code2 className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">Siza</span>
+            <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
+            <span className="text-2xl font-display font-bold">Siza</span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold">Set new password</h2>
+          <h2 className="mt-6 text-2xl font-semibold text-foreground">Set new password</h2>
           <p className="mt-2 text-sm text-muted-foreground">Enter your new password below</p>
         </div>
 
-        <div className="rounded-lg border bg-card p-8 shadow-sm">
+        <div>
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -136,7 +137,7 @@ export function ResetPasswordClient() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
                 placeholder="••••••••"
               />
               <p className="text-xs text-muted-foreground">Must be at least 6 characters</p>
@@ -153,7 +154,7 @@ export function ResetPasswordClient() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
                 placeholder="••••••••"
               />
             </div>
@@ -161,13 +162,13 @@ export function ResetPasswordClient() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
             >
               {loading ? 'Updating...' : 'Update password'}
             </button>
           </form>
         </div>
       </div>
-    </div>
+    </AuthCardShell>
   );
 }

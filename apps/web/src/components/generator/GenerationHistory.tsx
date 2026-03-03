@@ -47,9 +47,9 @@ export default function GenerationHistory({
   if (!generations || generations.length === 0) {
     return (
       <div className="p-6 text-center space-y-2">
-        <InboxIcon className="h-8 w-8 mx-auto text-text-muted" />
+        <InboxIcon className="h-8 w-8 mx-auto text-text-muted-foreground" />
         <p className="text-sm text-text-secondary">No generations yet</p>
-        <p className="text-xs text-text-muted">Create your first component!</p>
+        <p className="text-xs text-text-muted-foreground">Create your first component!</p>
       </div>
     );
   }
@@ -83,14 +83,14 @@ export default function GenerationHistory({
           </p>
 
           {(gen as any).parent_generation_id && (
-            <div className="flex items-center gap-1 mb-2 text-[10px] text-text-muted">
+            <div className="flex items-center gap-1 mb-2 text-[10px] text-text-muted-foreground">
               <GitBranchIcon className="h-3 w-3" />
               Refinement
             </div>
           )}
 
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-text-muted">
+            <span className="text-[10px] text-text-muted-foreground">
               {formatDistanceToNow(new Date(gen.created_at), {
                 addSuffix: true,
               })}
@@ -131,7 +131,7 @@ export default function GenerationHistory({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 w-7 p-0 text-text-muted hover:text-red-500"
+                className="h-7 w-7 p-0 text-text-muted-foreground hover:text-red-500"
                 title="Delete"
                 onClick={() => handleDelete(gen.id)}
               >

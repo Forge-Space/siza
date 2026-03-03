@@ -1,5 +1,6 @@
 'use client';
 
+import { motion, useReducedMotion } from 'motion/react';
 import { Layers, GitFork, ShieldCheck, CheckSquare, Boxes, Brain } from 'lucide-react';
 import { FadeIn } from './FadeIn';
 import { CONTAINER, SECTION_PADDING } from './constants';
@@ -68,6 +69,8 @@ const iconBgs: Record<string, string> = {
 };
 
 export function CapabilitiesSection() {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <section className={SECTION_PADDING}>
       <div className={CONTAINER}>
@@ -90,7 +93,11 @@ export function CapabilitiesSection() {
             const Icon = cap.icon;
             return (
               <FadeIn key={cap.title} delay={i * 0.06}>
-                <div className="group bg-[#18181B] border border-[#27272A] rounded-xl p-6 transition-all duration-200 ease-siza hover:border-[var(--border-hover)] hover:shadow-card-hover hover:-translate-y-0.5">
+                <motion.div
+                  whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+                  whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                  className="group bg-[#18181B] border border-[#27272A] rounded-xl p-6 transition-all duration-200 ease-siza hover:border-[var(--border-hover)] hover:shadow-card-hover"
+                >
                   <div
                     className={`w-10 h-10 flex items-center justify-center rounded-lg ${iconBgs[cap.title] || 'bg-brand/10'} mb-4 transition-transform duration-200 group-hover:scale-110`}
                   >
@@ -98,7 +105,7 @@ export function CapabilitiesSection() {
                   </div>
                   <h3 className="text-base font-semibold text-[#FAFAFA] mb-2">{cap.title}</h3>
                   <p className="text-sm text-[#A1A1AA] leading-relaxed">{cap.description}</p>
-                </div>
+                </motion.div>
               </FadeIn>
             );
           })}

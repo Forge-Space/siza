@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Plus_Jakarta_Sans, IBM_Plex_Mono } from 'next/font/google';
+import { DM_Sans, Sora, IBM_Plex_Mono } from 'next/font/google';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { FeatureFlagProvider } from '@/lib/features/provider';
 import './globals.css';
@@ -10,10 +10,10 @@ const dmSans = DM_Sans({
   preload: false,
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+const sora = Sora({
   subsets: ['latin'],
-  weight: ['600', '700', '800'],
-  variable: '--font-plus-jakarta',
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-sora',
   preload: false,
 });
 
@@ -72,10 +72,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${dmSans.variable} ${plusJakarta.variable} ${ibmPlexMono.variable}`}
-    >
+    <html lang="en" className={`${dmSans.variable} ${sora.variable} ${ibmPlexMono.variable}`}>
       <body className="font-sans">
         <a
           href="#main-content"

@@ -1,16 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
+import { verifySession } from '@/lib/api/auth';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { user } = await verifySession();
 
     const now = new Date();
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();

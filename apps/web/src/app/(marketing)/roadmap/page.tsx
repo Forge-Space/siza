@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { phases } from '@/components/roadmap/data';
 import { PhaseCard } from '@/components/roadmap/PhaseCard';
 import { StatusFilter } from '@/components/roadmap/StatusFilter';
@@ -11,7 +11,9 @@ import { EASE_SIZA } from '@/components/landing/constants';
 import type { ItemStatus } from '@/components/roadmap/types';
 
 export default function RoadmapPage() {
+  const prefersReducedMotion = useReducedMotion();
   const [activeFilter, setActiveFilter] = useState<ItemStatus | 'all'>('all');
+  const [scope, setScope] = useState<'all' | 'desktop'>('all');
   const [expandedPhases, setExpandedPhases] = useState<Set<number>>(
     () => new Set(phases.filter((p) => p.status === 'active').map((p) => p.number))
   );
@@ -46,9 +48,9 @@ export default function RoadmapPage() {
   return (
     <div className="min-h-screen bg-background">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: EASE_SIZA }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5, ease: EASE_SIZA }}
         className="pt-24 pb-8 px-6 text-center"
       >
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">Roadmap</h1>
@@ -57,6 +59,32 @@ export default function RoadmapPage() {
         </p>
         <div className="space-y-4">
           <PhaseNavigator phases={phases} activePhase={activePhase} onSelect={scrollToPhase} />
+          <div className="flex justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => setScope('all')}
+              className={
+                'px-3 py-1.5 rounded-full text-xs font-medium transition-colors ' +
+                (scope === 'all'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-card border border-border text-muted-foreground hover:text-foreground')
+              }
+            >
+              All Platforms
+            </button>
+            <button
+              type="button"
+              onClick={() => setScope('desktop')}
+              className={
+                'px-3 py-1.5 rounded-full text-xs font-medium transition-colors ' +
+                (scope === 'desktop'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-card border border-border text-muted-foreground hover:text-foreground')
+              }
+            >
+              Desktop
+            </button>
+          </div>
           <StatusFilter active={activeFilter} onChange={setActiveFilter} counts={counts} />
         </div>
       </motion.div>
@@ -70,6 +98,7 @@ export default function RoadmapPage() {
             expanded={expandedPhases.has(phase.number)}
             onToggle={() => togglePhase(phase.number)}
             activeFilter={activeFilter}
+            scope={scope}
           />
         ))}
       </div>

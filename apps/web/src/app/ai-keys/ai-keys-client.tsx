@@ -1,14 +1,11 @@
-/**
- * AI Keys Management Page
- * Main page for managing BYOK system and AI provider settings
- */
-
 'use client';
 
 import { useEffect } from 'react';
+import { AlertTriangle, KeySquare, Loader2 } from 'lucide-react';
 import { AIKeyManager } from '@/components/ai-keys/AIKeyManager';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { generateUserEncryptionKey, deriveEncryptionKey } from '@/lib/encryption';
+import { DashboardSection } from '@/components/migration/migration-primitives';
 
 export function AIKeysClient() {
   const { encryptionKey, initialize, loading, error } = useAIKeyStore();
@@ -41,9 +38,9 @@ export function AIKeysClient() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
           <p className="text-muted-foreground">Initializing AI Key Manager...</p>
         </div>
       </div>
@@ -52,9 +49,9 @@ export function AIKeysClient() {
 
   if (error && !encryptionKey) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center max-w-md">
-          <div className="text-red-600 mb-4">⚠️</div>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="max-w-md text-center">
+          <AlertTriangle className="mx-auto mb-4 h-10 w-10 text-red-500" />
           <h2 className="text-lg font-semibold mb-2">Initialization Failed</h2>
           <p className="text-muted-foreground mb-4">{error}</p>
           <button
@@ -69,7 +66,12 @@ export function AIKeysClient() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 space-y-6">
+      <DashboardSection
+        title="AI Keys"
+        description="Bring your own keys, keep full control, and manage provider routing."
+        actions={<KeySquare className="h-5 w-5 text-text-muted-foreground" aria-hidden="true" />}
+      />
       <AIKeyManager />
     </div>
   );

@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { Code2 } from 'lucide-react';
+import Image from 'next/image';
+import { AuthCardShell } from '@/components/migration/migration-primitives';
 
 export function ForgotPasswordClient() {
   const [email, setEmail] = useState('');
@@ -33,50 +34,50 @@ export function ForgotPasswordClient() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
-        <div className="w-full max-w-md space-y-8">
+      <AuthCardShell>
+        <div className="w-full space-y-8">
           <div className="text-center">
             <Link href="/" className="inline-flex items-center gap-2">
-              <Code2 className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">Siza</span>
+              <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
+              <span className="text-2xl font-display font-bold">Siza</span>
             </Link>
-            <h2 className="mt-6 text-3xl font-bold">Check your email</h2>
+            <h2 className="mt-6 text-2xl font-semibold text-foreground">Check your email</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               We&apos;ve sent a password reset link to <strong>{email}</strong>
             </p>
           </div>
 
-          <div className="rounded-lg border bg-card p-8 shadow-sm">
+          <div>
             <p className="text-center text-sm text-muted-foreground">
               Click the link in the email to reset your password. The link expires in 1 hour.
             </p>
             <Link
               href="/signin"
-              className="mt-6 block w-full rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="mt-6 block w-full rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-primary-hover"
             >
               Back to sign in
             </Link>
           </div>
         </div>
-      </div>
+      </AuthCardShell>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
-      <div className="w-full max-w-md space-y-8">
+    <AuthCardShell>
+      <div className="w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2">
-            <Code2 className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">Siza</span>
+            <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
+            <span className="text-2xl font-display font-bold">Siza</span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold">Forgot password?</h2>
+          <h2 className="mt-6 text-2xl font-semibold text-foreground">Forgot password?</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Enter your email and we&apos;ll send you a reset link
           </p>
         </div>
 
-        <div className="rounded-lg border bg-card p-8 shadow-sm">
+        <div>
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -94,7 +95,7 @@ export function ForgotPasswordClient() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
                 placeholder="you@example.com"
               />
             </div>
@@ -102,7 +103,7 @@ export function ForgotPasswordClient() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
             >
               {loading ? 'Sending...' : 'Send reset link'}
             </button>
@@ -116,6 +117,6 @@ export function ForgotPasswordClient() {
           </p>
         </div>
       </div>
-    </div>
+    </AuthCardShell>
   );
 }

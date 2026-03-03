@@ -77,22 +77,22 @@ export function CommandPalette() {
           loop
         >
           <div className="flex items-center border-b border-surface-3 px-3">
-            <SearchIcon className="mr-2 h-4 w-4 shrink-0 text-text-muted" />
+            <SearchIcon className="mr-2 h-4 w-4 shrink-0 text-text-muted-foreground" />
             {/* eslint-disable jsx-a11y/no-autofocus */}
             <Command.Input
               placeholder="Type a command or search..."
-              className="flex h-12 w-full bg-transparent py-3 text-sm text-text-primary outline-none placeholder:text-text-muted"
+              className="flex h-12 w-full bg-transparent py-3 text-sm text-text-primary outline-none placeholder:text-text-muted-foreground"
               autoFocus
             />
             {/* eslint-enable jsx-a11y/no-autofocus */}
           </div>
           <Command.List className="max-h-[300px] overflow-y-auto p-2">
-            <Command.Empty className="py-6 text-center text-sm text-text-muted">
+            <Command.Empty className="py-6 text-center text-sm text-text-muted-foreground">
               No results found.
             </Command.Empty>
             <Command.Group
               heading="Quick Actions"
-              className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-text-muted [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider"
+              className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider"
             >
               {actions.map((item) => (
                 <Command.Item
@@ -101,10 +101,10 @@ export function CommandPalette() {
                   onSelect={() => handleSelect(item.href)}
                   className="relative flex cursor-pointer select-none items-center rounded-lg px-2 py-2 text-sm text-text-secondary outline-none data-[selected=true]:bg-brand/10 data-[selected=true]:text-brand-light hover:bg-surface-2 transition-colors"
                 >
-                  <item.icon className="mr-3 h-4 w-4 text-text-muted" />
+                  <item.icon className="mr-3 h-4 w-4 text-text-muted-foreground" />
                   <span>{item.label}</span>
                   {item.shortcut && (
-                    <span className="ml-auto text-xs text-text-muted opacity-60">
+                    <span className="ml-auto text-xs text-text-muted-foreground opacity-60">
                       {item.shortcut}
                     </span>
                   )}
@@ -114,7 +114,7 @@ export function CommandPalette() {
             <Command.Separator className="mx-2 my-1 h-px bg-surface-3" />
             <Command.Group
               heading="Pages"
-              className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-text-muted [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider"
+              className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider"
             >
               {pages.map((item) => (
                 <Command.Item
@@ -123,10 +123,10 @@ export function CommandPalette() {
                   onSelect={() => handleSelect(item.href)}
                   className="relative flex cursor-pointer select-none items-center rounded-lg px-2 py-2 text-sm text-text-secondary outline-none data-[selected=true]:bg-brand/10 data-[selected=true]:text-brand-light hover:bg-surface-2 transition-colors"
                 >
-                  <item.icon className="mr-3 h-4 w-4 text-text-muted" />
+                  <item.icon className="mr-3 h-4 w-4 text-text-muted-foreground" />
                   <span>{item.label}</span>
                   {item.shortcut && (
-                    <span className="ml-auto text-xs text-text-muted opacity-60">
+                    <span className="ml-auto text-xs text-text-muted-foreground opacity-60">
                       {item.shortcut}
                     </span>
                   )}

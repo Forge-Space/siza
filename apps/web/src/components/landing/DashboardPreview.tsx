@@ -22,7 +22,7 @@ export function DashboardPreview() {
           <div
             className="max-w-4xl mx-auto rounded-xl border border-[#27272A] overflow-hidden"
             style={{
-              boxShadow: '0 0 60px rgba(124,58,237,0.08)',
+              boxShadow: '0 0 60px rgba(139,92,246,0.08)',
             }}
           >
             <div className="flex items-center gap-2 px-4 py-3 bg-[#18181B] border-b border-[#27272A]">

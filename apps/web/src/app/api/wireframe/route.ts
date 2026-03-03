@@ -195,7 +195,7 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         colors:
           request.style === 'low-fidelity'
             ? ['#000000', '#ffffff']
-            : ['#121214', '#7c3aed', '#3B82F6', '#F59E0B'],
+            : ['#121214', '#8B5CF6', '#A78BFA', '#6D28D9'],
         typography: {
           fontFamily:
             request.framework === 'react'

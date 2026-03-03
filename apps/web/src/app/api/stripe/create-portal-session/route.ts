@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { verifySession } from '@/lib/api/auth';
 import { getStripe } from '@/lib/stripe/server';
 import { getFeatureFlag } from '@/lib/features/flags';
 import { NextResponse } from 'next/server';
@@ -10,13 +11,7 @@ export async function POST(request: Request) {
 
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { user } = await verifySession();
 
     const { data: sub } = await supabase
       .from('subscriptions')

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { StepIndicator } from './StepIndicator';
 import { WelcomeStep } from './WelcomeStep';
 import { ProjectStep } from './ProjectStep';
@@ -40,7 +41,10 @@ export function OnboardingWizard() {
   return (
     <div className="w-full max-w-2xl space-y-10">
       <div className="flex justify-center">
-        <span className="text-xl font-bold text-white">siza</span>
+        <div className="inline-flex items-center gap-2 rounded-full border border-surface-3 bg-surface-1 px-4 py-2">
+          <Image src="/monogram.svg" alt="Siza" width={20} height={20} />
+          <span className="text-xl font-display font-bold text-text-primary">Siza</span>
+        </div>
       </div>
 
       <StepIndicator currentStep={currentStep} />

@@ -120,6 +120,16 @@ If you need help with the new deployment process:
 2. Review the deployment summary
 3. Contact the admin team for access issues
 
+## Local Utility
+
+For local or staging setup where you need to promote a user:
+
+```bash
+npm run admin:grant -- <email>
+```
+
+This command runs `scripts/grant-admin-by-email.ts` and updates `public.profiles.role` to `admin`.
+
 ---
 
 **Note**: This change improves security while maintaining all deployment functionality. The new approach is safer and more auditable.

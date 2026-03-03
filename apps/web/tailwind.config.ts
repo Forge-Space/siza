@@ -15,7 +15,13 @@ const config: Config = {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        elevated: 'var(--forge-bg-elevated)',
+        'surface-alt': 'var(--forge-surface-alt)',
+        subtle: 'var(--forge-text-subtle)',
+        'primary-hover': 'var(--forge-primary-hover)',
+        'primary-pressed': 'var(--forge-primary-pressed)',
         surface: {
+          DEFAULT: 'var(--forge-surface)',
           0: 'var(--surface-0)',
           1: 'var(--surface-1)',
           2: 'var(--surface-2)',
@@ -37,7 +43,7 @@ const config: Config = {
         error: 'var(--error)',
         info: 'var(--info)',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
+          DEFAULT: 'var(--forge-primary)',
           foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
@@ -74,10 +80,11 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-plus-jakarta)', 'var(--font-dm-sans)', 'sans-serif'],
+        display: ['var(--font-sora)', 'var(--font-dm-sans)', 'sans-serif'],
         mono: ['var(--font-ibm-plex-mono)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
+        xl: 'var(--forge-radius-xl)',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
@@ -108,22 +115,22 @@ const config: Config = {
         },
         'pulse-glow': {
           '0%, 100%': {
-            boxShadow: '0 0 12px rgba(124,58,237,0.2)',
+            boxShadow: '0 0 12px rgba(139,92,246,0.2)',
           },
           '50%': {
-            boxShadow: '0 0 24px rgba(124,58,237,0.4)',
+            boxShadow: '0 0 24px rgba(139,92,246,0.4)',
           },
         },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'siza-fade-in': 'siza-fade-in 0.3s var(--ease-siza) forwards',
-        'siza-scale-in': 'siza-scale-in 0.2s var(--ease-siza) forwards',
+        'siza-fade-in': 'siza-fade-in 0.3s var(--forge-ease) forwards',
+        'siza-scale-in': 'siza-scale-in 0.2s var(--forge-ease) forwards',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
       },
       transitionTimingFunction: {
-        siza: 'var(--ease-siza)',
+        siza: 'var(--forge-ease)',
       },
     },
   },
