@@ -24,7 +24,10 @@ export type FeatureFlagName =
   | 'ENABLE_DESIGN_ANALYSIS'
   | 'ENABLE_ONBOARDING'
   | 'ENABLE_SIZA_AI'
-  | 'ENABLE_SKILLS';
+  | 'ENABLE_SKILLS'
+  | 'ENABLE_AUDIT_DASHBOARD'
+  | 'ENABLE_POLICY_ENGINE'
+  | 'ENABLE_PROJECT_SCORECARDS';
 
 export type FeatureFlagCategory =
   | 'auth'
@@ -36,7 +39,8 @@ export type FeatureFlagCategory =
   | 'integration'
   | 'quality'
   | 'email'
-  | 'billing';
+  | 'billing'
+  | 'governance';
 
 export interface FeatureFlag {
   name: FeatureFlagName;

@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Build** — Removed HeroParticlesBackground (React 19 / @react-three/fiber peer conflict). Can be reintroduced when React 19–compatible three.js stack is available.
 
 ### Changed
+- **shadcn CLI v4** — Migrated from individual `@radix-ui/react-*` packages to unified `radix-ui` package (shadcn CLI v4). Consolidated 23 package dependencies into 2 (`radix-ui` in apps/web + packages/ui).
+- **Design tokens migration (Phase 2)** — Replaced `--siza-*` design tokens with `--forge-*` from `@forgespace/brand-guide`. `globals.css` now imports `forge-tokens.css`; `design-tokens.ts` renamed to `forgeTokens`; Tailwind configs (web + UI) use `--forge-ease`, `--forge-radius-*`, `--forge-surface`; components updated to `var(--forge-border)` and related tokens. Legacy aliases (`--surface-0`, `--brand`, `--font-sans`, etc.) point to `--forge-*` for backward compatibility.
 - **global-error** — Replaced NextError with brand-aligned custom UI (Sora/DM Sans, sizaTokens, styled Try again button). Kept Sentry reporting.
 - **Gap analysis primary cleanup** — Replaced remaining `rgba(124,58,237)` with `rgba(139,92,246)` in PhaseCard, PhaseNavigator, CTASection, EcosystemSection, DashboardPreview, and tailwind.config.ts for token consistency.
 - **UX overhaul (gap analysis)** — LandingFooter: fixed Platform → `/`, Pricing → `/pricing`. AI Keys: added Secure storage banner. Roadmap: added Desktop app (Electron/Tauri) item. Roadmap Desktop filter already present.

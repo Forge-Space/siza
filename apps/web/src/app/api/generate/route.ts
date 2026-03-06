@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import type { NextRequest } from 'next/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
           })
         : '';
 
+    const correlationId = randomUUID();
     const mcpEnabled = shouldUseMcpGateway();
     const activeProvider = mcpEnabled ? 'mcp-gateway' : input.provider;
     const activeModel = mcpEnabled ? 'mcp-specialist' : input.model || 'gemini-2.0-flash';
@@ -113,6 +115,7 @@ export async function POST(request: NextRequest) {
             model: activeModel,
             projectId: input.projectId,
             parentGenerationId: input.parentGenerationId,
+            correlationId,
           });
 
           let fullCode = '';
@@ -132,6 +135,7 @@ export async function POST(request: NextRequest) {
             imageMimeType: input.imageMimeType,
             provider: input.provider,
             model: input.model || 'gemini-2.0-flash',
+            correlationId,
           })) {
             if (event.type === 'chunk' && event.content) {
               fullCode += event.content;
@@ -225,6 +229,7 @@ export async function POST(request: NextRequest) {
         'Cache-Control': 'no-cache',
         Connection: 'keep-alive',
         'X-Accel-Buffering': 'no',
+        'X-Request-ID': correlationId,
       },
     });
   } catch (error) {

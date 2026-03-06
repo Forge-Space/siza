@@ -44,7 +44,7 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 
 ## UI Migration Status (March 2026)
 
-- Design-system implementation pass now unifies app theming with canonical `--siza-*` tokens while keeping legacy aliases for backward compatibility
+- Design tokens migrated from `--siza-*` to `--forge-*` (Phase 2). App theming now uses `@forgespace/brand-guide` forge-tokens; legacy aliases (`--surface-0`, `--brand`, etc.) point to `--forge-*` for backward compatibility
 - Dashboard shell chrome aligned to design-system structure (56px top bar, breadcrumbs, command search, notifications indicator, token-consistent backgrounds/borders)
 - Auth shell rebuilt to centered 440px card + radial glow/pattern and updated sign-in/sign-up/forgot/reset form controls to design-system styling
 - Landing page hero/nav/footer moved closer to flagship design-system hierarchy (public beta badge, production-grade hero line, docs secondary CTA, product/resources/company/legal footer columns)

@@ -106,12 +106,12 @@ const sizaUIConfig: Config = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'siza-fade-in': 'siza-fade-in 0.3s var(--ease-siza) forwards',
-        'siza-scale-in': 'siza-scale-in 0.2s var(--ease-siza) forwards',
+        'siza-fade-in': 'siza-fade-in 0.3s var(--forge-ease) forwards',
+        'siza-scale-in': 'siza-scale-in 0.2s var(--forge-ease) forwards',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
       },
       transitionTimingFunction: {
-        siza: 'var(--ease-siza)',
+        siza: 'var(--forge-ease)',
       },
     },
   },
