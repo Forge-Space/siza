@@ -32,13 +32,16 @@ const mockEntry = {
   tags: [] as string[],
   dependencies: [] as string[],
   project_id: null,
+  parent_id: null,
+  metadata: {},
+  description: null,
   created_at: '2026-01-01',
   updated_at: '2026-01-01',
 };
 
 describe('verifyCatalogOwnership', () => {
   it('returns entry when user is owner', async () => {
-    mockFind.mockResolvedValueOnce(mockEntry);
+    mockFind.mockResolvedValueOnce(mockEntry as any);
     const result = await catalogService.verifyCatalogOwnership('entry-1', 'user-1');
     expect(result).toEqual(mockEntry);
   });
@@ -54,7 +57,7 @@ describe('verifyCatalogOwnership', () => {
     mockFind.mockResolvedValueOnce({
       ...mockEntry,
       owner_id: 'other-user',
-    });
+    } as any);
     await expect(catalogService.verifyCatalogOwnership('entry-1', 'user-1')).rejects.toThrow(
       ForbiddenError
     );
@@ -80,7 +83,7 @@ describe('listCatalogEntries', () => {
 
   it('returns paginated results with defaults', async () => {
     mockRepoList.mockResolvedValueOnce(mockResult as any);
-    const result = await catalogService.listCatalogEntries('user-1');
+    const result = await catalogService.listCatalogEntries();
     expect(result.data).toHaveLength(1);
     expect(result.pagination).toEqual({
       page: 1,
@@ -92,7 +95,7 @@ describe('listCatalogEntries', () => {
 
   it('passes filters to repository', async () => {
     mockRepoList.mockResolvedValueOnce(mockResult as any);
-    await catalogService.listCatalogEntries('user-1', {
+    await catalogService.listCatalogEntries({
       search: 'gateway',
       type: 'service',
       lifecycle: 'production',
@@ -100,7 +103,6 @@ describe('listCatalogEntries', () => {
       limit: 5,
     });
     expect(mockRepoList).toHaveBeenCalledWith({
-      ownerId: 'user-1',
       search: 'gateway',
       type: 'service',
       lifecycle: 'production',
@@ -118,17 +120,16 @@ describe('listCatalogEntries', () => {
       limit: 10,
       hasMore: false,
     } as any);
-    const result = await catalogService.listCatalogEntries('user-1');
+    const result = await catalogService.listCatalogEntries();
     expect(result.pagination.pages).toBe(1);
   });
 
   it('splits comma-separated tags', async () => {
     mockRepoList.mockResolvedValueOnce(mockResult as any);
-    await catalogService.listCatalogEntries('user-1', {
+    await catalogService.listCatalogEntries({
       tags: 'typescript,api,backend',
     });
     expect(mockRepoList).toHaveBeenCalledWith({
-      ownerId: 'user-1',
       search: undefined,
       type: undefined,
       lifecycle: undefined,
@@ -146,7 +147,7 @@ describe('listCatalogEntries', () => {
       limit: 10,
       hasMore: false,
     } as any);
-    const result = await catalogService.listCatalogEntries('user-1', {
+    const result = await catalogService.listCatalogEntries({
       page: 3,
       limit: 10,
     });

@@ -42,7 +42,7 @@ export const createCatalogEntrySchema = z.object({
     .default([]),
   project_id: z.string().uuid().optional().nullable(),
   parent_id: z.string().uuid().optional().nullable(),
-  metadata: z.record(z.unknown()).optional().default({}),
+  metadata: z.record(z.string(), z.unknown()).optional().default({}),
 });
 
 export const updateCatalogEntrySchema = createCatalogEntrySchema.partial();
