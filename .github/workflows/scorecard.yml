@@ -26,14 +26,6 @@ jobs:
         id: scorecard
         continue-on-error: true
         run: |
-          if ! command -v forge-scorecard &>/dev/null && ! npx --yes forge-scorecard --help &>/dev/null 2>&1; then
-            echo "⏳ forge-scorecard CLI not yet published — skipping"
-            echo "result<<EOF" >> "$GITHUB_OUTPUT"
-            echo "⏳ Scorecard CLI not yet available. See IDP roadmap." >> "$GITHUB_OUTPUT"
-            echo "EOF" >> "$GITHUB_OUTPUT"
-            echo "exit_code=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           OUTPUT=$(npx forge-scorecard --project-dir . --threshold 60 --output summary 2>&1) || true
           echo "result<<EOF" >> "$GITHUB_OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
