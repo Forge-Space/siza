@@ -15,7 +15,9 @@ function StatItem({ end, suffix, label }: { end: number; suffix: string; label: 
   return (
     <div className="text-center">
       <div className="text-3xl sm:text-4xl font-bold text-foreground">
-        <span ref={ref} className="text-violet-400">{display}</span>
+        <span ref={ref} className="text-violet-400">
+          {display}
+        </span>
         <span className="text-violet-400">{suffix}</span>
       </div>
       <p className="text-[13px] text-muted-foreground mt-1">{label}</p>
