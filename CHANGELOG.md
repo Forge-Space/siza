@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.29.0] - 2026-03-07
+
+### Added
+- **2-column generate layout** — Restructured generate page into workspace-style 2-column layout with sidebar controls and main content area
+- **Dashboard stats** — Usage statistics, plan badge, and usage progress bars on dashboard
+- **Template card redesign** — Visual preview thumbnails and framework badges on template cards
+- **Auth page polish** — Brand violet accents on signin/signup pages
+
+### Dependencies
+- Bump the npm_and_yarn group with 2 updates (#284)
+
 ## [0.28.0] - 2026-03-07
 
 ### Added
