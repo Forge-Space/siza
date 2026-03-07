@@ -55,6 +55,9 @@
     "typescript": "^5.7.0",
     "wrangler": "^4.65.0"
   },
+  "overrides": {
+    "dompurify": "^3.3.2"
+  },
   "engines": {
     "node": ">=22",
     "npm": ">=10"
