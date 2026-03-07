@@ -1,6 +1,8 @@
 'use client';
 
 import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
+import { categorizeGenerationError } from '@/lib/errors/generation-errors';
+import { AlertTriangle, Info, ShieldAlert, Wifi, Zap } from 'lucide-react';
 
 interface UsageInfo {
   generations_count: number;
@@ -13,16 +15,32 @@ interface QuotaGuardProps {
   isQuotaExceeded: boolean;
 }
 
+const CATEGORY_ICONS = {
+  'rate-limit': Zap,
+  quota: AlertTriangle,
+  auth: ShieldAlert,
+  validation: Info,
+  provider: AlertTriangle,
+  network: Wifi,
+  unknown: AlertTriangle,
+} as const;
+
 export function QuotaGuard({ error, usage, isQuotaExceeded }: QuotaGuardProps) {
+  const errorInfo = error ? categorizeGenerationError(error) : null;
+  const isQuotaError = errorInfo?.category === 'quota';
+
   return (
     <>
-      {error &&
-        (error.toLowerCase().includes('quota') || error.toLowerCase().includes('limit reached') ? (
+      {errorInfo &&
+        (isQuotaError ? (
           <UpgradePrompt resource="Generation" />
         ) : (
-          <div className="rounded-md border border-red-800 bg-red-900/20 px-4 py-3 text-sm text-red-400">
-            {error}
-          </div>
+          <GenerationErrorDisplay
+            title={errorInfo.title}
+            message={errorInfo.message}
+            suggestion={errorInfo.suggestion}
+            category={errorInfo.category}
+          />
         ))}
 
       {isQuotaExceeded && !error && <UpgradePrompt resource="Generation" />}
@@ -39,5 +57,32 @@ export function QuotaGuard({ error, usage, isQuotaExceeded }: QuotaGuardProps) {
         </div>
       )}
     </>
+  );
+}
+
+function GenerationErrorDisplay({
+  title,
+  message,
+  suggestion,
+  category,
+}: {
+  title: string;
+  message: string;
+  suggestion: string;
+  category: keyof typeof CATEGORY_ICONS;
+}) {
+  const Icon = CATEGORY_ICONS[category];
+
+  return (
+    <div className="rounded-md border border-red-800/60 bg-red-900/15 px-4 py-3 text-sm">
+      <div className="flex items-start gap-2.5">
+        <Icon className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+        <div className="min-w-0">
+          <p className="font-medium text-red-300">{title}</p>
+          <p className="text-red-400/80 mt-0.5">{message}</p>
+          <p className="text-text-secondary mt-1.5 text-xs">{suggestion}</p>
+        </div>
+      </div>
+    </div>
   );
 }

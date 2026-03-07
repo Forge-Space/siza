@@ -6,6 +6,7 @@ import { useState, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { streamGeneration, GenerationOptions, GenerationEvent } from '@/lib/api/generation';
 import type { QualityReport } from '@/lib/quality/gates';
+import { categorizeGenerationError } from '@/lib/errors/generation-errors';
 
 export interface UseGenerationState {
   isGenerating: boolean;
@@ -222,7 +223,10 @@ export function useGenerationProgress({
   const latestEvent = events[events.length - 1];
 
   const getStatusMessage = () => {
-    if (error) return `Error: ${error}`;
+    if (error) {
+      const info = categorizeGenerationError(error);
+      return info.title;
+    }
     if (!isGenerating && progress === 100) return 'Generation complete!';
     if (isGenerating && progress === 0) return 'Starting generation...';
     if (isGenerating && progress < 30) return 'Analyzing requirements...';
