@@ -255,8 +255,8 @@ export async function* generateComponentStream(
         try {
           const event = JSON.parse(jsonStr) as GenerationEvent;
           yield event;
-        } catch (parseError) {
-          console.warn('[MCP SSE] Malformed event skipped:', jsonStr.slice(0, 100));
+        } catch {
+          console.warn('[MCP SSE] Malformed event:', jsonStr.slice(0, 100));
         }
       }
     }
