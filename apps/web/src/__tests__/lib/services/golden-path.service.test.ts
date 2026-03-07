@@ -35,16 +35,16 @@ describe('verifyGoldenPathOwnership', () => {
 
   it('throws NotFoundError when missing', async () => {
     mockFind.mockResolvedValueOnce(null);
-    await expect(
-      goldenPathService.verifyGoldenPathOwnership('x', 'user-1'),
-    ).rejects.toThrow(NotFoundError);
+    await expect(goldenPathService.verifyGoldenPathOwnership('x', 'user-1')).rejects.toThrow(
+      NotFoundError
+    );
   });
 
   it('throws ForbiddenError when not owner', async () => {
     mockFind.mockResolvedValueOnce({ ...mockPath, owner_id: 'other' } as any);
-    await expect(
-      goldenPathService.verifyGoldenPathOwnership('gp-1', 'user-1'),
-    ).rejects.toThrow(ForbiddenError);
+    await expect(goldenPathService.verifyGoldenPathOwnership('gp-1', 'user-1')).rejects.toThrow(
+      ForbiddenError
+    );
   });
 });
 
