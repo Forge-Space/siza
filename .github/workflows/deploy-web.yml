@@ -28,10 +28,13 @@ jobs:
 
       - run: npm ci --legacy-peer-deps
 
-      - name: Stub @vercel/og WASM before build
+      - name: Stub unused @vercel/og before build
         run: |
-          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/resvg.wasm
-          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/yoga.wasm
+          OG_DIR="node_modules/next/dist/compiled/@vercel/og"
+          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > "$OG_DIR/resvg.wasm"
+          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > "$OG_DIR/yoga.wasm"
+          echo 'module.exports={ImageResponse:class ImageResponse{constructor(){throw new Error("@vercel/og stubbed out")}}}' > "$OG_DIR/index.edge.js"
+          echo 'module.exports={ImageResponse:class ImageResponse{constructor(){throw new Error("@vercel/og stubbed out")}}}' > "$OG_DIR/index.node.js"
 
       - name: Build with OpenNext
         working-directory: apps/web
