@@ -3,6 +3,7 @@
 import { useProjects } from '@/hooks/use-projects';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useCatalog } from '@/hooks/use-catalog';
+import { useGoldenPaths } from '@/hooks/use-golden-paths';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import { Skeleton } from '@siza/ui';
 import {
@@ -17,10 +18,17 @@ import {
   KeyIcon,
   BookOpenIcon,
   ShieldCheckIcon,
+  RocketIcon,
+  CheckCircleIcon,
+  ServerIcon,
+  GlobeIcon,
+  CodeIcon,
+  LayersIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useMemo, useState } from 'react';
+import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
 
 interface StatCardProps {
   label: string;
@@ -170,22 +178,58 @@ function UsageBar({ used, limit, label }: { used: number; limit: number; label: 
   );
 }
 
-function GovernanceCard() {
+const STACK_META: Record<string, { icon: typeof ServerIcon; label: string }> = {
+  nextjs: { icon: GlobeIcon, label: 'Next.js' },
+  'api-service': { icon: ServerIcon, label: 'API Service' },
+  library: { icon: BookOpenIcon, label: 'Library' },
+  worker: { icon: CodeIcon, label: 'Worker' },
+  monorepo: { icon: LayersIcon, label: 'Monorepo' },
+};
+
+function GoldenPathCard({ path }: { path: GoldenPathRow }) {
+  const stackMeta = STACK_META[path.stack] || STACK_META.nextjs;
+  const StackIcon = stackMeta.icon;
+
+  return (
+    <Link
+      href="/golden-paths"
+      className="group flex items-center gap-4 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-all duration-200 hover:border-violet-500/30 hover:bg-surface-1/80"
+    >
+      <div className="flex-shrink-0 rounded-lg bg-violet-500/10 p-2.5">
+        <StackIcon className="h-5 w-5 text-violet-400" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-text-primary group-hover:text-violet-300 transition-colors">
+          {path.display_name}
+        </p>
+        <p className="mt-0.5 truncate text-xs text-text-secondary">
+          {stackMeta.label} &middot; {path.language}
+        </p>
+      </div>
+      <div className="flex items-center gap-1.5">
+        {path.includes_ci && <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-400" />}
+        {path.is_official && <SparklesIcon className="w-3.5 h-3.5 text-violet-400" />}
+      </div>
+    </Link>
+  );
+}
+
+function GovernanceOverview() {
   const catalogEnabled = isFeatureEnabled('ENABLE_SOFTWARE_CATALOG');
-  const { data, isLoading } = useCatalog({ limit: 100 });
+  const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
+  const { data: catalogData, isLoading: catalogLoading } = useCatalog({ limit: 100 });
+  const { data: goldenPathData, isLoading: goldenPathLoading } = useGoldenPaths({ limit: 100 });
 
-  if (!catalogEnabled) return null;
+  if (!catalogEnabled && !goldenPathsEnabled) return null;
 
-  const entries = data?.entries || [];
-  const production = entries.filter((e) => e.lifecycle === 'production').length;
-  const experimental = entries.filter((e) => e.lifecycle === 'experimental').length;
-  const total = data?.pagination?.total ?? 0;
+  const isLoading = catalogLoading || goldenPathLoading;
 
   if (isLoading) {
     return (
       <div className="rounded-xl border border-surface-3 bg-surface-1 p-5">
-        <Skeleton className="h-5 w-32 mb-4" />
-        <div className="grid grid-cols-3 gap-4">
+        <Skeleton className="h-5 w-40 mb-4" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <Skeleton className="h-16" />
           <Skeleton className="h-16" />
           <Skeleton className="h-16" />
           <Skeleton className="h-16" />
@@ -194,47 +238,63 @@ function GovernanceCard() {
     );
   }
 
+  const entries = catalogData?.entries || [];
+  const production = entries.filter((e) => e.lifecycle === 'production').length;
+  const totalCatalog = catalogData?.pagination?.total ?? 0;
+  const paths = goldenPathData?.data || [];
+  const totalPaths = goldenPathData?.pagination?.total ?? paths.length;
+
   return (
-    <Link
-      href="/catalog"
-      className="group block rounded-xl border border-surface-3 bg-surface-1 p-5 transition-all hover:border-violet-500/30 hover:shadow-[0_0_24px_rgba(124,58,237,0.08)]"
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
-            <ShieldCheckIcon className="h-4 w-4 text-violet-400" />
-          </div>
-          <h2 className="text-sm font-semibold text-text-primary">Service Catalog</h2>
+    <div className="rounded-xl border border-surface-3 bg-surface-1 p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+          <ShieldCheckIcon className="h-4 w-4 text-violet-400" />
         </div>
-        <ArrowRightIcon className="h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+        <h2 className="text-sm font-semibold text-text-primary">Platform Governance</h2>
       </div>
-      {total === 0 ? (
-        <p className="text-sm text-text-secondary">
-          Register services to track health and compliance
-        </p>
-      ) : (
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <p className="text-2xl font-semibold font-display text-text-primary">{total}</p>
-            <p className="text-xs text-text-secondary mt-0.5">Total services</p>
-          </div>
-          <div>
-            <p className="text-2xl font-semibold font-display text-emerald-400">{production}</p>
-            <p className="text-xs text-text-secondary mt-0.5">Production</p>
-          </div>
-          <div>
-            <p className="text-2xl font-semibold font-display text-amber-400">{experimental}</p>
-            <p className="text-xs text-text-secondary mt-0.5">Experimental</p>
-          </div>
-        </div>
-      )}
-    </Link>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {catalogEnabled && (
+          <>
+            <Link href="/catalog" className="group">
+              <p className="text-2xl font-semibold font-display text-text-primary group-hover:text-violet-300 transition-colors">
+                {totalCatalog}
+              </p>
+              <p className="text-xs text-text-secondary mt-0.5">Catalog entries</p>
+            </Link>
+            <Link href="/catalog" className="group">
+              <p className="text-2xl font-semibold font-display text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                {production}
+              </p>
+              <p className="text-xs text-text-secondary mt-0.5">Production</p>
+            </Link>
+          </>
+        )}
+        {goldenPathsEnabled && (
+          <>
+            <Link href="/golden-paths" className="group">
+              <p className="text-2xl font-semibold font-display text-text-primary group-hover:text-violet-300 transition-colors">
+                {totalPaths}
+              </p>
+              <p className="text-xs text-text-secondary mt-0.5">Golden paths</p>
+            </Link>
+            <Link href="/golden-paths" className="group">
+              <p className="text-2xl font-semibold font-display text-amber-400 group-hover:text-amber-300 transition-colors">
+                {paths.filter((p: GoldenPathRow) => p.is_official).length}
+              </p>
+              <p className="text-xs text-text-secondary mt-0.5">Official</p>
+            </Link>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 
 export function DashboardClient() {
   const { data: projects, isLoading: projectsLoading } = useProjects();
   const { usage, subscription, isLoading: usageLoading } = useSubscription();
+  const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
+  const { data: goldenPathData } = useGoldenPaths(goldenPathsEnabled ? { limit: 3 } : { limit: 0 });
   const [mountTime] = useState(() => Date.now());
 
   const isLoading = projectsLoading || usageLoading;
@@ -254,6 +314,10 @@ export function DashboardClient() {
     if (!projects) return [];
     return projects.slice(0, 5);
   }, [projects]);
+
+  const topPaths = useMemo(() => {
+    return goldenPathData?.data || [];
+  }, [goldenPathData?.data]);
 
   if (isLoading) {
     return (
@@ -283,24 +347,38 @@ export function DashboardClient() {
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-3xl font-bold font-display tracking-tight text-text-primary">
-            Dashboard
+            Developer Portal
           </h1>
           <p className="mt-1 text-sm text-text-secondary">
-            Overview of your workspace
+            Build, ship, and govern your software
             <span className="ml-2 inline-flex items-center rounded-md bg-violet-500/15 px-2 py-0.5 text-xs font-medium text-violet-300">
               {planLabel}
             </span>
           </p>
         </div>
-        <Button
-          asChild
-          className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
-        >
-          <Link href="/generate">
-            <SparklesIcon className="mr-2 h-4 w-4" />
-            Generate
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {goldenPathsEnabled && (
+            <Button
+              asChild
+              variant="outline"
+              className="border-violet-500/30 text-violet-300 hover:bg-violet-500/10"
+            >
+              <Link href="/golden-paths">
+                <RocketIcon className="mr-2 h-4 w-4" />
+                Scaffold
+              </Link>
+            </Button>
+          )}
+          <Button
+            asChild
+            className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
+          >
+            <Link href="/generate">
+              <SparklesIcon className="mr-2 h-4 w-4" />
+              Generate
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Stat Cards */}
@@ -343,6 +421,9 @@ export function DashboardClient() {
         />
       </div>
 
+      {/* Platform Governance Overview */}
+      <GovernanceOverview />
+
       {/* Usage Bars */}
       <div className="rounded-xl border border-surface-3 bg-surface-1 p-5">
         <h2 className="text-sm font-semibold text-text-primary mb-4">Usage This Month</h2>
@@ -366,9 +447,6 @@ export function DashboardClient() {
           </div>
         )}
       </div>
-
-      {/* Governance */}
-      <GovernanceCard />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Projects */}
@@ -417,57 +495,83 @@ export function DashboardClient() {
           )}
         </div>
 
-        {/* Quick Actions */}
-        <div>
-          <h2 className="text-lg font-semibold font-display text-text-primary mb-4">
-            Quick Actions
-          </h2>
-          <div className="space-y-2">
-            <QuickAction
-              href="/generate"
-              icon={SparklesIcon}
-              label="Generate Component"
-              description="AI-powered code generation"
-              accent="text-violet-400"
-            />
-            <QuickAction
-              href="/projects/new"
-              icon={PlusIcon}
-              label="New Project"
-              description="Start a new workspace"
-              accent="text-emerald-400"
-            />
-            <QuickAction
-              href="/templates"
-              icon={LayoutTemplateIcon}
-              label="Browse Templates"
-              description="Pre-built component library"
-              accent="text-amber-400"
-            />
-            <QuickAction
-              href="/catalog"
-              icon={BookOpenIcon}
-              label="Service Catalog"
-              description="Track health and compliance"
-              accent="text-violet-400"
-            />
-            <QuickAction
-              href="/history"
-              icon={ClockIcon}
-              label="View History"
-              description="Past generations and iterations"
-              accent="text-sky-400"
-            />
-            {subscription?.plan === 'free' && (
+        {/* Quick Actions + Golden Paths */}
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold font-display text-text-primary mb-4">
+              Quick Actions
+            </h2>
+            <div className="space-y-2">
               <QuickAction
-                href="/billing"
-                icon={TrendingUpIcon}
-                label="Upgrade Plan"
-                description="Unlock unlimited generations"
-                accent="text-pink-400"
+                href="/generate"
+                icon={SparklesIcon}
+                label="Generate Component"
+                description="AI-powered code generation"
+                accent="text-violet-400"
               />
-            )}
+              <QuickAction
+                href="/projects/new"
+                icon={PlusIcon}
+                label="New Project"
+                description="Start a new workspace"
+                accent="text-emerald-400"
+              />
+              <QuickAction
+                href="/catalog"
+                icon={BookOpenIcon}
+                label="Service Catalog"
+                description="Track health and compliance"
+                accent="text-violet-400"
+              />
+              {goldenPathsEnabled && (
+                <QuickAction
+                  href="/golden-paths"
+                  icon={RocketIcon}
+                  label="Golden Paths"
+                  description="Scaffold with governance"
+                  accent="text-amber-400"
+                />
+              )}
+              <QuickAction
+                href="/history"
+                icon={ClockIcon}
+                label="View History"
+                description="Past generations"
+                accent="text-sky-400"
+              />
+              {subscription?.plan === 'free' && (
+                <QuickAction
+                  href="/billing"
+                  icon={TrendingUpIcon}
+                  label="Upgrade Plan"
+                  description="Unlock unlimited generations"
+                  accent="text-pink-400"
+                />
+              )}
+            </div>
           </div>
+
+          {/* Golden Paths Widget */}
+          {goldenPathsEnabled && topPaths.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold font-display text-text-primary">
+                  Golden Paths
+                </h2>
+                <Link
+                  href="/golden-paths"
+                  className="text-sm text-violet-300 hover:text-violet-200 transition-colors"
+                >
+                  View all
+                </Link>
+              </div>
+              <div className="space-y-2">
+                {topPaths.map((path: GoldenPathRow) => (
+                  <GoldenPathCard key={path.id} path={path} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
