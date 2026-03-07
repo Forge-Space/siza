@@ -3,11 +3,15 @@ import { DashboardClient } from '@/app/(dashboard)/dashboard/dashboard-client';
 import { useProjects } from '@/hooks/use-projects';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useAIKeys } from '@/stores/ai-keys';
+import { useCatalog } from '@/hooks/use-catalog';
+import { useGoldenPaths } from '@/hooks/use-golden-paths';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 jest.mock('@/hooks/use-projects');
 jest.mock('@/hooks/use-subscription');
 jest.mock('@/stores/ai-keys');
+jest.mock('@/hooks/use-catalog');
+jest.mock('@/hooks/use-golden-paths');
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
@@ -52,6 +56,8 @@ jest.mock('@/components/ui/button', () => ({
 const mockUseProjects = useProjects as jest.MockedFunction<typeof useProjects>;
 const mockUseSubscription = useSubscription as jest.MockedFunction<typeof useSubscription>;
 const mockUseAIKeys = useAIKeys as jest.MockedFunction<typeof useAIKeys>;
+const mockUseCatalog = useCatalog as jest.MockedFunction<typeof useCatalog>;
+const mockUseGoldenPaths = useGoldenPaths as jest.MockedFunction<typeof useGoldenPaths>;
 
 const createMockQueryClient = () =>
   new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -82,6 +88,14 @@ describe('DashboardClient', () => {
     queryClient = createMockQueryClient();
     jest.clearAllMocks();
     mockUseAIKeys.mockReturnValue([]);
+    mockUseCatalog.mockReturnValue({
+      data: { entries: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } },
+      isLoading: false,
+    } as any);
+    mockUseGoldenPaths.mockReturnValue({
+      data: { data: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } },
+      isLoading: false,
+    } as any);
   });
 
   const renderWithQueryClient = (component: React.ReactElement) =>
@@ -147,8 +161,8 @@ describe('DashboardClient', () => {
 
       renderWithQueryClient(<DashboardClient />);
 
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
-      expect(screen.getByText('Overview of your workspace')).toBeInTheDocument();
+      expect(screen.getByText('Developer Portal')).toBeInTheDocument();
+      expect(screen.getByText(/Build, ship, and govern/)).toBeInTheDocument();
     });
   });
 
@@ -537,8 +551,8 @@ describe('DashboardClient', () => {
       expect(screen.getByText('Quick Actions')).toBeInTheDocument();
       expect(screen.getByText('AI-powered code generation')).toBeInTheDocument();
       expect(screen.getByText('Start a new workspace')).toBeInTheDocument();
-      expect(screen.getByText('Pre-built component library')).toBeInTheDocument();
-      expect(screen.getByText('Past generations and iterations')).toBeInTheDocument();
+      expect(screen.getByText('Track health and compliance')).toBeInTheDocument();
+      expect(screen.getByText('Past generations')).toBeInTheDocument();
     });
   });
 });
