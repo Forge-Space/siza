@@ -3,7 +3,7 @@ import { routeSizaGeneration, getQuotaFallback } from './siza-router';
 import type { GenerationEvent } from './gemini';
 import { generateComponentStream } from './gemini';
 import { generateWithProvider } from './generation';
-import { generateComponent } from '@/lib/mcp/client';
+import { generateComponentStream as mcpStream } from '@/lib/mcp/client';
 import { captureServerError } from '@/lib/sentry/server';
 import { canUseFallback, recordFallback } from './fallback-limiter';
 
@@ -21,6 +21,7 @@ export interface RouteGenerationOptions {
   provider: string;
   model: string;
   correlationId?: string;
+  accessToken?: string;
 }
 
 export async function* routeGeneration(
@@ -94,11 +95,20 @@ async function* routeViaSizaAI(opts: RouteGenerationOptions): AsyncGenerator<Gen
 }
 
 async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
+  if (!opts.accessToken) {
+    yield {
+      type: 'error',
+      message: 'MCP gateway requires authentication. No access token available.',
+      timestamp: Date.now(),
+    };
+    return;
+  }
+
   yield { type: 'start', timestamp: Date.now() };
 
-  let mcpCode = '';
+  let hasOutput = false;
   try {
-    mcpCode = await generateComponent(
+    for await (const event of mcpStream(
       {
         prompt: opts.prompt,
         framework: opts.framework,
@@ -109,8 +119,14 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
         imageMimeType: opts.imageMimeType,
         contextAddition: opts.contextAddition,
       },
+      opts.accessToken,
       opts.correlationId
-    );
+    )) {
+      hasOutput = true;
+      if (event.type !== 'complete') {
+        yield event;
+      }
+    }
   } catch (mcpError) {
     captureServerError(mcpError, {
       route: '/api/generate',
@@ -118,16 +134,7 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
     });
   }
 
-  if (mcpCode) {
-    const chunkSize = 200;
-    for (let i = 0; i < mcpCode.length; i += chunkSize) {
-      yield {
-        type: 'chunk',
-        content: mcpCode.slice(i, i + chunkSize),
-        timestamp: Date.now(),
-      };
-    }
-  } else {
+  if (!hasOutput) {
     for await (const event of generateComponentStream({
       prompt: opts.prompt,
       framework: opts.framework,

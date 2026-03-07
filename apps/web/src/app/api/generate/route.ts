@@ -8,9 +8,12 @@ import { getFeatureFlag } from '@/lib/features/flags';
 import { isMcpConfigured } from '@/lib/mcp/client';
 import { generateSchema } from '@/lib/api/validation/generate';
 import { APIError } from '@/lib/api/errors';
+import { isLocalAuthBypassEnabled } from '@/lib/auth/local-auth-bypass';
+import { createClient } from '@/lib/supabase/server';
 import { validateConversation } from '@/lib/services/conversation.service';
 import {
   buildDesignContext,
+  buildSizaGenContext,
   enrichWithRag,
   createGenerationRecord,
   completeGeneration,
@@ -30,14 +33,30 @@ function shouldUseMcpGateway(): boolean {
   return getFeatureFlag('ENABLE_MCP_GATEWAY') && isMcpConfigured();
 }
 
+async function getAccessToken(): Promise<string | undefined> {
+  if (isLocalAuthBypassEnabled()) return undefined;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getSession();
+    return data.session?.access_token;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const rateLimitResult = await checkRateLimit(request, 15, 60000);
     if (!rateLimitResult.allowed) {
-      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded. Try again shortly.',
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const { user } = await verifySession();
@@ -80,13 +99,15 @@ export async function POST(request: NextRequest) {
     const skillContext =
       skillsEnabled && input.skillIds?.length ? await buildSkillContext(input.skillIds) : '';
     const enrichedDescription = input.description + designContext + skillContext;
-    const contextAddition =
+    const ragContext =
       input.useRag !== false
         ? await enrichWithRag(enrichedDescription, {
             framework: input.framework,
             apiKey: input.userApiKey,
           })
         : '';
+    const sizaGenContext = buildSizaGenContext(input.framework, input.componentLibrary);
+    const contextAddition = [ragContext, sizaGenContext].filter(Boolean).join('\n\n');
 
     const correlationId = randomUUID();
     const mcpEnabled = shouldUseMcpGateway();
@@ -99,6 +120,8 @@ export async function POST(request: NextRequest) {
             refinementPrompt: input.refinementPrompt!,
           }
         : undefined;
+
+    const accessToken = mcpEnabled ? await getAccessToken() : undefined;
 
     const encoder = new TextEncoder();
     const streamPrompt = buildStreamPrompt(enrichedDescription, conversationCtx);
@@ -136,6 +159,7 @@ export async function POST(request: NextRequest) {
             provider: input.provider,
             model: input.model || 'gemini-2.0-flash',
             correlationId,
+            accessToken,
           })) {
             if (event.type === 'chunk' && event.content) {
               fullCode += event.content;
