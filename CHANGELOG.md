@@ -8,7 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Catalog Auto-Discovery** — Scan connected GitHub repos for `catalog-info.yaml` files, preview entities, and batch import into service catalog. Closes the biggest IDP gap vs Backstage (#363)
 - **API Documentation Viewer** — Inline OpenAPI 3.x renderer for catalog API entities with method badges, parameter tables, schema tree, endpoint search, and tag grouping (~4 KB gzipped, zero new dependencies)
+
+### Fixed
+- **Background video optimization** — Replaced 1.7 MB ambient-bg.webm with CSS noise texture + animated gradients (zero network cost) (#362)
 
 ---
 
