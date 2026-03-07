@@ -84,9 +84,11 @@ describe('routeGeneration', () => {
       const { generateComponentStream: geminiStream } = require('@/lib/services/gemini');
       const { captureServerError } = require('@/lib/sentry/server');
 
-      mcpStream.mockImplementation(async function* () {
-        throw new Error('Gateway down');
-      });
+      mcpStream.mockImplementation(() => ({
+        async *[Symbol.asyncIterator]() {
+          throw new Error('Gateway down');
+        },
+      }));
       geminiStream.mockImplementation(async function* () {
         yield { type: 'start', timestamp: 10 };
         yield { type: 'chunk', content: 'fallback-code', timestamp: 11 };
