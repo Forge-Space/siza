@@ -2,7 +2,7 @@ import { GoldenPathsClient } from './golden-paths-client';
 
 export const metadata = {
   title: 'Golden Paths | Siza',
-  description: 'Project scaffolding templates with built-in best practices',
+  description: 'Production-ready project scaffolds with built-in governance',
 };
 
 export default function GoldenPathsPage() {
