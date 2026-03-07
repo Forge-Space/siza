@@ -169,17 +169,16 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
 }
 
 const QUOTA_ERROR_PATTERNS = [
-  'quota',
-  '429',
-  'rate limit',
-  'resource_exhausted',
-  'too many requests',
+  /quota\s*(exceeded|limit)/i,
+  /\b429\b/,
+  /rate\s*limit/i,
+  /resource_exhausted/i,
+  /too\s*many\s*requests/i,
 ];
 
 function isQuotaError(message?: string): boolean {
   if (!message) return false;
-  const lower = message.toLowerCase();
-  return QUOTA_ERROR_PATTERNS.some((p) => lower.includes(p));
+  return QUOTA_ERROR_PATTERNS.some((p) => p.test(message));
 }
 
 async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {

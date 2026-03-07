@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
+import { UnauthorizedError } from '@/lib/api/errors';
+import { captureServerError } from '@/lib/sentry/server';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -67,7 +69,11 @@ export async function GET() {
         cancel_at_period_end: false,
       },
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: error.message }, { status: 401 });
+    }
+    captureServerError(error, { route: '/api/usage/current' });
     return NextResponse.json({ error: 'Failed to fetch usage data' }, { status: 500 });
   }
 }
