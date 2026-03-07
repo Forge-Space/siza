@@ -17,30 +17,30 @@ export async function GET() {
       .eq('billing_period_start', periodStart)
       .single();
 
-    const [{ data: sub }, { count: generationsTotal }, { count: projectsCount }] =
-      await Promise.all([
-        supabase
-          .from('subscriptions')
-          .select('plan, status, current_period_end, cancel_at_period_end')
-          .eq('user_id', user.id)
-          .single(),
-        supabase
-          .from('generations')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id),
-        supabase
-          .from('projects')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id),
-      ]);
+    const VALID_PLANS = ['free', 'pro', 'team', 'enterprise'] as const;
 
-    const plan = sub?.plan ?? 'free';
-    const { data: limits } = await supabase
-      .from('plan_limits')
-      .select('generations_per_month, max_projects')
-      .eq('plan', plan)
-      .single();
+    const [
+      { data: sub },
+      { count: generationsTotal },
+      { count: projectsCount },
+      { data: allLimits },
+    ] = await Promise.all([
+      supabase
+        .from('subscriptions')
+        .select('plan, status, current_period_end, cancel_at_period_end')
+        .eq('user_id', user.id)
+        .single(),
+      supabase
+        .from('generations')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id),
+      supabase.from('projects').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+      supabase.from('plan_limits').select('plan, generations_per_month, max_projects'),
+    ]);
 
+    const rawPlan = sub?.plan ?? 'free';
+    const plan = VALID_PLANS.includes(rawPlan as (typeof VALID_PLANS)[number]) ? rawPlan : 'free';
+    const limits = allLimits?.find((l) => l.plan === plan);
     const genLimit = limits?.generations_per_month ?? 10;
     const projLimit = limits?.max_projects ?? 2;
 
