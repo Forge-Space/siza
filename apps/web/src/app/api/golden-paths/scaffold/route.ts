@@ -76,10 +76,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('Golden path not found', 404);
     }
 
-    const resolvedParams = resolveParameters(
-      goldenPath.parameters || [],
-      paramValues || {}
-    );
+    const resolvedParams = resolveParameters(goldenPath.parameters || [], paramValues || {});
 
     const description = resolvedParams.description
       ? String(resolvedParams.description)

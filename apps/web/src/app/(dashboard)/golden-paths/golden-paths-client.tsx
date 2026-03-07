@@ -405,9 +405,7 @@ function ScaffoldForm({
         onChange={(e) => onProjectNameChange(e.target.value)}
         placeholder="Project name *"
         className="text-xs h-8 bg-surface-2 border-surface-3"
-        onKeyDown={(e) =>
-          e.key === 'Enter' && parameters.length === 0 && onSubmit()
-        }
+        onKeyDown={(e) => e.key === 'Enter' && parameters.length === 0 && onSubmit()}
       />
       {parameters.map((param) => (
         <ParameterInput
@@ -426,12 +424,7 @@ function ScaffoldForm({
         >
           {isPending ? 'Creating...' : 'Create'}
         </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={onCancel}
-          className="text-xs h-7"
-        >
+        <Button size="sm" variant="ghost" onClick={onCancel} className="text-xs h-7">
           Cancel
         </Button>
       </div>
@@ -491,9 +484,7 @@ function ParameterInput({
       <Input
         type="number"
         value={value !== undefined ? String(value) : ''}
-        onChange={(e) =>
-          onChange(e.target.value ? Number(e.target.value) : undefined)
-        }
+        onChange={(e) => onChange(e.target.value ? Number(e.target.value) : undefined)}
         placeholder={`${label}${required}`}
         className="text-xs h-8 bg-surface-2 border-surface-3"
       />

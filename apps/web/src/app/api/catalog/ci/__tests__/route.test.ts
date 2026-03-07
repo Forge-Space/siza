@@ -65,12 +65,9 @@ beforeEach(() => {
   mockVerifySession.mockResolvedValue({
     user: { id: 'user-1', email: 'test@example.com' },
   });
-  mockSuccessResponse.mockImplementation(
-    (data) => new Response(JSON.stringify({ data }))
-  );
+  mockSuccessResponse.mockImplementation((data) => new Response(JSON.stringify({ data })));
   mockErrorResponse.mockImplementation(
-    (msg, status) =>
-      new Response(JSON.stringify({ error: msg }), { status })
+    (msg, status) => new Response(JSON.stringify({ error: msg }), { status })
   );
   setupSupabaseMock();
 });
@@ -82,18 +79,12 @@ afterAll(() => {
 describe('GET /api/catalog/ci', () => {
   it('returns 400 when repo param is missing', async () => {
     await GET(makeRequest());
-    expect(mockErrorResponse).toHaveBeenCalledWith(
-      'Missing repo parameter',
-      400
-    );
+    expect(mockErrorResponse).toHaveBeenCalledWith('Missing repo parameter', 400);
   });
 
   it('returns 400 when repo param is invalid', async () => {
     await GET(makeRequest({ repo: 'invalid-format' }));
-    expect(mockErrorResponse).toHaveBeenCalledWith(
-      'Invalid repo format, expected owner/repo',
-      400
-    );
+    expect(mockErrorResponse).toHaveBeenCalledWith('Invalid repo format, expected owner/repo', 400);
   });
 
   it('fetches and transforms workflow runs from public API', async () => {
@@ -152,9 +143,6 @@ describe('GET /api/catalog/ci', () => {
 
     await GET(makeRequest({ repo: 'Forge-Space/siza' }));
 
-    expect(mockErrorResponse).toHaveBeenCalledWith(
-      'Failed to fetch workflow runs',
-      502
-    );
+    expect(mockErrorResponse).toHaveBeenCalledWith('Failed to fetch workflow runs', 502);
   });
 });

@@ -47,8 +47,7 @@ function transformRun(run: Record<string, unknown>): WorkflowRun {
     status: run.status as string,
     conclusion: (run.conclusion as string) || null,
     branch: (run.head_branch as string) || '',
-    commit_message: ((run.head_commit as Record<string, unknown>)
-      ?.message as string) || '',
+    commit_message: ((run.head_commit as Record<string, unknown>)?.message as string) || '',
     html_url: run.html_url as string,
     run_started_at: startedAt,
     updated_at: updatedAt,
@@ -96,13 +95,8 @@ async function fetchWithInstallation(
   }
 }
 
-async function fetchPublic(
-  owner: string,
-  name: string
-): Promise<WorkflowRun[]> {
-  const url =
-    `https://api.github.com/repos/${owner}/${name}` +
-    `/actions/runs?per_page=10`;
+async function fetchPublic(owner: string, name: string): Promise<WorkflowRun[]> {
+  const url = `https://api.github.com/repos/${owner}/${name}` + `/actions/runs?per_page=10`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10000);
@@ -119,9 +113,7 @@ async function fetchPublic(
   }
 
   const data = await res.json();
-  return (data.workflow_runs || []).map(
-    (r: Record<string, unknown>) => transformRun(r)
-  );
+  return (data.workflow_runs || []).map((r: Record<string, unknown>) => transformRun(r));
 }
 
 export async function GET(request: NextRequest) {
@@ -129,9 +121,7 @@ export async function GET(request: NextRequest) {
     const rateResult = await checkRateLimit(request, RATE_LIMIT, RATE_WINDOW);
     if (!rateResult.allowed) {
       const response = errorResponse('Rate limit exceeded', 429, {
-        retry_after: Math.ceil(
-          (rateResult.resetAt - Date.now()) / 1000
-        ),
+        retry_after: Math.ceil((rateResult.resetAt - Date.now()) / 1000),
       });
       return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
     }

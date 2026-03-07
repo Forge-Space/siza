@@ -107,22 +107,23 @@ export default function CicdPanel({ repositoryUrl }: CicdPanelProps) {
   useEffect(() => {
     if (!repo) return;
 
+    const currentRepo = repo;
     let cancelled = false;
     async function loadRuns() {
       try {
-        const res = await fetch(`/api/catalog/ci?repo=${encodeURIComponent(repo)}`);
+        const res = await fetch(`/api/catalog/ci?repo=${encodeURIComponent(currentRepo)}`);
         if (!res.ok) throw new Error('Failed to fetch workflow runs');
         const json = await res.json();
         if (!cancelled) {
           setRuns(json.data || []);
           setError(null);
-          setLoadedRepo(repo);
+          setLoadedRepo(currentRepo);
         }
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Unknown error');
           setRuns([]);
-          setLoadedRepo(repo);
+          setLoadedRepo(currentRepo);
         }
       }
     }

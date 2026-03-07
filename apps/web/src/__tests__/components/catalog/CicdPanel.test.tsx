@@ -62,9 +62,7 @@ describe('CicdPanel', () => {
 
   it('shows loading state while fetch is pending', () => {
     (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
-    render(
-      <CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />
-    );
+    render(<CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />);
     expect(screen.getByText('Loading workflow runs...')).toBeInTheDocument();
   });
 
@@ -74,9 +72,7 @@ describe('CicdPanel', () => {
       json: () => Promise.resolve({ data: mockRuns }),
     });
 
-    render(
-      <CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />
-    );
+    render(<CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />);
 
     await waitFor(() => {
       expect(screen.getByText('CI')).toBeInTheDocument();
@@ -92,9 +88,7 @@ describe('CicdPanel', () => {
       json: () => Promise.resolve({ data: [mockRuns[0]] }),
     });
 
-    render(
-      <CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />
-    );
+    render(<CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />);
 
     await waitFor(() => {
       expect(screen.getByText('Success')).toBeInTheDocument();
@@ -107,9 +101,7 @@ describe('CicdPanel', () => {
       json: () => Promise.resolve({ data: [mockRuns[1]] }),
     });
 
-    render(
-      <CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />
-    );
+    render(<CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />);
 
     await waitFor(() => {
       expect(screen.getByText('Failed')).toBeInTheDocument();
@@ -122,9 +114,7 @@ describe('CicdPanel', () => {
       json: () => Promise.resolve({ data: [mockRuns[2]] }),
     });
 
-    render(
-      <CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />
-    );
+    render(<CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />);
 
     await waitFor(() => {
       expect(screen.getByText('In Progress')).toBeInTheDocument();
@@ -134,9 +124,7 @@ describe('CicdPanel', () => {
   it('shows error state when fetch fails', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false });
 
-    render(
-      <CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />
-    );
+    render(<CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />);
 
     await waitFor(() => {
       expect(screen.getByText('Unable to load CI/CD data')).toBeInTheDocument();
@@ -150,14 +138,10 @@ describe('CicdPanel', () => {
       json: () => Promise.resolve({ data: [] }),
     });
 
-    render(
-      <CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />
-    );
+    render(<CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText('No workflow runs found for this repository.')
-      ).toBeInTheDocument();
+      expect(screen.getByText('No workflow runs found for this repository.')).toBeInTheDocument();
     });
   });
 
@@ -167,17 +151,12 @@ describe('CicdPanel', () => {
       json: () => Promise.resolve({ data: mockRuns }),
     });
 
-    render(
-      <CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />
-    );
+    render(<CicdPanel repositoryUrl="https://github.com/Forge-Space/siza" />);
 
     await waitFor(() => {
       expect(screen.getByText('View all')).toBeInTheDocument();
     });
     const link = screen.getByText('View all').closest('a');
-    expect(link).toHaveAttribute(
-      'href',
-      'https://github.com/Forge-Space/siza/actions'
-    );
+    expect(link).toHaveAttribute('href', 'https://github.com/Forge-Space/siza/actions');
   });
 });

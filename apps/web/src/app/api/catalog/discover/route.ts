@@ -53,10 +53,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (!Array.isArray(body.repos) || body.repos.length === 0) {
-      const response = errorResponse(
-        'repos must be a non-empty array',
-        400
-      );
+      const response = errorResponse('repos must be a non-empty array', 400);
       return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
     }
 
@@ -65,10 +62,7 @@ export async function POST(request: NextRequest) {
       return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
     }
 
-    const result = await importDiscoveredRepos(
-      session.user.id,
-      body.repos
-    );
+    const result = await importDiscoveredRepos(session.user.id, body.repos);
 
     const response = createdResponse(result, 'Import completed');
     return setRateLimitHeaders(response, rateResult, RATE_LIMIT);

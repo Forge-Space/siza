@@ -52,13 +52,7 @@ function extractEntitiesPreview(
   try {
     const docs = yaml.loadAll(yamlContent) as Record<string, unknown>[];
     return docs
-      .filter(
-        (doc) =>
-          doc &&
-          typeof doc === 'object' &&
-          'kind' in doc &&
-          'metadata' in doc
-      )
+      .filter((doc) => doc && typeof doc === 'object' && 'kind' in doc && 'metadata' in doc)
       .map((doc) => {
         const meta = doc.metadata as Record<string, unknown>;
         const kind = String(doc.kind || 'Component');
@@ -81,9 +75,7 @@ function extractEntitiesPreview(
   }
 }
 
-export async function discoverCatalogFiles(
-  userId: string
-): Promise<DiscoveryResult> {
+export async function discoverCatalogFiles(userId: string): Promise<DiscoveryResult> {
   const supabase = await createClient();
   const { data: installations } = await supabase
     .from('github_installations')
@@ -118,12 +110,7 @@ export async function discoverCatalogFiles(
       const [owner, name] = repo.fullName.split('/');
 
       for (const filePath of CATALOG_FILE_PATHS) {
-        const content = await fetchFileContent(
-          inst.installation_id,
-          owner,
-          name,
-          filePath
-        );
+        const content = await fetchFileContent(inst.installation_id, owner, name, filePath);
 
         if (content) {
           const entities = extractEntitiesPreview(content);
@@ -160,12 +147,7 @@ export async function importDiscoveredRepos(
 
     let yamlContent: string | null = null;
     for (const filePath of CATALOG_FILE_PATHS) {
-      yamlContent = await fetchFileContent(
-        repo.installationId,
-        owner,
-        name,
-        filePath
-      );
+      yamlContent = await fetchFileContent(repo.installationId, owner, name, filePath);
       if (yamlContent) break;
     }
 
