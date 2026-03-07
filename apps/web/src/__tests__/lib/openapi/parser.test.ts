@@ -2,10 +2,8 @@ import {
   detectFormat,
   parseSpec,
   validateSpec,
-  resolveRefs,
   getEndpoints,
 } from '@/lib/openapi/parser';
-import type { OpenAPISpec } from '@/lib/openapi/types';
 
 const VALID_JSON_SPEC = JSON.stringify({
   openapi: '3.0.3',
