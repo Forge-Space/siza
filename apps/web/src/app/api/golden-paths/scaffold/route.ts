@@ -15,11 +15,7 @@ const scaffoldSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const { allowed, remaining, resetAt } = await checkRateLimit(
-      request,
-      10,
-      60_000,
-    );
+    const { allowed, remaining, resetAt } = await checkRateLimit(request, 10, 60_000);
     if (!allowed) {
       const response = errorResponse('Rate limit exceeded', 429);
       setRateLimitHeaders(response, { allowed, remaining, resetAt }, 10);
@@ -37,10 +33,7 @@ export async function POST(request: NextRequest) {
 
     const parseResult = scaffoldSchema.safeParse(body);
     if (!parseResult.success) {
-      throw new ValidationError(
-        'Invalid scaffold request',
-        parseResult.error.flatten(),
-      );
+      throw new ValidationError('Invalid scaffold request', parseResult.error.flatten());
     }
 
     const { golden_path_id, project_name } = parseResult.data;
@@ -70,17 +63,15 @@ export async function POST(request: NextRequest) {
       return errorResponse('Failed to create project', 500);
     }
 
-    const { error: catalogError } = await supabase
-      .from('catalog_entries')
-      .insert({
-        name: project_name.toLowerCase().replace(/\s+/g, '-'),
-        display_name: project_name,
-        type: goldenPath.catalog_type,
-        lifecycle: goldenPath.catalog_lifecycle,
-        owner_id: user.id,
-        project_id: project.id,
-        tags: goldenPath.tags,
-      });
+    const { error: catalogError } = await supabase.from('catalog_entries').insert({
+      name: project_name.toLowerCase().replace(/\s+/g, '-'),
+      display_name: project_name,
+      type: goldenPath.catalog_type,
+      lifecycle: goldenPath.catalog_lifecycle,
+      owner_id: user.id,
+      project_id: project.id,
+      tags: goldenPath.tags,
+    });
 
     if (catalogError) {
       captureServerError(catalogError, {
@@ -104,10 +95,7 @@ export async function POST(request: NextRequest) {
     setRateLimitHeaders(response, { allowed, remaining, resetAt }, 10);
     return response;
   } catch (error) {
-    if (
-      error instanceof UnauthorizedError ||
-      error instanceof ValidationError
-    ) {
+    if (error instanceof UnauthorizedError || error instanceof ValidationError) {
       return errorResponse(error.message, error.statusCode);
     }
     captureServerError(error, { route: '/api/golden-paths/scaffold' });
