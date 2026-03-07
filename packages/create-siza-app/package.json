@@ -41,7 +41,7 @@
     "enquirer": "^2.4.1",
     "kleur": "^4.1.5",
     "fs-extra": "^11.2.0",
-    "validate-npm-package-name": "^6.0.0"
+    "validate-npm-package-name": "^7.0.2"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
