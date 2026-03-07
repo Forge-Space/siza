@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **CI/CD Visibility Panel** — Inline GitHub Actions workflow runs on catalog entity detail pages with status badges, duration, branch info, and authenticated/public fallback strategy (~3.5 KB gzipped, zero new dependencies)
 - **Catalog Auto-Discovery** — Scan connected GitHub repos for `catalog-info.yaml` files, preview entities, and batch import into service catalog. Closes the biggest IDP gap vs Backstage (#363)
+- **Parameterized Golden Path Templates** — Dynamic scaffold form with 4 input types (string, number, boolean, select), parameter validation, and default values. Seeds updated with CSS framework selector and port config (#363)
+- **Global Search (⌘K)** — Command palette now searches across projects, catalog entries, golden paths, and templates with debounced API queries, grouped results, and loading states (#363)
 - **API Documentation Viewer** — Inline OpenAPI 3.x renderer for catalog API entities with method badges, parameter tables, schema tree, endpoint search, and tag grouping (~4 KB gzipped, zero new dependencies)
 
 ### Fixed
