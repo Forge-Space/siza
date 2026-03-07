@@ -114,16 +114,23 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [build]
-    if: github.actor != 'dependabot[bot]'
     steps:
+      - name: Skip E2E for dependabot
+        if: github.actor == 'dependabot[bot]'
+        run: echo 'Skipping E2E — dependabot PRs lack secrets access'
       - uses: actions/checkout@v4
+        if: github.actor != 'dependabot[bot]'
       - uses: actions/setup-node@v4
+        if: github.actor != 'dependabot[bot]'
         with:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
+        if: github.actor != 'dependabot[bot]'
       - run: npx playwright install --with-deps chromium
+        if: github.actor != 'dependabot[bot]'
       - name: Build web app
+        if: github.actor != 'dependabot[bot]'
         run: cd apps/web && npx next build
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -131,6 +138,7 @@ jobs:
           NEXT_PUBLIC_ENABLE_STRIPE_BILLING: 'true'
           NEXT_PUBLIC_ENABLE_USAGE_LIMITS: 'true'
       - name: Run E2E tests
+        if: github.actor != 'dependabot[bot]'
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -140,7 +148,7 @@ jobs:
           NEXT_PUBLIC_ENABLE_USAGE_LIMITS: 'true'
         run: cd apps/web && npx playwright test e2e/auth.spec.ts e2e/billing.spec.ts e2e/landing.spec.ts --project=chromium
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: failure() && github.actor != 'dependabot[bot]'
         with:
           name: playwright-report
           path: apps/web/playwright-report/
