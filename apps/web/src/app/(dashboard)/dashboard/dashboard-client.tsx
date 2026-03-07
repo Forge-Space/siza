@@ -292,7 +292,7 @@ function GovernanceOverview() {
 
 export function DashboardClient() {
   const { data: projects, isLoading: projectsLoading } = useProjects();
-  const { usage, subscription, isLoading: usageLoading } = useSubscription();
+  const { usage, subscription, generationsTotal, isLoading: usageLoading } = useSubscription();
   const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
   const { data: goldenPathData } = useGoldenPaths(goldenPathsEnabled ? { limit: 3 } : { limit: 0 });
   const [mountTime] = useState(() => Date.now());
@@ -394,8 +394,8 @@ export function DashboardClient() {
         />
         <StatCard
           label="Generations"
-          value={String(generationsUsed)}
-          subtitle={generationsLimit === -1 ? 'Unlimited' : `of ${generationsLimit} this month`}
+          value={String(generationsTotal)}
+          subtitle={`${generationsUsed} this month`}
           icon={ZapIcon}
           href="/history"
           accent="text-emerald-400"

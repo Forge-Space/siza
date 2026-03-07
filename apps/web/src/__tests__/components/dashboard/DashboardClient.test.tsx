@@ -111,6 +111,7 @@ describe('DashboardClient', () => {
       mockUseSubscription.mockReturnValue({
         subscription: null,
         usage: null,
+        generationsTotal: 0,
         isLoading: false,
         error: null,
       } as any);
@@ -129,6 +130,7 @@ describe('DashboardClient', () => {
       mockUseSubscription.mockReturnValue({
         subscription: null,
         usage: null,
+        generationsTotal: 0,
         isLoading: true,
         error: null,
       } as any);
@@ -155,6 +157,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 0,
         },
+        generationsTotal: 0,
         isLoading: false,
         error: null,
       } as any);
@@ -182,6 +185,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 0,
         },
+        generationsTotal: 0,
         isLoading: false,
         error: null,
       } as any);
@@ -206,6 +210,7 @@ describe('DashboardClient', () => {
           projects_limit: -1,
           tokens_used: 5000,
         },
+        generationsTotal: 300,
         isLoading: false,
         error: null,
       } as any);
@@ -230,6 +235,7 @@ describe('DashboardClient', () => {
           projects_limit: -1,
           tokens_used: 50000,
         },
+        generationsTotal: 1500,
         isLoading: false,
         error: null,
       } as any);
@@ -256,6 +262,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 1000,
         },
+        generationsTotal: 30,
         isLoading: false,
         error: null,
       } as any);
@@ -281,6 +288,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 2500,
         },
+        generationsTotal: 75,
         isLoading: false,
         error: null,
       } as any);
@@ -288,8 +296,8 @@ describe('DashboardClient', () => {
       renderWithQueryClient(<DashboardClient />);
 
       expect(screen.getAllByText('Generations').length).toBeGreaterThan(0);
-      expect(screen.getByText('25')).toBeInTheDocument();
-      expect(screen.getByText('of 50 this month')).toBeInTheDocument();
+      expect(screen.getByText('75')).toBeInTheDocument();
+      expect(screen.getByText('25 this month')).toBeInTheDocument();
     });
 
     it('shows unlimited for pro plan generations', () => {
@@ -307,6 +315,7 @@ describe('DashboardClient', () => {
           projects_limit: -1,
           tokens_used: 10000,
         },
+        generationsTotal: 300,
         isLoading: false,
         error: null,
       } as any);
@@ -314,8 +323,8 @@ describe('DashboardClient', () => {
       renderWithQueryClient(<DashboardClient />);
 
       expect(screen.getAllByText('Generations').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('100').length).toBeGreaterThan(0);
-      expect(screen.getByText('Unlimited')).toBeInTheDocument();
+      expect(screen.getByText('300')).toBeInTheDocument();
+      expect(screen.getByText('100 this month')).toBeInTheDocument();
     });
   });
 
@@ -335,6 +344,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 500,
         },
+        generationsTotal: 30,
         isLoading: false,
         error: null,
       } as any);
@@ -359,6 +369,7 @@ describe('DashboardClient', () => {
       mockUseSubscription.mockReturnValue({
         subscription: null,
         usage: null,
+        generationsTotal: 0,
         isLoading: false,
         error: null,
       } as any);
@@ -386,6 +397,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 500,
         },
+        generationsTotal: 30,
         isLoading: false,
         error: null,
       } as any);
@@ -413,6 +425,7 @@ describe('DashboardClient', () => {
           projects_limit: -1,
           tokens_used: 10000,
         },
+        generationsTotal: 300,
         isLoading: false,
         error: null,
       } as any);
@@ -437,6 +450,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 500,
         },
+        generationsTotal: 30,
         isLoading: false,
         error: null,
       } as any);
@@ -462,6 +476,7 @@ describe('DashboardClient', () => {
           projects_limit: -1,
           tokens_used: 10000,
         },
+        generationsTotal: 300,
         isLoading: false,
         error: null,
       } as any);
@@ -488,6 +503,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 0,
         },
+        generationsTotal: 0,
         isLoading: false,
         error: null,
       } as any);
@@ -515,6 +531,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 0,
         },
+        generationsTotal: 0,
         isLoading: false,
         error: null,
       } as any);
@@ -542,6 +559,7 @@ describe('DashboardClient', () => {
           projects_limit: 2,
           tokens_used: 0,
         },
+        generationsTotal: 0,
         isLoading: false,
         error: null,
       } as any);

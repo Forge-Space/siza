@@ -17,11 +17,17 @@ export async function GET() {
       .eq('billing_period_start', periodStart)
       .single();
 
-    const { data: sub } = await supabase
-      .from('subscriptions')
-      .select('plan, status, current_period_end, cancel_at_period_end')
-      .eq('user_id', user.id)
-      .single();
+    const [{ data: sub }, { count: generationsTotal }] = await Promise.all([
+      supabase
+        .from('subscriptions')
+        .select('plan, status, current_period_end, cancel_at_period_end')
+        .eq('user_id', user.id)
+        .single(),
+      supabase
+        .from('generations')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id),
+    ]);
 
     return NextResponse.json({
       usage: usage ?? {
@@ -31,6 +37,7 @@ export async function GET() {
         generations_limit: 10,
         projects_limit: 2,
       },
+      generations_total: generationsTotal ?? 0,
       subscription: sub ?? {
         plan: 'free',
         status: 'active',
