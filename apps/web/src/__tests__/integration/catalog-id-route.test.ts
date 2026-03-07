@@ -79,6 +79,7 @@ describe('GET /api/catalog/[id]', () => {
       entry: mockEntry,
       dependencies: [],
       dependents: [],
+      children: [],
     };
     mockGetCatalogEntryWithRelations.mockResolvedValueOnce(mockData);
     mockSuccessResponse.mockReturnValueOnce(new Response() as any);

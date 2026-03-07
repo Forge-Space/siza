@@ -69,7 +69,7 @@ describe('CatalogClient', () => {
     mockUseCatalog.mockReturnValue({
       data: undefined,
       isLoading: true,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     expect(screen.getAllByText('Loading...').length).toBeGreaterThan(0);
@@ -79,7 +79,7 @@ describe('CatalogClient', () => {
     mockUseCatalog.mockReturnValue({
       data: { entries: [], pagination: { page: 1, limit: 20, total: 0, pages: 1 } },
       isLoading: false,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     expect(screen.getByText('Your Service Catalog')).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe('CatalogClient', () => {
         pagination: { page: 1, limit: 20, total: 1, pages: 1 },
       },
       isLoading: false,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     expect(screen.getByText('Siza Web')).toBeInTheDocument();
@@ -113,7 +113,7 @@ describe('CatalogClient', () => {
         pagination: { page: 1, limit: 20, total: 1, pages: 1 },
       },
       isLoading: false,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     expect(screen.getByText('ts')).toBeInTheDocument();
@@ -127,7 +127,7 @@ describe('CatalogClient', () => {
         pagination: { page: 1, limit: 20, total: 1, pages: 1 },
       },
       isLoading: false,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     expect(screen.getByText('1 deps')).toBeInTheDocument();
@@ -140,7 +140,7 @@ describe('CatalogClient', () => {
         pagination: { page: 1, limit: 20, total: 45, pages: 3 },
       },
       isLoading: false,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     expect(screen.getByText('1 / 3')).toBeInTheDocument();
@@ -155,7 +155,7 @@ describe('CatalogClient', () => {
         pagination: { page: 1, limit: 20, total: 1, pages: 1 },
       },
       isLoading: false,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     expect(screen.queryByText('Previous')).not.toBeInTheDocument();
@@ -168,7 +168,7 @@ describe('CatalogClient', () => {
         pagination: { page: 1, limit: 20, total: 5, pages: 1 },
       },
       isLoading: false,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     expect(screen.getByText('1 production')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('CatalogClient', () => {
         pagination: { page: 1, limit: 20, total: 1, pages: 1 },
       },
       isLoading: false,
-    } as ReturnType<typeof useCatalog>);
+    } as unknown as ReturnType<typeof useCatalog>);
 
     renderWithProviders(<CatalogClient />);
     const link = screen.getByText('Siza Web').closest('a');
