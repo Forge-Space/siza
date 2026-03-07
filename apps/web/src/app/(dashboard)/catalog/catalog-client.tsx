@@ -24,6 +24,10 @@ import { Skeleton } from '@siza/ui';
 import { useCatalog, type CatalogFilters } from '@/hooks/use-catalog';
 import type { CatalogEntryRow } from '@/lib/repositories/catalog.repo';
 
+interface CatalogEntryWithScore extends CatalogEntryRow {
+  scorecard?: { overall: number; categories: { name: string; score: number }[] } | null;
+}
+
 const TYPE_META: Record<string, { icon: typeof ServerIcon; label: string }> = {
   service: { icon: ServerIcon, label: 'Service' },
   component: { icon: BoxIcon, label: 'Component' },
@@ -72,7 +76,24 @@ function TypeIcon({ type }: { type: string }) {
   );
 }
 
-function CatalogCard({ entry }: { entry: CatalogEntryRow }) {
+function scoreColor(score: number): string {
+  if (score >= 90) return 'text-emerald-400 bg-emerald-500/10';
+  if (score >= 70) return 'text-sky-400 bg-sky-500/10';
+  if (score >= 50) return 'text-amber-400 bg-amber-500/10';
+  return 'text-red-400 bg-red-500/10';
+}
+
+function ScoreBadge({ score }: { score: number }) {
+  return (
+    <span
+      className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold tabular-nums ${scoreColor(score)}`}
+    >
+      {score}
+    </span>
+  );
+}
+
+function CatalogCard({ entry }: { entry: CatalogEntryWithScore }) {
   const meta = TYPE_META[entry.type] || TYPE_META.service;
 
   return (
@@ -118,21 +139,24 @@ function CatalogCard({ entry }: { entry: CatalogEntryRow }) {
           </div>
         )}
 
-        <div className="flex items-center gap-3 text-[11px] text-text-muted">
-          {entry.repository_url && (
-            <span className="flex items-center gap-1">
-              <GitBranchIcon className="w-3 h-3" />
-              Linked
-            </span>
-          )}
-          {entry.dependencies.length > 0 && <span>{entry.dependencies.length} deps</span>}
+        <div className="flex items-center justify-between text-[11px] text-text-muted">
+          <div className="flex items-center gap-3">
+            {entry.repository_url && (
+              <span className="flex items-center gap-1">
+                <GitBranchIcon className="w-3 h-3" />
+                Linked
+              </span>
+            )}
+            {entry.dependencies.length > 0 && <span>{entry.dependencies.length} deps</span>}
+          </div>
+          {entry.scorecard && <ScoreBadge score={entry.scorecard.overall} />}
         </div>
       </div>
     </Link>
   );
 }
 
-function CatalogListItem({ entry }: { entry: CatalogEntryRow }) {
+function CatalogListItem({ entry }: { entry: CatalogEntryWithScore }) {
   const meta = TYPE_META[entry.type] || TYPE_META.service;
 
   return (
@@ -163,6 +187,7 @@ function CatalogListItem({ entry }: { entry: CatalogEntryRow }) {
             {tag}
           </span>
         ))}
+        {entry.scorecard && <ScoreBadge score={entry.scorecard.overall} />}
         {entry.repository_url && <ExternalLinkIcon className="w-3.5 h-3.5 text-text-muted" />}
       </div>
     </Link>
