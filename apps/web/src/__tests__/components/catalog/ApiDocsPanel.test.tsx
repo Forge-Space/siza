@@ -89,9 +89,7 @@ describe('ApiDocsPanel', () => {
 
   it('renders server URL', () => {
     render(<ApiDocsPanel spec={VALID_SPEC} />);
-    expect(
-      screen.getByText('https://api.example.com')
-    ).toBeInTheDocument();
+    expect(screen.getByText('https://api.example.com')).toBeInTheDocument();
   });
 
   it('renders endpoint count', () => {
