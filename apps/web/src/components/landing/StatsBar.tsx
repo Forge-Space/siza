@@ -27,9 +27,15 @@ function StatItem({ end, suffix, label }: { end: number; suffix: string; label: 
 
 export function StatsBar() {
   return (
-    <div className="border-y border-border bg-surface/50">
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-20 py-10">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-[#27272A]">
+    <div className="relative border-y border-violet-500/10 bg-surface/50 overflow-hidden">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.04) 50%, transparent)',
+        }}
+      />
+      <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-20 py-10 relative z-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-violet-500/10">
           {stats.map((stat, i) => (
             <FadeIn key={stat.label} delay={i * 0.1}>
               <StatItem end={stat.end} suffix={stat.suffix} label={stat.label} />

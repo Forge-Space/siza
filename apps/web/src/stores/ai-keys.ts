@@ -6,7 +6,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { AIProvider, AI_PROVIDERS } from '@/lib/encryption';
-import { aiKeyManager, DecryptedApiKey, UsageStats } from '@/lib/ai-keys';
+import {
+  aiKeyManager,
+  DecryptedApiKey,
+  UsageStats,
+  DEFAULT_SIZA_KEY,
+  isSizaFreeKey,
+} from '@/lib/ai-keys';
 
 export interface AIKeyState {
   // User preferences
@@ -68,10 +74,10 @@ export const useAIKeyStore = create<AIKeyStore>()(
     (set, get) => ({
       // Initial state
       encryptionKey: undefined,
-      defaultProvider: undefined,
+      defaultProvider: 'siza' as AIProvider,
       geminiFallbackEnabled: true,
       usageTrackingEnabled: true,
-      apiKeys: [],
+      apiKeys: [DEFAULT_SIZA_KEY],
       loading: false,
       error: undefined,
       showAddKeyDialog: false,
@@ -85,7 +91,8 @@ export const useAIKeyStore = create<AIKeyStore>()(
 
         try {
           await aiKeyManager.initialize(encryptionKey);
-          set({ encryptionKey });
+          const state = get();
+          set({ encryptionKey, defaultProvider: state.defaultProvider || 'siza' });
           await get().loadApiKeys();
         } catch (error) {
           set({
@@ -104,7 +111,8 @@ export const useAIKeyStore = create<AIKeyStore>()(
         set({ loading: true, error: undefined });
 
         try {
-          const apiKeys = await aiKeyManager.getApiKeys(encryptionKey);
+          const userKeys = await aiKeyManager.getApiKeys(encryptionKey);
+          const apiKeys = [DEFAULT_SIZA_KEY, ...userKeys.filter((k) => !isSizaFreeKey(k.keyId))];
           set({ apiKeys });
         } catch (error) {
           set({ error: error instanceof Error ? error.message : 'Failed to load API keys' });
@@ -235,10 +243,10 @@ export const useAIKeyStore = create<AIKeyStore>()(
       reset: () => {
         set({
           encryptionKey: undefined,
-          defaultProvider: undefined,
+          defaultProvider: 'siza' as AIProvider,
           geminiFallbackEnabled: true,
           usageTrackingEnabled: true,
-          apiKeys: [],
+          apiKeys: [DEFAULT_SIZA_KEY],
           loading: false,
           error: undefined,
           showAddKeyDialog: false,

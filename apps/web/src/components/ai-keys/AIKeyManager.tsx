@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { AIProvider, AI_PROVIDERS } from '@/lib/encryption';
+import { isSizaFreeKey } from '@/lib/ai-keys';
 import { AddApiKeyDialog } from './AddApiKeyDialog';
 import { EditApiKeyDialog } from './EditApiKeyDialog';
 import { UsageStats } from './UsageStats';
@@ -76,6 +77,8 @@ export function AIKeyManager() {
 
   const getProviderIcon = (provider: AIProvider) => {
     switch (provider) {
+      case 'siza':
+        return '⚡';
       case 'openai':
         return '🤖';
       case 'anthropic':
@@ -89,6 +92,8 @@ export function AIKeyManager() {
 
   const getProviderColor = (provider: AIProvider) => {
     switch (provider) {
+      case 'siza':
+        return 'bg-violet-500/10 text-violet-400 border-violet-500/30';
       case 'openai':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'anthropic':
@@ -171,21 +176,45 @@ export function AIKeyManager() {
         ) : (
           apiKeys.map((apiKey) => {
             const isDefault = apiKey.isDefault;
-            const expired = isExpired(apiKey.createdAt);
+            const isFree = isSizaFreeKey(apiKey.keyId);
+            const expired = !isFree && isExpired(apiKey.createdAt);
             const config = AI_PROVIDERS[apiKey.provider];
 
             return (
-              <Card key={apiKey.keyId} className={expired ? 'border-orange-200' : ''}>
+              <Card
+                key={apiKey.keyId}
+                className={
+                  isFree
+                    ? 'border-violet-500/30 bg-violet-500/5'
+                    : expired
+                      ? 'border-orange-200'
+                      : ''
+                }
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="text-2xl">{getProviderIcon(apiKey.provider)}</div>
                       <div>
-                        <CardTitle className="text-lg">{config.name}</CardTitle>
-                        <CardDescription>{apiKey.keyId}</CardDescription>
+                        <CardTitle className="text-lg">
+                          {isFree ? 'Siza AI \u2014 Free Tier' : config.name}
+                        </CardTitle>
+                        <CardDescription>
+                          {isFree
+                            ? 'Included with your account. No API key required.'
+                            : apiKey.keyId}
+                        </CardDescription>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {isFree && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-violet-500/10 text-violet-400 border-violet-500/30"
+                        >
+                          Free
+                        </Badge>
+                      )}
                       {isDefault && (
                         <Badge variant="secondary" className="bg-brand/10 text-text-brand">
                           <Star className="h-3 w-3 mr-1" />
@@ -207,18 +236,20 @@ export function AIKeyManager() {
                 <CardContent className="pt-0">
                   <div className="space-y-4">
                     {/* Key Details */}
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Created:</span>
-                        <div className="font-medium">{formatDate(apiKey.createdAt)}</div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Last Used:</span>
-                        <div className="font-medium">
-                          {apiKey.lastUsed ? formatDate(apiKey.lastUsed) : 'Never'}
+                    {!isFree && (
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Created:</span>
+                          <div className="font-medium">{formatDate(apiKey.createdAt)}</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Last Used:</span>
+                          <div className="font-medium">
+                            {apiKey.lastUsed ? formatDate(apiKey.lastUsed) : 'Never'}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Available Models */}
                     <div>
@@ -236,59 +267,72 @@ export function AIKeyManager() {
                     <div className="bg-muted/50 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Shield className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Provider Information</span>
+                        <span className="text-sm font-medium">
+                          {isFree ? 'Siza Routing' : 'Provider Information'}
+                        </span>
                       </div>
-                      <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
-                        <div>
-                          <div>Rate Limit:</div>
-                          <div className="font-medium text-foreground">
-                            {config.rateLimitPerMinute} requests/min
+                      {isFree ? (
+                        <p className="text-xs text-muted-foreground">
+                          Requests are routed through Siza&apos;s AI gateway. No configuration
+                          needed \u2014 just start generating.
+                        </p>
+                      ) : (
+                        <>
+                          <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
+                            <div>
+                              <div>Rate Limit:</div>
+                              <div className="font-medium text-foreground">
+                                {config.rateLimitPerMinute} requests/min
+                              </div>
+                            </div>
+                            <div>
+                              <div>Max Tokens:</div>
+                              <div className="font-medium text-foreground">
+                                {config.maxTokens.toLocaleString()}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div>
-                          <div>Max Tokens:</div>
-                          <div className="font-medium text-foreground">
-                            {config.maxTokens.toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
-                      {config.requiresOrganization && (
-                        <div className="text-xs text-orange-600 bg-orange-50 rounded p-2 mt-2">
-                          Requires organization ID in API key
-                        </div>
+                          {config.requiresOrganization && (
+                            <div className="text-xs text-orange-600 bg-orange-50 rounded p-2 mt-2">
+                              Requires organization ID in API key
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 pt-2">
-                      {!isDefault && (
+                    {!isFree && (
+                      <div className="flex items-center gap-2 pt-2">
+                        {!isDefault && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSetDefault(apiKey.keyId)}
+                          >
+                            <Star className="h-4 w-4 mr-1" />
+                            Set Default
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleSetDefault(apiKey.keyId)}
+                          onClick={() => handleEditKey(apiKey.keyId)}
                         >
-                          <Star className="h-4 w-4 mr-1" />
-                          Set Default
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
                         </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditKey(apiKey.keyId)}
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteKey(apiKey.keyId)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
-                      </Button>
-                    </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteKey(apiKey.keyId)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Delete
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

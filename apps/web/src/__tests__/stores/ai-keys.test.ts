@@ -5,7 +5,7 @@
 
 import { act, renderHook } from '@testing-library/react';
 import { useAIKeyStore } from '@/stores/ai-keys';
-import { aiKeyManager } from '@/lib/ai-keys';
+import { aiKeyManager, DEFAULT_SIZA_KEY } from '@/lib/ai-keys';
 import { AIProvider } from '@/lib/encryption';
 
 jest.mock('@/lib/ai-keys');
@@ -37,10 +37,11 @@ describe('AI Keys Store', () => {
   });
 
   describe('initialization', () => {
-    it('should initialize with default state', () => {
+    it('should initialize with default state including Siza free key', () => {
       const { result } = renderHook(() => useAIKeyStore());
 
-      expect(result.current.apiKeys).toEqual([]);
+      expect(result.current.apiKeys).toEqual([DEFAULT_SIZA_KEY]);
+      expect(result.current.defaultProvider).toBe('siza');
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeUndefined();
       expect(result.current.encryptionKey).toBeUndefined();
@@ -133,7 +134,7 @@ describe('AI Keys Store', () => {
         await result.current.initialize(testEncryptionKey);
       });
 
-      expect(result.current.apiKeys).toEqual(mockKeys);
+      expect(result.current.apiKeys).toEqual([DEFAULT_SIZA_KEY, ...mockKeys]);
       expect(result.current.loading).toBe(false);
     });
 
@@ -329,7 +330,7 @@ describe('AI Keys Store', () => {
     it('should reflect api keys after load', async () => {
       const { result } = renderHook(() => useAIKeyStore());
 
-      expect(result.current.apiKeys.length).toBe(0);
+      expect(result.current.apiKeys).toEqual([DEFAULT_SIZA_KEY]);
 
       mockAIKeyManager.getApiKeys.mockResolvedValue([
         {
@@ -345,7 +346,7 @@ describe('AI Keys Store', () => {
         await result.current.initialize(testEncryptionKey);
       });
 
-      expect(result.current.apiKeys.length).toBe(1);
+      expect(result.current.apiKeys.length).toBe(2);
     });
   });
 
@@ -403,7 +404,8 @@ describe('AI Keys Store', () => {
       });
 
       expect(result.current.encryptionKey).toBeUndefined();
-      expect(result.current.apiKeys).toEqual([]);
+      expect(result.current.apiKeys).toEqual([DEFAULT_SIZA_KEY]);
+      expect(result.current.defaultProvider).toBe('siza');
       expect(result.current.showAddKeyDialog).toBe(false);
       expect(result.current.selectedProvider).toBeUndefined();
     });

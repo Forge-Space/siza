@@ -71,7 +71,9 @@ export function ProviderSelector({
 
       <div className="flex items-center gap-2 text-xs px-3 py-2 rounded-md border">
         <KeyIcon className="h-3.5 w-3.5" />
-        {hasProviderKey ? (
+        {selectedProvider === 'siza' ? (
+          <span className="text-violet-400">Using Siza AI \u2014 free tier included</span>
+        ) : hasProviderKey ? (
           <span className="text-green-700">
             Using your {PROVIDER_LABELS[selectedProvider]} API key
           </span>

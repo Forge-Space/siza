@@ -15,7 +15,7 @@ export function AmbientVideoBackground({
       aria-hidden="true"
     >
       <video
-        className="siza-video-bg opacity-30"
+        className="siza-video-bg opacity-40"
         src={src}
         autoPlay
         muted
@@ -24,7 +24,7 @@ export function AmbientVideoBackground({
         preload="metadata"
       />
       <div
-        className={`absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.18),transparent_45%),radial-gradient(circle_at_80%_20%,rgba(54,143,231,0.14),transparent_45%)] ${overlayClassName}`}
+        className={`absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.25),transparent_50%),radial-gradient(circle_at_80%_20%,rgba(6,182,212,0.18),transparent_50%)] ${overlayClassName}`}
       />
     </div>
   );

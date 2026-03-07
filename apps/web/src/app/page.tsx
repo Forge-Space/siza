@@ -8,7 +8,6 @@ import { EcosystemSection } from '@/components/landing/EcosystemSection';
 import { DashboardPreview } from '@/components/landing/DashboardPreview';
 import { CTASection } from '@/components/landing/CTASection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { AmbientVideoBackground } from '@/components/migration/ambient-video-background';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +19,6 @@ export default async function HomePage() {
 
   return (
     <div className="relative isolate overflow-hidden">
-      <AmbientVideoBackground src="/ambient-bg.webm" />
       <LandingNav user={user} />
       <main id="main-content" className="relative z-10">
         <HeroSection user={user} />
