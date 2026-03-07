@@ -1,3 +1,4 @@
+import { createClient } from '@supabase/supabase-js';
 import { getSession } from './auth';
 import { RateLimitError } from './errors';
 
@@ -7,17 +8,19 @@ export interface RouteLimitConfig {
 }
 
 const ROUTE_LIMITS: Record<string, RouteLimitConfig> = {
-  '/api/generate': { limit: 15, window: 60000 },
-  '/api/generate/validate': { limit: 30, window: 60000 },
-  '/api/generate/format': { limit: 30, window: 60000 },
+  '/api/generate': { limit: 10, window: 60000 },
+  '/api/generate/validate': { limit: 20, window: 60000 },
+  '/api/generate/format': { limit: 20, window: 60000 },
+  '/api/generate/analyze': { limit: 5, window: 60000 },
   '/api/components': { limit: 60, window: 60000 },
   '/api/projects': { limit: 60, window: 60000 },
   '/api/templates': { limit: 60, window: 60000 },
   '/api/generations': { limit: 60, window: 60000 },
   '/api/auth': { limit: 10, window: 60000 },
-  '/api/wireframe': { limit: 10, window: 60000 },
+  '/api/wireframe': { limit: 5, window: 60000 },
   '/api/audit': { limit: 30, window: 60000 },
   '/api/scorecards': { limit: 60, window: 60000 },
+  '/api/catalog': { limit: 120, window: 60000 },
 };
 
 export function getRouteLimit(pathname: string): RouteLimitConfig {
@@ -27,25 +30,11 @@ export function getRouteLimit(pathname: string): RouteLimitConfig {
   return { limit: 100, window: 60000 };
 }
 
-interface RateLimitInfo {
-  count: number;
-  resetAt: number;
-}
-
-// In-memory storage — resets per worker instance on Cloudflare Workers.
-// For production scale, migrate to Cloudflare KV or Supabase.
-const rateLimitMap = new Map<string, RateLimitInfo>();
-
-function cleanupExpired() {
-  const now = Date.now();
-  let cleaned = 0;
-  for (const [key, value] of rateLimitMap.entries()) {
-    if (cleaned >= 10) break;
-    if (now > value.resetAt) {
-      rateLimitMap.delete(key);
-      cleaned++;
-    }
-  }
+function getServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
 }
 
 export interface RateLimitResult {
@@ -66,36 +55,34 @@ export async function checkRateLimit(
     identifier = session.user.id;
   } else {
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
-    const userAgent = request.headers.get('user-agent');
-    const acceptLang = request.headers.get('accept-language');
-
-    if (ip) {
-      identifier = `anon:${ip}:${userAgent?.substring(0, 50) || 'unknown'}:${acceptLang?.substring(0, 20) || 'unknown'}`;
-    } else {
-      identifier = 'anonymous:unknown';
-    }
+    identifier = ip ? `anon:${ip}` : 'anonymous:unknown';
   }
 
-  cleanupExpired();
+  const endpoint = new URL(request.url).pathname;
+  const windowSeconds = Math.ceil(window / 1000);
+  const supabase = getServiceClient();
 
-  const now = Date.now();
-  const userLimit = rateLimitMap.get(identifier);
-
-  if (!userLimit || now > userLimit.resetAt) {
-    const resetAt = now + window;
-    rateLimitMap.set(identifier, { count: 1, resetAt });
-    return { allowed: true, remaining: limit - 1, resetAt };
+  if (!supabase) {
+    return { allowed: true, remaining: limit, resetAt: Date.now() + window };
   }
 
-  if (userLimit.count >= limit) {
-    return { allowed: false, remaining: 0, resetAt: userLimit.resetAt };
+  const { data, error } = await supabase.rpc('check_rate_limit', {
+    p_identifier: identifier,
+    p_endpoint: endpoint,
+    p_limit: limit,
+    p_window_seconds: windowSeconds,
+  });
+
+  if (error || !data?.[0]) {
+    return { allowed: true, remaining: limit, resetAt: Date.now() + window };
   }
 
-  userLimit.count++;
+  const row = data[0];
+  const resetAt = new Date(row.reset_at).getTime();
   return {
-    allowed: true,
-    remaining: limit - userLimit.count,
-    resetAt: userLimit.resetAt,
+    allowed: row.allowed,
+    remaining: Math.max(0, limit - row.current_count),
+    resetAt,
   };
 }
 
@@ -130,5 +117,5 @@ export function setRateLimitHeaders(
 }
 
 export function _resetForTesting(): void {
-  rateLimitMap.clear();
+  // No-op — DB-backed rate limiting, no local state to clear
 }
