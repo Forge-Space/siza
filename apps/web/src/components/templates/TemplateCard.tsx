@@ -75,7 +75,7 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
             >
               {template.difficulty}
             </Badge>
-            <span className="text-xs text-text-muted">{template.category}</span>
+            <span className="text-xs text-text-muted-foreground">{template.category}</span>
           </div>
 
           <div className="flex flex-wrap gap-1">
@@ -91,7 +91,7 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
             )}
           </div>
 
-          <div className="flex items-center justify-between text-sm text-text-muted">
+          <div className="flex items-center justify-between text-sm text-text-muted-foreground">
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
               <span>{template.rating}</span>

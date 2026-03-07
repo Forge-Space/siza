@@ -73,7 +73,9 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
           <SparklesIcon className="h-6 w-6 text-error" />
         </div>
         <p className="text-error font-medium">Project not found</p>
-        <p className="text-sm text-text-muted mt-1">This project may have been deleted</p>
+        <p className="text-sm text-text-muted-foreground mt-1">
+          This project may have been deleted
+        </p>
       </div>
     );
   }
@@ -146,7 +148,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
                 activeTab === 'code'
                   ? 'text-brand-light border-b-2 border-brand'
-                  : 'text-text-muted hover:text-text-primary'
+                  : 'text-text-muted-foreground hover:text-text-primary'
               }`}
               aria-label="View code"
             >
@@ -159,7 +161,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
                 activeTab === 'preview'
                   ? 'text-brand-light border-b-2 border-brand'
-                  : 'text-text-muted hover:text-text-primary'
+                  : 'text-text-muted-foreground hover:text-text-primary'
               }`}
               aria-label="View preview"
             >

@@ -7,7 +7,7 @@ import ProjectGrid from './ProjectGrid';
 import ProjectFilters from './ProjectFilters';
 import EmptyState from '@/components/ui/EmptyState';
 import { Skeleton } from '@siza/ui';
-import { FolderIcon } from 'lucide-react';
+import { FolderIcon, LayoutGridIcon, ListIcon } from 'lucide-react';
 
 function ProjectCardSkeleton() {
   return (
@@ -30,6 +30,7 @@ export { ProjectCardSkeleton };
 export default function ProjectList() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'updated' | 'created' | 'name'>('updated');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { data: projects, isLoading, error } = useProjects();
 
   useRealtimeProjects();
@@ -78,13 +79,47 @@ export default function ProjectList() {
 
   return (
     <div className="space-y-6">
-      <ProjectFilters
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-      />
-      <ProjectGrid projects={filteredProjects} />
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <ProjectFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+        <div
+          className="flex rounded-lg border border-border bg-surface p-0.5"
+          role="tablist"
+          aria-label="View mode"
+        >
+          <button
+            type="button"
+            aria-pressed={viewMode === 'grid'}
+            aria-label="Grid view"
+            onClick={() => setViewMode('grid')}
+            className={`rounded-md p-2 transition-colors ${
+              viewMode === 'grid'
+                ? 'border border-primary/20 bg-primary/10 text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <LayoutGridIcon className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            aria-pressed={viewMode === 'list'}
+            aria-label="List view"
+            onClick={() => setViewMode('list')}
+            className={`rounded-md p-2 transition-colors ${
+              viewMode === 'list'
+                ? 'border border-primary/20 bg-primary/10 text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <ListIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+      <ProjectGrid projects={filteredProjects} viewMode={viewMode} />
     </div>
   );
 }

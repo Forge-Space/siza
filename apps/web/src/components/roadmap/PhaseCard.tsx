@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useInView, AnimatePresence, useReducedMotion } from 'motion/react';
 import { clsx } from 'clsx';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Check, Circle, Loader2, ChevronDown, ExternalLink } from 'lucide-react';
 import { EASE_SIZA } from '@/components/landing/constants';
 import type { Phase, ItemStatus, RoadmapItem } from './types';
-import { calculatePhaseProgress, filterItemsByStatus } from './utils';
+import { calculatePhaseProgress, filterItemsByScope, filterItemsByStatus } from './utils';
 
 function StatusIcon({ status }: { status: ItemStatus }) {
   switch (status) {
@@ -51,16 +51,22 @@ function ItemRow({
   item,
   index,
   isInView,
+  prefersReducedMotion,
 }: {
   item: RoadmapItem;
   index: number;
   isInView: boolean;
+  prefersReducedMotion: boolean;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -10 }}
+      initial={prefersReducedMotion ? false : { opacity: 0, x: -10 }}
       animate={isInView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.3, ease: EASE_SIZA, delay: index * 0.04 }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0 }
+          : { duration: 0.3, ease: EASE_SIZA, delay: index * 0.04 }
+      }
       className="flex items-center gap-3 py-1.5"
     >
       <StatusIcon status={item.status} />
@@ -96,6 +102,7 @@ interface PhaseCardProps {
   expanded: boolean;
   onToggle: () => void;
   activeFilter: ItemStatus | 'all';
+  scope: 'all' | 'desktop';
 }
 
 export function PhaseCard({
@@ -105,20 +112,26 @@ export function PhaseCard({
   expanded,
   onToggle,
   activeFilter,
+  scope,
 }: PhaseCardProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
+  const prefersReducedMotion = useReducedMotion();
   const isActive = phase.status === 'active';
   const progress = calculatePhaseProgress(phase);
-  const filteredItems = filterItemsByStatus(phase, activeFilter);
+  const filteredItems = filterItemsByScope(filterItemsByStatus(phase, activeFilter), scope);
 
   return (
     <motion.div
       ref={ref}
       id={`phase-${phase.number}`}
-      initial={{ opacity: 0, y: 30 }}
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, ease: EASE_SIZA, delay: index * 0.15 }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0 }
+          : { duration: 0.5, ease: EASE_SIZA, delay: index * 0.15 }
+      }
       className="relative pl-12 md:pl-16"
     >
       {index < totalPhases - 1 && (
@@ -128,7 +141,7 @@ export function PhaseCard({
         className={clsx(
           'absolute left-0 md:left-2 top-1 w-[38px] h-[38px] rounded-full flex items-center justify-center font-bold text-sm',
           isActive
-            ? 'bg-primary text-primary-foreground shadow-[0_0_16px_rgba(124,58,237,0.4)]'
+            ? 'bg-primary text-primary-foreground shadow-[0_0_16px_rgba(139,92,246,0.4)]'
             : 'bg-card border border-border text-muted-foreground'
         )}
       >
@@ -136,7 +149,7 @@ export function PhaseCard({
       </div>
       <Card
         className={clsx('p-6 mb-8 bg-card border-border', {
-          'shadow-[0_0_20px_rgba(124,58,237,0.1)]': isActive,
+          'shadow-[0_0_20px_rgba(139,92,246,0.1)]': isActive,
         })}
       >
         <button
@@ -155,7 +168,10 @@ export function PhaseCard({
             <Badge className="bg-primary/20 text-primary border-0 text-xs">Current</Badge>
           )}
           <span className="text-xs text-muted-foreground ml-auto mr-2">{phase.estimatedDate}</span>
-          <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+          <motion.div
+            animate={{ rotate: expanded ? 180 : 0 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
+          >
             <ChevronDown className="w-4 h-4 text-muted-foreground" />
           </motion.div>
         </button>
@@ -168,15 +184,29 @@ export function PhaseCard({
           {expanded && (
             <motion.div
               id={`phase-${phase.number}-items`}
-              initial={{ height: 0, opacity: 0 }}
+              initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: EASE_SIZA }}
+              exit={{
+                height: 0,
+                opacity: 0,
+                transition: prefersReducedMotion
+                  ? { duration: 0 }
+                  : { duration: 0.3, ease: EASE_SIZA },
+              }}
+              transition={
+                prefersReducedMotion ? { duration: 0 } : { duration: 0.3, ease: EASE_SIZA }
+              }
               className="overflow-hidden"
             >
               <div className="space-y-1">
                 {filteredItems.map((item, i) => (
-                  <ItemRow key={item.label} item={item} index={i} isInView={isInView} />
+                  <ItemRow
+                    key={item.label}
+                    item={item}
+                    index={i}
+                    isInView={isInView}
+                    prefersReducedMotion={!!prefersReducedMotion}
+                  />
                 ))}
                 {filteredItems.length === 0 && (
                   <p className="text-sm text-muted-foreground py-4 text-center">

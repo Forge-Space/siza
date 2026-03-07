@@ -236,7 +236,7 @@ describe('Theme Store', () => {
       expect(json).toBeDefined();
       const parsed = JSON.parse(json!);
       expect(parsed.name).toBe('Siza Default');
-      expect(parsed.primaryColor).toBe('#7C3AED');
+      expect(parsed.primaryColor).toBe('#8B5CF6');
       expect(parsed.id).toBeUndefined();
       expect(parsed.builtIn).toBeUndefined();
       expect(parsed.createdAt).toBeUndefined();
@@ -331,7 +331,7 @@ describe('Theme Store', () => {
       brandName: 'Acme Corp',
       colors: {
         primary: { hex: '#E11D48' },
-        secondary: { hex: '#7C3AED' },
+        secondary: { hex: '#A78BFA' },
         accent: { hex: '#F59E0B' },
         success: { hex: '#10B981' },
         warning: { hex: '#F59E0B' },
@@ -352,7 +352,7 @@ describe('Theme Store', () => {
       expect(result).not.toBeNull();
       expect(result!.name).toBe('Acme Corp');
       expect(result!.primaryColor).toBe('#E11D48');
-      expect(result!.secondaryColor).toBe('#7C3AED');
+      expect(result!.secondaryColor).toBe('#A78BFA');
       expect(result!.accentColor).toBe('#F59E0B');
       expect(result!.typography).toBe('sans');
       expect(result!.spacing).toBe('default');

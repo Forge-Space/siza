@@ -27,7 +27,8 @@ function getConfig(): McpGatewayConfig {
 async function rpc(
   config: McpGatewayConfig,
   method: string,
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
+  requestId?: string
 ): Promise<McpJsonRpcResponse> {
   const body: McpJsonRpcRequest = {
     jsonrpc: '2.0',
@@ -39,13 +40,18 @@ async function rpc(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), config.timeoutMs);
 
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${config.jwt}`,
+    'Content-Type': 'application/json',
+  };
+  if (requestId) {
+    headers['X-Request-ID'] = requestId;
+  }
+
   try {
     const response = await fetch(`${config.baseUrl}/rpc`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${config.jwt}`,
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(body),
       signal: controller.signal,
     });
@@ -82,10 +88,11 @@ export async function listTools(): Promise<McpToolDefinition[]> {
 
 export async function callTool(
   name: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
+  requestId?: string
 ): Promise<McpToolResult> {
   const config = getConfig();
-  const result = await rpc(config, 'tools/call', { name, arguments: args });
+  const result = await rpc(config, 'tools/call', { name, arguments: args }, requestId);
 
   if (result.error) {
     throw new Error(`MCP tool error (${result.error.code}): ${result.error.message}`);
@@ -100,7 +107,10 @@ export async function callTool(
   return result.result;
 }
 
-export async function generateComponent(options: McpGenerateOptions): Promise<string> {
+export async function generateComponent(
+  options: McpGenerateOptions,
+  requestId?: string
+): Promise<string> {
   const preferences = {
     cost_preference: 'balanced',
     responsive: true,
@@ -127,12 +137,16 @@ export async function generateComponent(options: McpGenerateOptions): Promise<st
     task += `\n\nAdditional context:\n${options.contextAddition}`;
   }
 
-  const result = await callTool('execute_specialist_task', {
-    task,
-    category: 'ui_generation',
-    user_preferences: JSON.stringify(preferences),
-    cost_optimization: true,
-  });
+  const result = await callTool(
+    'execute_specialist_task',
+    {
+      task,
+      category: 'ui_generation',
+      user_preferences: JSON.stringify(preferences),
+      cost_optimization: true,
+    },
+    requestId
+  );
 
   const textContent = result.content.find((c) => c.type === 'text');
   if (!textContent?.text) {

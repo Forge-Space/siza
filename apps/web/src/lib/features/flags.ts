@@ -12,13 +12,13 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_MAINTENANCE_MODE: false,
   ENABLE_BETA_FEATURES: false,
   ENABLE_GITHUB_APP: true,
-  ENABLE_QUALITY_GATES: false,
+  ENABLE_QUALITY_GATES: true,
   ENABLE_MULTI_LLM: true,
   ENABLE_RESEND_EMAILS: false,
   ENABLE_CENTRALIZED_FEATURE_FLAGS: false,
   ENABLE_STRIPE_BILLING: false,
   ENABLE_USAGE_LIMITS: false,
-  ENABLE_MCP_GATEWAY: false,
+  ENABLE_MCP_GATEWAY: true,
   ENABLE_DESIGN_CONTEXT: true,
   ENABLE_PROMPT_AUTOCOMPLETE: true,
   ENABLE_CODE_INTELLISENSE: true,
@@ -27,6 +27,9 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_ONBOARDING: false,
   ENABLE_SIZA_AI: true,
   ENABLE_SKILLS: false,
+  ENABLE_AUDIT_DASHBOARD: false,
+  ENABLE_POLICY_ENGINE: false,
+  ENABLE_PROJECT_SCORECARDS: false,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -99,7 +102,7 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
   {
     name: 'ENABLE_QUALITY_GATES',
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_QUALITY_GATES,
-    description: 'Run quality checks before PR creation',
+    description: 'Run quality checks on generated code and display scorecard',
     category: 'quality',
   },
   {
@@ -185,6 +188,24 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SKILLS,
     description: 'Enable skills system for prompt enrichment during generation',
     category: 'generation',
+  },
+  {
+    name: 'ENABLE_AUDIT_DASHBOARD',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_AUDIT_DASHBOARD,
+    description: 'Show audit event dashboard for admin users',
+    category: 'governance',
+  },
+  {
+    name: 'ENABLE_POLICY_ENGINE',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_POLICY_ENGINE,
+    description: 'Enforce governance policies on code generation',
+    category: 'governance',
+  },
+  {
+    name: 'ENABLE_PROJECT_SCORECARDS',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_PROJECT_SCORECARDS,
+    description: 'Show per-project quality and compliance scorecards',
+    category: 'governance',
   },
 ];
 

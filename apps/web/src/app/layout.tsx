@@ -10,9 +10,9 @@ const dmSans = DM_Sans({
   preload: false,
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['600', '700', '800'],
+  weight: ['500', '600', '700'],
   variable: '--font-plus-jakarta',
   preload: false,
 });
@@ -74,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${plusJakarta.variable} ${ibmPlexMono.variable}`}
+      className={`${dmSans.variable} ${plusJakartaSans.variable} ${ibmPlexMono.variable}`}
     >
       <body className="font-sans">
         <a

@@ -20,6 +20,7 @@ export interface RouteGenerationOptions {
   imageMimeType?: string;
   provider: string;
   model: string;
+  correlationId?: string;
 }
 
 export async function* routeGeneration(
@@ -97,16 +98,19 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
 
   let mcpCode = '';
   try {
-    mcpCode = await generateComponent({
-      prompt: opts.prompt,
-      framework: opts.framework,
-      componentLibrary: opts.componentLibrary,
-      style: opts.style,
-      typescript: opts.typescript,
-      imageBase64: opts.imageBase64,
-      imageMimeType: opts.imageMimeType,
-      contextAddition: opts.contextAddition,
-    });
+    mcpCode = await generateComponent(
+      {
+        prompt: opts.prompt,
+        framework: opts.framework,
+        componentLibrary: opts.componentLibrary,
+        style: opts.style,
+        typescript: opts.typescript,
+        imageBase64: opts.imageBase64,
+        imageMimeType: opts.imageMimeType,
+        contextAddition: opts.contextAddition,
+      },
+      opts.correlationId
+    );
   } catch (mcpError) {
     captureServerError(mcpError, {
       route: '/api/generate',

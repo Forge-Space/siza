@@ -25,7 +25,7 @@ export function PhaseNavigator({ phases, activePhase, onSelect }: PhaseNavigator
           className={clsx(
             'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
             {
-              'bg-primary text-primary-foreground shadow-[0_0_12px_rgba(124,58,237,0.3)]':
+              'bg-primary text-primary-foreground shadow-[0_0_12px_rgba(139,92,246,0.3)]':
                 activePhase === phase.number,
               'bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/30':
                 activePhase !== phase.number,

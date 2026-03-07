@@ -2,7 +2,7 @@ module.exports = {
   identity: {
     name: 'Forge Space',
     colors: {
-      primary: { hex: '#7C3AED' },
+      primary: { hex: '#8B5CF6' },
       secondary: { hex: '#6366F1' },
       accent: { hex: '#22C55E' },
       semantic: {
@@ -26,7 +26,7 @@ module.exports = {
     },
     subBrands: {
       siza: {
-        headingFont: 'Plus Jakarta Sans',
+        headingFont: 'Sora',
         bodyFont: 'DM Sans',
       },
     },

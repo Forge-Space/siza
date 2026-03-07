@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, Github } from 'lucide-react';
 import { FadeIn } from './FadeIn';
 
@@ -9,12 +10,14 @@ interface CTASectionProps {
 }
 
 export function CTASection({ user }: CTASectionProps) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <section className="relative border-t border-[#27272A] overflow-hidden">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.20), transparent 70%)',
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.20), transparent 70%)',
         }}
       />
 
@@ -23,7 +26,7 @@ export function CTASection({ user }: CTASectionProps) {
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-6">
               Start building{' '}
-              <span className="bg-gradient-to-r from-brand via-brand-light to-info bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-violet-500 via-violet-300 to-blue-400 bg-clip-text text-transparent">
                 the right way
               </span>
             </h2>
@@ -34,22 +37,30 @@ export function CTASection({ user }: CTASectionProps) {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href={user ? '/generate' : '/signup'}
-                className="bg-brand hover:bg-brand-light text-white rounded-lg px-8 py-3 text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors"
+              <motion.div
+                whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                className="inline-flex"
               >
-                {user ? 'Go to Dashboard' : 'Get Started Free'}
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
+                <Link
+                  href={user ? '/generate' : '/signup'}
+                  className="bg-violet-600 hover:bg-violet-500 text-white rounded-lg px-8 py-3 text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors shadow-[0_0_24px_rgba(139,92,246,0.25)] hover:shadow-[0_0_32px_rgba(139,92,246,0.35)]"
+                >
+                  {user ? 'Go to Dashboard' : 'Get Started Free'}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </motion.div>
+              <motion.a
                 href="https://github.com/Forge-Space"
                 target="_blank"
                 rel="noopener noreferrer"
+                whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                 className="border border-[#27272A] rounded-lg px-8 py-3 text-sm font-medium text-[#FAFAFA] hover:bg-[#27272A]/50 inline-flex items-center justify-center gap-2 transition-colors"
               >
                 <Github className="w-4 h-4" />
                 View on GitHub
-              </Link>
+              </motion.a>
             </div>
 
             <p className="text-sm text-[#71717A] text-center mt-6">

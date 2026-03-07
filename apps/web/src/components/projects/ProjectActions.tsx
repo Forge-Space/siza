@@ -30,7 +30,7 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
     <>
       <div className="relative">
         <button onClick={() => setMenuOpen(!menuOpen)} className="p-1 rounded hover:bg-accent">
-          <MoreVerticalIcon className="h-5 w-5 text-text-muted" />
+          <MoreVerticalIcon className="h-5 w-5 text-text-muted-foreground" />
         </button>
         {menuOpen && (
           <>

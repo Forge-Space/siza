@@ -43,6 +43,7 @@ interface GeneratorFormProps {
   onGenerating: () => void;
   isGenerating: boolean;
   initialDescription?: string;
+  formRef?: React.RefObject<HTMLFormElement | null>;
 }
 
 export default function GeneratorForm({
@@ -52,6 +53,7 @@ export default function GeneratorForm({
   onGenerating,
   isGenerating,
   initialDescription,
+  formRef,
 }: GeneratorFormProps) {
   const generation = useGeneration(projectId);
   const encryptionKey = useAIKeyStore((s) => s.encryptionKey);
@@ -232,6 +234,7 @@ export default function GeneratorForm({
   return (
     <div className="flex flex-col h-full">
       <form
+        ref={formRef}
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col flex-1 overflow-y-auto p-6 space-y-4"
       >
@@ -262,7 +265,8 @@ export default function GeneratorForm({
 
         <div>
           <label htmlFor="prompt" className="block text-sm font-medium text-text-primary mb-2">
-            Describe Your Component *
+            Describe Your Component *{' '}
+            <span className="text-text-muted-foreground font-normal">(⌘K to focus)</span>
           </label>
           {autocompleteEnabled ? (
             <PromptAutocomplete
@@ -382,6 +386,7 @@ export default function GeneratorForm({
         <button
           type="submit"
           disabled={generation.isGenerating || isQuotaExceeded || needsApiKey}
+          title="Generate component (⌘↵)"
           className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {generation.isGenerating ? (
@@ -392,7 +397,7 @@ export default function GeneratorForm({
           ) : (
             <>
               <SparklesIcon className="h-5 w-5 mr-2" />
-              Generate Component
+              Generate (⌘↵)
               {selectedSkillIds.length > 0 && <SkillBadge count={selectedSkillIds.length} />}
             </>
           )}

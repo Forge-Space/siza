@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { MarketingSection } from '@/components/migration/migration-primitives';
 
 export const metadata: Metadata = {
   title: 'Terms of Service | Siza',
@@ -7,15 +8,15 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="max-w-3xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
-      <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-2">
+    <MarketingSection className="max-w-3xl py-16 sm:py-24">
+      <h1 className="mb-2 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
         Terms of Service
       </h1>
-      <p className="text-sm text-[#71717A] mb-12">Last updated: February 28, 2026</p>
+      <p className="mb-12 text-sm text-text-muted-foreground">Last updated: February 28, 2026</p>
 
-      <div className="space-y-8 text-[#A1A1AA] text-sm leading-relaxed">
+      <div className="siza-prose space-y-8">
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">1. Acceptance</h2>
+          <h2 className="mb-3">1. Acceptance</h2>
           <p>
             By accessing or using Siza (&quot;the Service&quot;), you agree to be bound by these
             Terms of Service. If you do not agree, do not use the Service.
@@ -23,7 +24,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">2. The Service</h2>
+          <h2 className="mb-3">2. The Service</h2>
           <p>
             Siza is an open-source AI workspace that generates production-grade UI code. The Service
             includes the web application, desktop application, MCP tools, and associated APIs.
@@ -31,7 +32,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">3. Accounts</h2>
+          <h2 className="mb-3">3. Accounts</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li>You must provide accurate information when creating an account</li>
             <li>You are responsible for maintaining the security of your account</li>
@@ -40,7 +41,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">4. Generated code ownership</h2>
+          <h2 className="mb-3">4. Generated code ownership</h2>
           <p>
             Code generated through Siza belongs to you. You may use, modify, and distribute
             generated code without restriction. We claim no intellectual property rights over your
@@ -49,7 +50,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">5. Free and paid tiers</h2>
+          <h2 className="mb-3">5. Free and paid tiers</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li>
               The free tier includes limited generations per month as described on the pricing page
@@ -63,7 +64,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">6. Acceptable use</h2>
+          <h2 className="mb-3">6. Acceptable use</h2>
           <p>You agree not to:</p>
           <ul className="list-disc pl-5 space-y-2 mt-2">
             <li>Use the Service to generate malicious code or malware</li>
@@ -74,7 +75,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">7. Limitation of liability</h2>
+          <h2 className="mb-3">7. Limitation of liability</h2>
           <p>
             The Service is provided &quot;as is&quot; without warranty of any kind. Siza is not
             liable for any damages arising from the use of generated code in production
@@ -84,7 +85,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">8. Open source</h2>
+          <h2 className="mb-3">8. Open source</h2>
           <p>
             Siza&apos;s source code is available under the MIT License. These Terms govern the
             hosted Service at forgespace.co. Self-hosted instances are governed by the MIT License
@@ -93,7 +94,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">9. Changes</h2>
+          <h2 className="mb-3">9. Changes</h2>
           <p>
             We may update these Terms from time to time. Continued use of the Service after changes
             constitutes acceptance. Material changes will be communicated via email.
@@ -101,7 +102,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">10. Contact</h2>
+          <h2 className="mb-3">10. Contact</h2>
           <p>
             Questions? Email{' '}
             <a href="mailto:support@forgespace.co" className="text-brand-light hover:underline">
@@ -111,6 +112,6 @@ export default function TermsPage() {
           </p>
         </section>
       </div>
-    </div>
+    </MarketingSection>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { motion, useReducedMotion } from 'motion/react';
 import { CONTAINER, SECTION_PADDING } from './constants';
 import { FadeIn } from './FadeIn';
 
@@ -49,12 +50,16 @@ const repos = [
 ];
 
 export function EcosystemSection() {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <section id="ecosystem" className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
         <div className="text-center">
           <FadeIn>
-            <p className="text-sm font-mono text-brand tracking-wider uppercase mb-4">Ecosystem</p>
+            <p className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-4">
+              Ecosystem
+            </p>
           </FadeIn>
           <FadeIn delay={0.08}>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
@@ -77,7 +82,7 @@ export function EcosystemSection() {
                 y1="0"
                 x2={`${x}%`}
                 y2="100%"
-                stroke="rgba(124,58,237,0.3)"
+                stroke="rgba(139,92,246,0.3)"
                 strokeWidth="1"
                 strokeDasharray="4 4"
               >
@@ -96,20 +101,22 @@ export function EcosystemSection() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-14">
           {repos.map((repo, i) => (
             <FadeIn key={repo.name} delay={0.24 + i * 0.08}>
-              <a
+              <motion.a
                 href={repo.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block rounded-xl border border-[#27272A] bg-[#18181B] p-6 transition-all duration-200 ease-siza hover:border-[var(--border-hover)] hover:shadow-card-hover hover:-translate-y-0.5 group"
+                whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                className="block rounded-xl border border-[#27272A] bg-[#18181B] p-6 transition-all duration-200 ease-siza hover:border-violet-500/30 hover:shadow-card-hover group"
               >
-                <span className="inline-flex items-center rounded-md bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand-light mb-3">
+                <span className="inline-flex items-center rounded-md bg-violet-500/15 px-2.5 py-0.5 text-xs font-medium text-violet-300 mb-3">
                   {repo.badge}
                 </span>
-                <h3 className="text-base font-semibold text-[#FAFAFA] mb-2 group-hover:text-brand-light transition-colors">
+                <h3 className="text-base font-semibold text-[#FAFAFA] mb-2 group-hover:text-violet-300 transition-colors">
                   {repo.name}
                 </h3>
                 <p className="text-sm text-[#A1A1AA] leading-relaxed">{repo.desc}</p>
-              </a>
+              </motion.a>
             </FadeIn>
           ))}
         </div>

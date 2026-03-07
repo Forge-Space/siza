@@ -59,7 +59,9 @@ export function BYOKProviderGrid({
               >
                 {AI_PROVIDERS[provider].name}
                 {!hasKey(provider) && (
-                  <span className="block text-[10px] text-text-muted mt-0.5">No key</span>
+                  <span className="block text-[10px] text-text-muted-foreground mt-0.5">
+                    No key
+                  </span>
                 )}
               </button>
             ))}

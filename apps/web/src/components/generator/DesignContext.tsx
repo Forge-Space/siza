@@ -24,7 +24,7 @@ export interface DesignContextValues {
 
 export const DESIGN_DEFAULTS: DesignContextValues = {
   colorMode: 'dark',
-  primaryColor: '#7C3AED',
+  primaryColor: '#8B5CF6',
   secondaryColor: '#3B82F6',
   accentColor: '#22C55E',
   animation: 'subtle',

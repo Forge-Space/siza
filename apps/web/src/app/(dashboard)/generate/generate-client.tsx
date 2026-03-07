@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, Suspense, useEffect } from 'react';
+import { useState, useCallback, Suspense, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import GeneratorForm from '@/components/generator/GeneratorForm';
 import CodeEditor from '@/components/generator/CodeEditor';
@@ -28,6 +28,7 @@ import type { QualityReport } from '@/lib/quality/gates';
 import { SaveTemplateDialog } from '@/components/generator/SaveTemplateDialog';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import { useGeneration } from '@/hooks/use-generation';
+import { useGeneratePageShortcuts } from '@/hooks/use-generate-page-shortcuts';
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
 import { FolderPlus } from 'lucide-react';
 
@@ -57,8 +58,17 @@ function GeneratePageClient() {
   const [qualityReport, setQualityReport] = useState<QualityReport | null>(null);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [lastFormOptions, setLastFormOptions] = useState<any>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const githubEnabled = isFeatureEnabled('ENABLE_GITHUB_APP');
+
+  useGeneratePageShortcuts({
+    formRef,
+    onSaveTemplate: () => setSaveDialogOpen(true),
+    saveDialogOpen,
+    onCloseModals: () => setSaveDialogOpen(false),
+    promptInputId: 'prompt',
+  });
 
   useEffect(() => {
     if (!template) return;
@@ -317,6 +327,7 @@ function GeneratePageClient() {
               onGenerating={handleGenerating}
               isGenerating={isGenerating}
               initialDescription={isTemplateMode ? description || undefined : undefined}
+              formRef={formRef}
             />
           </Card>
         </div>
@@ -356,9 +367,14 @@ function GeneratePageClient() {
               <QualityBadge report={qualityReport} />
             </div>
             <div className="flex items-center gap-3">
-              <Button onClick={() => setSaveDialogOpen(true)} variant="outline" size="sm">
+              <Button
+                onClick={() => setSaveDialogOpen(true)}
+                variant="outline"
+                size="sm"
+                title="Save as template (⌘S)"
+              >
                 <Save className="mr-2 h-4 w-4" />
-                Save as Template
+                Save as Template (⌘S)
               </Button>
               {githubEnabled && pushState === 'idle' && (
                 <Button onClick={handlePushToGitHub} variant="outline" size="sm">

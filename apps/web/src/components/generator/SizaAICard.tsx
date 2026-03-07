@@ -41,8 +41,8 @@ export function SizaAICard({
       </p>
       <div className="space-y-1">
         <div className="flex justify-between text-xs">
-          <span className="text-text-muted">{remaining} generations left</span>
-          <span className="text-text-muted">
+          <span className="text-text-muted-foreground">{remaining} generations left</span>
+          <span className="text-text-muted-foreground">
             {generationsUsed}/{generationsLimit}
           </span>
         </div>

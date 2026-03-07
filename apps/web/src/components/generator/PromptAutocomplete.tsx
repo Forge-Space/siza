@@ -118,18 +118,18 @@ export function PromptAutocomplete({
               }`}
             >
               {s.source === 'history' ? (
-                <HistoryIcon className="h-4 w-4 mt-0.5 shrink-0 text-text-muted" />
+                <HistoryIcon className="h-4 w-4 mt-0.5 shrink-0 text-text-muted-foreground" />
               ) : (
                 <LayoutTemplateIcon className="h-4 w-4 mt-0.5 shrink-0 text-brand-light" />
               )}
               <div className="min-w-0 flex-1">
                 <p className="truncate">{s.text}</p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-xs text-text-muted">
+                  <span className="text-xs text-text-muted-foreground">
                     {s.source === 'history' ? 'History' : 'Template'}
                   </span>
                   {s.framework && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-surface-2 text-text-muted">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-surface-2 text-text-muted-foreground">
                       {s.framework}
                     </span>
                   )}
@@ -138,7 +138,7 @@ export function PromptAutocomplete({
             </li>
           ))}
           {isLoading && (
-            <li className="px-3 py-2 text-xs text-text-muted text-center">Loading...</li>
+            <li className="px-3 py-2 text-xs text-text-muted-foreground text-center">Loading...</li>
           )}
         </ul>
       )}

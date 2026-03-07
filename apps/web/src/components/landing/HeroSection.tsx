@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRight, Github } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 import { EASE_SIZA, CONTAINER } from './constants';
 
 interface HeroSectionProps {
@@ -11,6 +11,8 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ user }: HeroSectionProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
   const particles = useMemo(() => {
     const seed = (i: number) => {
       const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
@@ -27,13 +29,17 @@ export function HeroSection({ user }: HeroSectionProps) {
     }));
   }, []);
 
+  useEffect(() => {
+    queueMicrotask(() => setMounted(true));
+  }, []);
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       <div
         className="absolute w-[800px] h-[800px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
           background:
-            'conic-gradient(from 0deg, rgba(124,58,237,0.12), rgba(99,102,241,0.08), rgba(124,58,237,0.12))',
+            'conic-gradient(from 0deg, rgba(139,92,246,0.12), rgba(99,102,241,0.08), rgba(139,92,246,0.12))',
           filter: 'blur(80px)',
           animation: 'mesh-rotate 75s linear infinite',
           opacity: 0.15,
@@ -43,155 +49,157 @@ export function HeroSection({ user }: HeroSectionProps) {
       <div
         className="absolute inset-0 opacity-[0.6]"
         style={{
-          backgroundImage: 'radial-gradient(circle, #27272A 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(circle, var(--forge-border) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
 
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute rounded-full bg-brand"
-          style={
-            {
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              top: p.top,
-              left: p.left,
-              opacity: p.opacity,
-              animation: `particle-drift ${p.duration}s ease-in-out infinite`,
-              animationDelay: `${p.delay}s`,
-              '--drift-x': `${(p.id % 2 === 0 ? 1 : -1) * 20}px`,
-              '--drift-y': `${(p.id % 3 === 0 ? 1 : -1) * 15}px`,
-              '--particle-opacity': `${p.opacity}`,
-            } as React.CSSProperties
-          }
-        />
-      ))}
+      {mounted &&
+        particles.map((p) => (
+          <div
+            key={p.id}
+            className="absolute rounded-full bg-violet-500"
+            style={
+              {
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                top: p.top,
+                left: p.left,
+                opacity: p.opacity,
+                animation: `particle-drift ${p.duration}s ease-in-out infinite`,
+                animationDelay: `${p.delay}s`,
+                '--drift-x': `${(p.id % 2 === 0 ? 1 : -1) * 20}px`,
+                '--drift-y': `${(p.id % 3 === 0 ? 1 : -1) * 15}px`,
+                '--particle-opacity': `${p.opacity}`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
 
       <div
         className="absolute w-[600px] h-[400px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
-          background: 'radial-gradient(ellipse, rgba(124,58,237,0.20), transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(139,92,246,0.20), transparent 70%)',
           animation: 'pulse-glow 4s ease-in-out infinite',
         }}
       />
 
       <div className={`${CONTAINER} relative z-10 text-center`}>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE_SIZA }}
-          className="inline-flex items-center gap-2 rounded-full border border-[#27272A] bg-[#18181B]/80 px-4 py-1.5 text-xs font-mono text-[#A1A1AA]"
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA }}
+          className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-mono text-violet-300"
         >
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          Open Source &middot; MIT License
+          <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+          Now in Public Beta
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.8,
-            ease: EASE_SIZA,
-            delay: 0.1,
-          }}
+          transition={
+            prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA, delay: 0.1 }
+          }
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mt-6"
         >
-          Vibe code{' '}
-          <span className="bg-gradient-to-r from-brand via-brand-light to-info bg-clip-text text-transparent">
-            the right way
-          </span>
+          Generate <span className="shimmer-text">production-grade</span>
+          <br />
+          UI code with AI
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.8,
-            ease: EASE_SIZA,
-            delay: 0.2,
-          }}
-          className="text-lg text-[#A1A1AA] max-w-xl mx-auto mt-6"
+          transition={
+            prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA, delay: 0.2 }
+          }
+          className="text-lg text-muted-foreground max-w-2xl mx-auto mt-6"
         >
-          AI-powered full-stack generation with real architecture, security by default, and quality
-          gates that catch what linters miss.
+          Siza generates quality React, Next.js, and Vue components, not generic AI slop. Bring your
+          own API key, choose your model, and ship faster.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.8,
-            ease: EASE_SIZA,
-            delay: 0.3,
-          }}
+          transition={
+            prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA, delay: 0.3 }
+          }
           className="flex flex-col sm:flex-row gap-4 justify-center mt-10"
         >
-          <Link
-            href={user ? '/generate' : '/signin'}
-            className="group relative inline-flex items-center gap-2 bg-brand text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-brand-light hover:shadow-card-hover hover:-translate-y-0.5 overflow-hidden"
+          <motion.div
+            whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+            whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+            className="inline-flex"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-            <span className="relative">{user ? 'Go to Dashboard' : 'Get Started Free'}</span>
-            <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-          <Link
-            href="https://github.com/Forge-Space"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 border border-[#27272A] rounded-lg px-6 py-3 text-sm font-medium text-[#FAFAFA] hover:bg-[#27272A]/50 hover:border-[var(--border-hover)] transition-all duration-200"
+            <Link
+              href={user ? '/generate' : '/signin'}
+              className="group relative inline-flex items-center gap-2 bg-violet-600 text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,0.3)] hover:shadow-[0_0_32px_rgba(139,92,246,0.45)] overflow-hidden"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="relative">{user ? 'Go to Dashboard' : 'Start Generating Free'}</span>
+              <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </motion.div>
+          <motion.div
+            whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+            whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+            className="inline-flex"
           >
-            <Github className="w-4 h-4" />
-            View on GitHub
-          </Link>
+            <Link
+              href="/docs"
+              className="inline-flex items-center gap-2 border border-border rounded-lg px-6 py-3 text-sm font-medium text-foreground hover:bg-violet-500/5 hover:border-violet-500/40 transition-all duration-200"
+            >
+              <BookOpen className="w-4 h-4" />
+              Read the Docs
+            </Link>
+          </motion.div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.8,
-            ease: EASE_SIZA,
-            delay: 0.5,
-          }}
-          className="max-w-2xl mx-auto rounded-xl border border-[#27272A] bg-[#18181B] overflow-hidden mt-16 shadow-card hover:shadow-card-hover transition-all duration-300"
+          transition={
+            prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA, delay: 0.5 }
+          }
+          whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+          className="max-w-4xl mx-auto rounded-xl border border-border bg-surface overflow-hidden mt-16 shadow-card hover:shadow-card-hover transition-all duration-300"
         >
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-[#27272A]">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 opacity-60" />
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 opacity-60" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500 opacity-60" />
+            <span className="ml-3 text-xs text-subtle font-mono">
+              siza generate --component ProductCard
+            </span>
           </div>
           <div className="p-5 font-mono text-[13px] leading-relaxed">
             <div>
-              <span className="text-[#71717A]">$</span>{' '}
-              <span className="text-[#FAFAFA]">npx create-siza-app my-saas</span>
+              <span className="text-subtle">{'// Generated by Siza AI — Claude 3.5 Sonnet'}</span>
             </div>
             <div>
-              <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">
-                Architecture scaffolded (service layers, middleware)
+              <span className="text-violet-400">export function</span>{' '}
+              <span className="text-info">ProductCard</span>{' '}
+              <span className="text-subtle">{'({ product }: Props) {'}</span>
+            </div>
+            <div>
+              <span className="text-violet-400">return</span>{' '}
+              <span className="text-subtle">
+                {'(<Card className="group hover:shadow-lg transition-all">)'}
               </span>
             </div>
             <div>
-              <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">
-                Security configured (BYOK, RLS, input validation)
+              <span className="text-subtle">
+                {'<Badge variant="secondary">{product.category}</Badge>'}
               </span>
             </div>
             <div>
-              <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">Quality gates enabled (5 validation layers)</span>
-            </div>
-            <div>
-              <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">
-                CI/CD pipeline ready (lint, test, security scan)
-              </span>
+              <span className="text-subtle">{'<h3>{product.name}</h3>'}</span>
             </div>
             <div>
               <span
-                className="inline-block w-2 h-4 bg-brand"
+                className="inline-block w-2 h-4 bg-violet-500"
                 style={{
                   animation: 'cursor-blink 1s step-end infinite',
                 }}

@@ -49,6 +49,7 @@ export function HistoryClient() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
   const [filters, setFilters] = useState<HistoryFilters>({
     framework: '',
     provider: '',
@@ -62,7 +63,7 @@ export function HistoryClient() {
       try {
         const params = new URLSearchParams({
           page: page.toString(),
-          limit: '12',
+          limit: itemsPerPage.toString(),
         });
         if (filters.framework) params.set('framework', filters.framework);
         if (filters.provider) params.set('provider', filters.provider);
@@ -79,7 +80,7 @@ export function HistoryClient() {
         setLoading(false);
       }
     },
-    [filters]
+    [filters, itemsPerPage]
   );
 
   useEffect(() => {
@@ -119,7 +120,7 @@ export function HistoryClient() {
       <div className="flex-1 overflow-auto mt-6">
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-text-muted" />
+            <Loader2 className="h-8 w-8 animate-spin text-text-muted-foreground" />
           </div>
         )}
 
@@ -150,7 +151,7 @@ export function HistoryClient() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <Code2Icon className="w-12 h-12 text-text-muted mb-4" />
+                <Code2Icon className="w-12 h-12 text-text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold text-text-primary mb-2">
                   No generations found
                 </h3>
@@ -178,7 +179,19 @@ export function HistoryClient() {
             Showing {(pagination.page - 1) * pagination.limit + 1}-
             {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+              }}
+              className="h-9 rounded-md border border-surface-3 bg-surface-1 px-2 text-xs text-text-secondary"
+              aria-label="Items per page"
+            >
+              <option value={8}>8 / page</option>
+              <option value={12}>12 / page</option>
+              <option value={24}>24 / page</option>
+            </select>
             <button
               onClick={() => fetchHistory(pagination.page - 1)}
               disabled={pagination.page <= 1}

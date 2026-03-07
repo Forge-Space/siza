@@ -92,6 +92,7 @@ export interface GenerationRecordParams {
   model: string;
   projectId?: string;
   parentGenerationId?: string | null;
+  correlationId?: string;
 }
 
 export async function createGenerationRecord(
@@ -106,6 +107,7 @@ export async function createGenerationRecord(
     model_used: params.model,
     project_id: params.projectId,
     parent_generation_id: params.parentGenerationId,
+    correlation_id: params.correlationId,
   });
 }
 

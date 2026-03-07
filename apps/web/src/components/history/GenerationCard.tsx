@@ -67,8 +67,8 @@ export function GenerationCard({ generation, onReusePrompt, onCopyCode }: Genera
       <p className="text-xs text-text-secondary line-clamp-2">{generation.prompt}</p>
 
       {codePreview && (
-        <div className="bg-surface-0 rounded-md p-2 text-xs font-mono text-text-muted overflow-hidden">
-          <div className="flex items-center gap-1 mb-1 text-text-muted">
+        <div className="bg-surface-0 rounded-md p-2 text-xs font-mono text-text-muted-foreground overflow-hidden">
+          <div className="flex items-center gap-1 mb-1 text-text-muted-foreground">
             <CodeIcon className="h-3 w-3" />
             <span>Preview</span>
           </div>
@@ -76,7 +76,7 @@ export function GenerationCard({ generation, onReusePrompt, onCopyCode }: Genera
         </div>
       )}
 
-      <div className="flex items-center gap-2 text-xs text-text-muted flex-wrap">
+      <div className="flex items-center gap-2 text-xs text-text-muted-foreground flex-wrap">
         <span>{timeAgo}</span>
         {generation.ai_provider && (
           <>

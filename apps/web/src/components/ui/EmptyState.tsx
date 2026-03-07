@@ -20,7 +20,7 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="text-center py-12">
-      <Icon className="mx-auto h-12 w-12 text-text-muted" />
+      <Icon className="mx-auto h-12 w-12 text-text-muted-foreground" />
       <h3 className="mt-2 text-sm font-semibold text-text-primary">{title}</h3>
       <p className="mt-1 text-sm text-text-secondary">{description}</p>
       {actionLabel && (actionHref || onAction) && (

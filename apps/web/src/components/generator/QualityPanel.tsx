@@ -80,7 +80,7 @@ function GateRow({ result }: { result: QualityResult }) {
         {hasIssues && (
           <ChevronDown
             className={cn(
-              'h-4 w-4 text-text-muted transition-transform duration-200',
+              'h-4 w-4 text-text-muted-foreground transition-transform duration-200',
               expanded && 'rotate-180'
             )}
           />
@@ -89,7 +89,7 @@ function GateRow({ result }: { result: QualityResult }) {
       {expanded && hasIssues && (
         <ul className="mt-2 ml-10 space-y-1">
           {result.issues.map((issue, i) => (
-            <li key={i} className="text-xs text-text-muted leading-relaxed">
+            <li key={i} className="text-xs text-text-muted-foreground leading-relaxed">
               {issue}
             </li>
           ))}
@@ -151,14 +151,14 @@ export function QualityPanel({ report, open, onOpenChange }: QualityPanelProps) 
           <ScoreGauge score={report.score} />
           <div>
             <h3 className="text-sm font-semibold text-text-primary">Quality Gates</h3>
-            <p className="text-xs text-text-muted">
+            <p className="text-xs text-text-muted-foreground">
               {report.results.filter((r) => r.passed).length}/{report.results.length} checks passed
             </p>
           </div>
         </div>
         <button
           onClick={() => onOpenChange(false)}
-          className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
+          className="p-1.5 rounded-md text-text-muted-foreground hover:text-text-primary hover:bg-surface-2 transition-colors"
           aria-label="Close quality panel"
         >
           <X className="h-4 w-4" />

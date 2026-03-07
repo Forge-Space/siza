@@ -21,9 +21,9 @@ export const generateSchema = z.object({
   imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
   imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
   colorMode: z.enum(['dark', 'light', 'both']).optional(),
-  primaryColor: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #7c3aed)').optional(),
-  secondaryColor: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #7c3aed)').optional(),
-  accentColor: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #7c3aed)').optional(),
+  primaryColor: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #8B5CF6)').optional(),
+  secondaryColor: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #8B5CF6)').optional(),
+  accentColor: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #8B5CF6)').optional(),
   animation: z.enum(['none', 'subtle', 'standard', 'rich']).optional(),
   spacing: z.enum(['compact', 'default', 'spacious']).optional(),
   borderRadius: z.enum(['none', 'small', 'medium', 'large', 'full']).optional(),
@@ -32,10 +32,10 @@ export const generateSchema = z.object({
   brandBodyFont: z.string().max(100).optional(),
   brandSemanticColors: z
     .object({
-      success: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #7c3aed)'),
-      warning: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #7c3aed)'),
-      error: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #7c3aed)'),
-      info: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #7c3aed)'),
+      success: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #8B5CF6)'),
+      warning: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #8B5CF6)'),
+      error: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #8B5CF6)'),
+      info: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #8B5CF6)'),
     })
     .optional(),
   skillIds: z

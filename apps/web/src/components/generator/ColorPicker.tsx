@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 
 const PRESET_COLORS = [
-  '#7C3AED',
+  '#8B5CF6',
   '#6366F1',
   '#3B82F6',
   '#22C55E',
@@ -45,7 +45,7 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
           onChange={handleHexChange}
           maxLength={7}
           className="w-24 px-2 py-1.5 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md font-mono focus:ring-brand focus:border-brand"
-          placeholder="#7C3AED"
+          placeholder="#8B5CF6"
         />
       </div>
       <div className="flex gap-1.5">

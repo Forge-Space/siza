@@ -4,9 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Code2 } from 'lucide-react';
+import Image from 'next/image';
 import { OAuthButton } from '@/components/auth/oauth-button';
 import { signInWithGoogle, signInWithGitHub } from '@/lib/auth/oauth';
+import { AuthCardShell } from '@/components/migration/migration-primitives';
 
 export function SignInClient() {
   const [email, setEmail] = useState('');
@@ -62,18 +63,20 @@ export function SignInClient() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
-      <div className="w-full max-w-md space-y-8">
+    <AuthCardShell>
+      <div className="w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2">
-            <Code2 className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">Siza</span>
+            <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
+            <span className="text-2xl font-display font-bold">Siza</span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold">Welcome back</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Sign in to your account to continue</p>
+          <h2 className="mt-6 text-2xl font-semibold text-foreground">Sign in to Siza</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Welcome back to the premium AI coding platform
+          </p>
         </div>
 
-        <div className="rounded-lg border bg-card p-8 shadow-sm">
+        <div>
           <form onSubmit={handleSignIn} className="space-y-6">
             {error && (
               <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -82,8 +85,8 @@ export function SignInClient() {
             )}
 
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
+              <label htmlFor="email" className="text-sm font-medium text-muted-foreground">
+                Email address
               </label>
               <input
                 id="email"
@@ -91,13 +94,13 @@ export function SignInClient() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="you@example.com"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
+                placeholder="name@example.com"
               />
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
+              <label htmlFor="password" className="text-sm font-medium text-muted-foreground">
                 Password
               </label>
               <input
@@ -106,15 +109,15 @@ export function SignInClient() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="••••••••"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
+                placeholder="Enter your password"
               />
             </div>
 
             <div className="flex justify-end">
               <Link
                 href="/forgot-password"
-                className="text-xs text-muted-foreground hover:text-primary"
+                className="text-xs text-primary hover:text-primary-hover"
               >
                 Forgot password?
               </Link>
@@ -123,7 +126,7 @@ export function SignInClient() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
@@ -131,10 +134,10 @@ export function SignInClient() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t"></div>
+              <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-surface px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
 
@@ -159,6 +162,6 @@ export function SignInClient() {
           </p>
         </div>
       </div>
-    </div>
+    </AuthCardShell>
   );
 }

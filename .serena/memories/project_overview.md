@@ -42,13 +42,14 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 ## Brand Voice
 Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
 
-## Current State (2026-03-01)
+## Current State (2026-03-02)
 - **Version**: v0.27.0 (released 2026-03-01)
 - **Domain**: `siza.forgespace.co` (Cloudflare Workers)
 - **Dev**: `dev.forgespace.co`
 - **Branch**: main — 0 open PRs, 0 open issues, all CI green
-- **Tags**: v0.2.1 → ... → v0.25.0 → v0.26.0 → v0.27.0
+- **Tags**: v0.2.1 → ... → v0.26.0 → v0.27.0
 - **v0.27.0 includes**: Loading skeletons (#279), actionable error messages (#278), billing tests (#280)
+- **PR #282 MERGED (2026-03-02)**: CodeEditor aligned to Siza design system (Monaco), keyboard shortcuts ⌘1-4 (use-generate-page-shortcuts.test.tsx, 8 tests), Serena docs update
 - **v0.26.0 includes**: Nav shell overhaul (#263), brand-guide theme wiring (#269), Supabase SSR + Anthropic SDK upgrade (#271)
 - **v0.25.0 includes**: Skills system (#256, #257), platform metrics API (#262), GitHub PR tracking (#258), GeneratorForm refactor (#261), Sentry tracking (#264), E2E fixture fix (#260)
 - **Desktop**: v0.2.0 released (Electron + Ollama local generation)
