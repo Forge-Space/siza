@@ -1,3 +1,4 @@
+import type { GenerationEvent } from '@/lib/services/gemini';
 import type {
   McpGatewayConfig,
   McpToolDefinition,
@@ -7,19 +8,18 @@ import type {
   McpGenerateOptions,
 } from './types';
 
-function getConfig(): McpGatewayConfig {
+function getBaseUrl(): string {
   const baseUrl = process.env.MCP_GATEWAY_URL;
-  const jwt = process.env.MCP_GATEWAY_JWT;
-
-  if (!baseUrl || !jwt) {
-    throw new Error(
-      'MCP gateway is not configured. Set MCP_GATEWAY_URL and MCP_GATEWAY_JWT environment variables.'
-    );
+  if (!baseUrl) {
+    throw new Error('MCP gateway is not configured. Set MCP_GATEWAY_URL environment variable.');
   }
+  return baseUrl.replace(/\/$/, '');
+}
 
+function getConfig(accessToken: string): McpGatewayConfig {
   return {
-    baseUrl: baseUrl.replace(/\/$/, ''),
-    jwt,
+    baseUrl: getBaseUrl(),
+    jwt: accessToken,
     timeoutMs: 120_000,
   };
 }
@@ -67,13 +67,13 @@ async function rpc(
 }
 
 export function isMcpConfigured(): boolean {
-  return !!(process.env.MCP_GATEWAY_URL && process.env.MCP_GATEWAY_JWT);
+  return !!process.env.MCP_GATEWAY_URL;
 }
 
-export async function listTools(): Promise<McpToolDefinition[]> {
-  const config = getConfig();
-  const response = await fetch(`${config.baseUrl}/tools?limit=0&include_pagination=false`, {
-    headers: { Authorization: `Bearer ${config.jwt}` },
+export async function listTools(accessToken: string): Promise<McpToolDefinition[]> {
+  const baseUrl = getBaseUrl();
+  const response = await fetch(`${baseUrl}/tools?limit=0&include_pagination=false`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!response.ok) {
@@ -89,9 +89,10 @@ export async function listTools(): Promise<McpToolDefinition[]> {
 export async function callTool(
   name: string,
   args: Record<string, unknown>,
+  accessToken: string,
   requestId?: string
 ): Promise<McpToolResult> {
-  const config = getConfig();
+  const config = getConfig(accessToken);
   const result = await rpc(config, 'tools/call', { name, arguments: args }, requestId);
 
   if (result.error) {
@@ -109,6 +110,7 @@ export async function callTool(
 
 export async function generateComponent(
   options: McpGenerateOptions,
+  accessToken: string,
   requestId?: string
 ): Promise<string> {
   const preferences = {
@@ -145,6 +147,7 @@ export async function generateComponent(
       user_preferences: JSON.stringify(preferences),
       cost_optimization: true,
     },
+    accessToken,
     requestId
   );
 
@@ -156,4 +159,108 @@ export async function generateComponent(
   }
 
   return textContent.text;
+}
+
+export async function* generateComponentStream(
+  options: McpGenerateOptions,
+  accessToken: string,
+  requestId?: string
+): AsyncGenerator<GenerationEvent> {
+  const baseUrl = getBaseUrl();
+  const preferences = {
+    cost_preference: 'balanced',
+    responsive: true,
+    dark_mode: true,
+    framework: options.framework === 'react' ? 'react' : options.framework,
+    design_system:
+      options.componentLibrary === 'tailwind' || options.componentLibrary === 'shadcn'
+        ? 'tailwind_ui'
+        : options.componentLibrary === 'mui'
+          ? 'material_design'
+          : options.componentLibrary === 'chakra'
+            ? 'chakra_ui'
+            : 'tailwind_ui',
+  };
+
+  let task = options.prompt;
+  if (options.style) {
+    task += ` Design style: ${options.style}.`;
+  }
+  if (options.typescript) {
+    task += ' Use TypeScript with proper type annotations.';
+  }
+  if (options.contextAddition) {
+    task += `\n\nAdditional context:\n${options.contextAddition}`;
+  }
+
+  const body: McpJsonRpcRequest = {
+    jsonrpc: '2.0',
+    id: Date.now(),
+    method: 'tools/call',
+    params: {
+      name: 'execute_specialist_task',
+      arguments: {
+        task,
+        category: 'ui_generation',
+        user_preferences: JSON.stringify(preferences),
+        cost_optimization: true,
+      },
+    },
+  };
+
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+  };
+  if (requestId) {
+    headers['X-Request-ID'] = requestId;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120_000);
+
+  try {
+    const response = await fetch(`${baseUrl}/rpc/stream`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`MCP gateway returned ${response.status}: ${response.statusText}`);
+    }
+
+    if (!response.body) {
+      throw new Error('MCP gateway returned no response body');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const jsonStr = line.slice(6).trim();
+        if (!jsonStr) continue;
+
+        try {
+          const event = JSON.parse(jsonStr) as GenerationEvent;
+          yield event;
+        } catch {
+          // Skip malformed SSE lines
+        }
+      }
+    }
+  } finally {
+    clearTimeout(timeout);
+  }
 }
