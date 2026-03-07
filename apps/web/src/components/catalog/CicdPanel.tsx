@@ -44,9 +44,7 @@ function parseRepoFromUrl(url: string): string | null {
 
 function getStatusIcon(run: WorkflowRun) {
   if (run.status === 'in_progress' || run.status === 'queued') {
-    return (
-      <Loader2Icon className="h-4 w-4 text-amber-400 animate-spin" />
-    );
+    return <Loader2Icon className="h-4 w-4 text-amber-400 animate-spin" />;
   }
   if (run.conclusion === 'success') {
     return <CheckCircle2Icon className="h-4 w-4 text-emerald-500" />;
@@ -85,11 +83,7 @@ function getStatusBadge(run: WorkflowRun) {
   }
 
   return (
-    <span
-      className={`inline-flex rounded-full border px-2 py-0.5 text-xs ${style}`}
-    >
-      {label}
-    </span>
+    <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs ${style}`}>{label}</span>
   );
 }
 
@@ -104,14 +98,14 @@ function formatDuration(ms: number | null): string {
 
 export default function CicdPanel({ repositoryUrl }: CicdPanelProps) {
   const [runs, setRuns] = useState<WorkflowRun[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadedRepo, setLoadedRepo] = useState<string | null>(null);
 
   const repo = repositoryUrl ? parseRepoFromUrl(repositoryUrl) : null;
+  const isLoading = repo !== null && loadedRepo !== repo;
 
   useEffect(() => {
     if (!repo) return;
-    setIsLoading(true);
 
     fetch(`/api/catalog/ci?repo=${encodeURIComponent(repo)}`)
       .then((res) => {
@@ -121,12 +115,13 @@ export default function CicdPanel({ repositoryUrl }: CicdPanelProps) {
       .then((json) => {
         setRuns(json.data || []);
         setError(null);
+        setLoadedRepo(repo);
       })
       .catch((err) => {
         setError(err.message);
         setRuns([]);
-      })
-      .finally(() => setIsLoading(false));
+        setLoadedRepo(repo);
+      });
   }, [repo]);
 
   if (!repo) {
@@ -143,12 +138,8 @@ export default function CicdPanel({ repositoryUrl }: CicdPanelProps) {
   if (isLoading) {
     return (
       <div className="rounded-xl border border-surface-3 bg-surface-1 p-8 text-center">
-        <Loader2Icon
-          className="mx-auto h-6 w-6 text-violet-400 animate-spin mb-3"
-        />
-        <p className="text-sm text-text-secondary">
-          Loading workflow runs...
-        </p>
+        <Loader2Icon className="mx-auto h-6 w-6 text-violet-400 animate-spin mb-3" />
+        <p className="text-sm text-text-secondary">Loading workflow runs...</p>
       </div>
     );
   }
@@ -157,13 +148,9 @@ export default function CicdPanel({ repositoryUrl }: CicdPanelProps) {
     return (
       <div className="rounded-xl border border-surface-3 bg-surface-1 p-6">
         <div className="flex items-start gap-3">
-          <AlertTriangleIcon
-            className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5"
-          />
+          <AlertTriangleIcon className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-text-primary mb-1">
-              Unable to load CI/CD data
-            </p>
+            <p className="text-sm text-text-primary mb-1">Unable to load CI/CD data</p>
             <p className="text-xs text-text-secondary mb-3">{error}</p>
             <a
               href={`${repositoryUrl}/actions`}
@@ -183,18 +170,14 @@ export default function CicdPanel({ repositoryUrl }: CicdPanelProps) {
     return (
       <div className="rounded-xl border border-surface-3 bg-surface-1 p-8 text-center">
         <GitBranchIcon className="mx-auto h-8 w-8 text-text-muted mb-3" />
-        <p className="text-sm text-text-secondary">
-          No workflow runs found for this repository.
-        </p>
+        <p className="text-sm text-text-secondary">No workflow runs found for this repository.</p>
       </div>
     );
   }
 
   return (
     <div className="rounded-xl border border-surface-3 bg-surface-1 overflow-hidden">
-      <div
-        className="flex items-center justify-between border-b border-surface-3 px-4 py-2.5"
-      >
+      <div className="flex items-center justify-between border-b border-surface-3 px-4 py-2.5">
         <div className="flex items-center gap-2 text-sm text-text-secondary">
           <PlayCircleIcon className="h-4 w-4" />
           CI/CD Workflow Runs
