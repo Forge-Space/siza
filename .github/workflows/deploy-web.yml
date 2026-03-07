@@ -28,6 +28,11 @@ jobs:
 
       - run: npm ci --legacy-peer-deps
 
+      - name: Stub @vercel/og WASM before build
+        run: |
+          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/resvg.wasm
+          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/yoga.wasm
+
       - name: Build with OpenNext
         working-directory: apps/web
         run: npx opennextjs-cloudflare build
@@ -40,12 +45,15 @@ jobs:
           NEXT_PUBLIC_ENABLE_USAGE_LIMITS: ${{ vars.NEXT_PUBLIC_ENABLE_USAGE_LIMITS }}
           NEXT_PUBLIC_ENABLE_ONBOARDING: ${{ vars.NEXT_PUBLIC_ENABLE_ONBOARDING }}
           NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+          IS_DEV_DEPLOY: ${{ github.ref == 'refs/heads/dev' && 'true' || 'false' }}
 
-      - name: Stub unused @vercel/og WASM to fit Workers free tier
+      - name: Post-build cleanup for Workers size limit
         run: |
-          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/resvg.wasm
-          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/yoga.wasm
           rm -f apps/web/.open-next/assets/_redirects 2>/dev/null || true
+          find apps/web/.open-next -name "*.wasm" -size +100k -exec sh -c 'printf "\x00\x61\x73\x6d\x01\x00\x00\x00" > "$1"' _ {} \;
+          echo "Worker size after cleanup:"
+          du -sh apps/web/.open-next/worker.js 2>/dev/null || true
+          gzip -c apps/web/.open-next/worker.js 2>/dev/null | wc -c | awk '{printf "Gzipped: %.1f KiB\n", $1/1024}'
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
