@@ -1,8 +1,12 @@
 import {
   findCatalogEntryById,
+  findCatalogChildren,
   getCatalogDependencies,
   getCatalogDependents,
+  getCatalogGraphData,
+  getCatalogStats as repoGetCatalogStats,
   listCatalogEntries as repoListCatalogEntries,
+  type CatalogGraphData,
   type CatalogListParams,
 } from '@/lib/repositories/catalog.repo';
 import { ForbiddenError, NotFoundError } from '@/lib/api/errors';
@@ -26,6 +30,7 @@ export async function getCatalogEntryWithRelations(entryId: string): Promise<{
   entry: any;
   dependencies: any[];
   dependents: any[];
+  children: any[];
   scorecard?: any;
 }> {
   const entry = await findCatalogEntryById(entryId);
@@ -33,12 +38,13 @@ export async function getCatalogEntryWithRelations(entryId: string): Promise<{
     throw new NotFoundError('Catalog entry not found');
   }
 
-  const [dependencies, dependents] = await Promise.all([
+  const [dependencies, dependents, children] = await Promise.all([
     getCatalogDependencies(entryId),
     getCatalogDependents(entryId),
+    findCatalogChildren(entryId),
   ]);
 
-  const result: any = { entry, dependencies, dependents };
+  const result: any = { entry, dependencies, dependents, children };
 
   if (entry.project_id) {
     const supabase = await getClient();
@@ -63,6 +69,7 @@ export interface CatalogListQuery {
   type?: string;
   lifecycle?: string;
   tags?: string;
+  parent_id?: string;
   page?: number;
   limit?: number;
 }
@@ -76,6 +83,7 @@ export async function listCatalogEntries(query: CatalogListQuery = {}): Promise<
     type: query.type,
     lifecycle: query.lifecycle,
     tags: query.tags ? query.tags.split(',').map((t) => t.trim()) : undefined,
+    parent_id: query.parent_id,
     page: query.page || 1,
     limit: query.limit || 10,
   };
@@ -91,4 +99,17 @@ export async function listCatalogEntries(query: CatalogListQuery = {}): Promise<
       pages: Math.max(1, Math.ceil(result.total / result.limit)),
     },
   };
+}
+
+export async function getCatalogGraph(): Promise<CatalogGraphData> {
+  return getCatalogGraphData();
+}
+
+export async function getCatalogStats(): Promise<{
+  total: number;
+  production: number;
+  servicesAndApis: number;
+  libsAndComponents: number;
+}> {
+  return repoGetCatalogStats();
 }
