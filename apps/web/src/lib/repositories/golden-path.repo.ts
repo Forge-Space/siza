@@ -27,6 +27,7 @@ export interface GoldenPathRow {
     required?: boolean;
     default?: unknown;
     description?: string;
+    options?: string[];
   }>;
   steps: Array<{
     id: string;
