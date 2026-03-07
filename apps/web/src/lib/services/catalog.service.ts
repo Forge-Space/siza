@@ -12,6 +12,23 @@ import {
 import { ForbiddenError, NotFoundError } from '@/lib/api/errors';
 import { getClient } from '@/lib/repositories/base.repo';
 
+export interface TransformedScorecard {
+  overall: number;
+  categories: { name: string; score: number }[];
+}
+
+function transformScorecard(raw: Record<string, unknown>): TransformedScorecard {
+  return {
+    overall: (raw.overall_score as number) || 0,
+    categories: [
+      { name: 'Security', score: (raw.security_score as number) || 0 },
+      { name: 'Quality', score: (raw.quality_score as number) || 0 },
+      { name: 'Performance', score: (raw.performance_score as number) || 0 },
+      { name: 'Compliance', score: (raw.compliance_score as number) || 0 },
+    ],
+  };
+}
+
 export async function verifyCatalogOwnership(entryId: string, userId: string): Promise<any> {
   const entry = await findCatalogEntryById(entryId);
 
@@ -57,7 +74,7 @@ export async function getCatalogEntryWithRelations(entryId: string): Promise<{
       .single();
 
     if (scorecard) {
-      result.scorecard = scorecard;
+      result.scorecard = transformScorecard(scorecard);
     }
   }
 
@@ -118,4 +135,33 @@ export async function getCatalogStats(): Promise<{
     servicesAndApis: (stats.byType['service'] || 0) + (stats.byType['api'] || 0),
     libsAndComponents: (stats.byType['library'] || 0) + (stats.byType['component'] || 0),
   };
+}
+
+export async function getScorecardsForEntries(
+  entries: Array<{ project_id: string | null }>
+): Promise<Map<string, TransformedScorecard>> {
+  const projectIds = entries.map((e) => e.project_id).filter((id): id is string => id !== null);
+
+  if (projectIds.length === 0) return new Map();
+
+  const supabase = await getClient();
+  const { data } = await supabase
+    .from('project_scorecards')
+    .select(
+      'project_id, overall_score, security_score, quality_score, performance_score, compliance_score'
+    )
+    .in('project_id', projectIds)
+    .order('created_at', { ascending: false });
+
+  const map = new Map<string, TransformedScorecard>();
+  if (!data) return map;
+
+  for (const row of data) {
+    const pid = row.project_id as string;
+    if (!map.has(pid)) {
+      map.set(pid, transformScorecard(row));
+    }
+  }
+
+  return map;
 }

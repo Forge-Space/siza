@@ -5,6 +5,7 @@ import {
   noContentResponse,
   errorResponse,
   apiErrorResponse,
+  jsonResponse,
   type APIError,
 } from '@/lib/api';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
@@ -29,10 +30,23 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
     }
 
-    await verifySession();
-    const data = await getCatalogEntryWithRelations(id);
+    const session = await verifySession();
+    const { entry, dependencies, dependents, children, scorecard } =
+      await getCatalogEntryWithRelations(id);
 
-    const response = successResponse(data);
+    const data = {
+      ...entry,
+      dependencies: (dependencies || []).map((d: any) => d.name || d),
+      dependents: (dependents || []).map((d: any) => d.name || d),
+      children,
+      ...(scorecard && { scorecard }),
+    };
+
+    const response = jsonResponse({
+      success: true,
+      data,
+      isOwner: entry.owner_id === session.user.id,
+    });
     return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
   } catch (error) {
     if ((error as APIError).statusCode) {

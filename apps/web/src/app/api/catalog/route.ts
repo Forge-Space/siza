@@ -9,7 +9,11 @@ import {
 } from '@/lib/api';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { insertCatalogEntry } from '@/lib/repositories/catalog.repo';
-import { listCatalogEntries, type CatalogListQuery } from '@/lib/services/catalog.service';
+import {
+  listCatalogEntries,
+  getScorecardsForEntries,
+  type CatalogListQuery,
+} from '@/lib/services/catalog.service';
 import { createCatalogEntrySchema, catalogQuerySchema } from '@/lib/api/validation/catalog';
 
 const RATE_LIMIT = 120;
@@ -31,8 +35,14 @@ export async function GET(request: NextRequest) {
 
     const result = await listCatalogEntries(query as CatalogListQuery);
 
+    const scorecards = await getScorecardsForEntries(result.data);
+    const entries = result.data.map((entry) => ({
+      ...entry,
+      scorecard: entry.project_id ? scorecards.get(entry.project_id) || null : null,
+    }));
+
     const response = successResponse({
-      entries: result.data,
+      entries,
       pagination: result.pagination,
     });
     return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
