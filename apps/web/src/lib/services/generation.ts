@@ -73,12 +73,22 @@ export async function* generateWithProvider(
     case 'anthropic':
       yield* generateWithAnthropic(options);
       break;
-    default:
+    case 'siza':
       yield {
         type: 'error',
-        message: `Unsupported provider "${provider}". Supported: Google, OpenAI, Anthropic.`,
+        message:
+          'Siza provider should be resolved by the router before reaching generateWithProvider.',
         timestamp: Date.now(),
       };
+      break;
+    default: {
+      const _exhaustive: never = provider;
+      yield {
+        type: 'error',
+        message: `Unsupported provider "${_exhaustive}". Supported: Google, OpenAI, Anthropic.`,
+        timestamp: Date.now(),
+      };
+    }
   }
 }
 

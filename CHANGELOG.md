@@ -16,8 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TechDocs Auto-Detection** — Catalog discovery now scans for docs indicators (docs/index.md, mkdocs.yml, docusaurus.config) and shows "Docs" badge on discovered repos
 - **API Documentation Viewer** — Inline OpenAPI 3.x renderer for catalog API entities with method badges, parameter tables, schema tree, endpoint search, and tag grouping (~4 KB gzipped, zero new dependencies)
 
+### Changed
+- **Provider-agnostic generation** — Decoupled from Gemini; providers configurable via `DEFAULT_GENERATION_PROVIDER` / `DEFAULT_GENERATION_MODEL` env vars. Deleted `gemini.ts`, unified all providers in `generation.ts` with exhaustive switch + env var validation
+- **Generate page simplification** — Collapsed AI Provider and Advanced sections into accordions, reducing visible form fields from 8+ to 2 (Component Name + Prompt)
+
 ### Fixed
 - **Background video optimization** — Replaced 1.7 MB ambient-bg.webm with CSS noise texture + animated gradients (zero network cost) (#362)
+- **CSP headers** — Added `unsafe-eval` for Babel standalone in LivePreview
+- **LivePreview hydration** — Fixed SSR mismatch with client-only mounting
+- **Sidebar/TopBar layout** — Fixed overflow and responsive issues
 
 ---
 
