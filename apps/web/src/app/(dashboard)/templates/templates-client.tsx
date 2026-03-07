@@ -240,7 +240,7 @@ export function TemplatesClient() {
               className={
                 'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ' +
                 (ownershipFilter === key
-                  ? 'border-brand text-brand-light'
+                  ? 'border-violet-500 text-violet-300'
                   : 'border-transparent text-text-secondary hover:text-text-primary')
               }
             >
@@ -271,7 +271,7 @@ export function TemplatesClient() {
               className={
                 'px-3 py-1.5 text-sm rounded-full border transition-colors ' +
                 (selectedCategory === category
-                  ? 'border-brand bg-brand/10 text-brand-light font-medium'
+                  ? 'border-violet-500 bg-violet-500/15 text-violet-300 font-medium'
                   : 'border-surface-3 text-text-secondary hover:border-surface-3 hover:text-text-primary')
               }
             >
@@ -288,7 +288,7 @@ export function TemplatesClient() {
               className={
                 'px-3 py-1.5 text-xs rounded-md border transition-colors ' +
                 (selectedFramework === fw
-                  ? 'border-brand bg-brand/10 text-brand-light font-medium'
+                  ? 'border-violet-500 bg-violet-500/15 text-violet-300 font-medium'
                   : 'border-surface-3 text-text-muted-foreground hover:text-text-secondary')
               }
             >
@@ -333,7 +333,7 @@ export function TemplatesClient() {
         {error && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-sm text-red-600 mb-2">{error}</p>
-            <button onClick={fetchTemplates} className="text-sm text-brand underline">
+            <button onClick={fetchTemplates} className="text-sm text-violet-400 underline">
               Retry
             </button>
           </div>
@@ -406,7 +406,7 @@ export function TemplatesClient() {
                   className={
                     'px-3 py-1 rounded-md text-sm ' +
                     (currentPage === page
-                      ? 'bg-brand text-white'
+                      ? 'bg-violet-600 text-white'
                       : 'border border-surface-3 hover:bg-surface-2')
                   }
                 >
