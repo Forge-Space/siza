@@ -19,9 +19,10 @@ describe('QuotaGuard', () => {
     expect(screen.getByTestId('upgrade-prompt')).toBeDefined();
   });
 
-  it('shows error message for non-quota errors', () => {
+  it('shows categorized error for non-quota errors', () => {
     render(<QuotaGuard error="Network error" usage={null} isQuotaExceeded={false} />);
-    expect(screen.getByText('Network error')).toBeDefined();
+    expect(screen.getByText('Connection error')).toBeDefined();
+    expect(screen.getByText(/Check your internet/)).toBeDefined();
   });
 
   it('shows upgrade prompt when quota exceeded', () => {
