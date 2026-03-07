@@ -27,6 +27,22 @@ export interface AIKeyManager {
 
 export interface DecryptedApiKey extends EncryptedApiKey {
   isDefault?: boolean;
+  isSizaFree?: boolean;
+}
+
+export const SIZA_FREE_KEY_ID = 'key_siza-free-tier';
+
+export const DEFAULT_SIZA_KEY: DecryptedApiKey = {
+  provider: 'siza' as AIProvider,
+  encryptedKey: 'siza-internal-routing',
+  keyId: SIZA_FREE_KEY_ID,
+  createdAt: new Date('2026-01-01').toISOString(),
+  isDefault: true,
+  isSizaFree: true,
+};
+
+export function isSizaFreeKey(keyId: string): boolean {
+  return keyId === SIZA_FREE_KEY_ID;
 }
 
 export interface UsageStats {

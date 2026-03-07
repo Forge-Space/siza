@@ -42,7 +42,11 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Siza Team' }],
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/monogram.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/monogram.png',
   },
   openGraph: {
     title: 'Siza — Vibe Code the Right Way',
