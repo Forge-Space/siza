@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { AIKeysClient } from './ai-keys-client';
+import { AIKeysClient } from '@/app/ai-keys/ai-keys-client';
 
 export default function AIKeysPage() {
   return <AIKeysClient />;

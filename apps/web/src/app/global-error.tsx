@@ -49,7 +49,7 @@ export default function GlobalError({
       <head>
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap"
         />
       </head>
       <body
@@ -74,7 +74,7 @@ export default function GlobalError({
         >
           <h2
             style={{
-              fontFamily: '"Sora", system-ui, sans-serif',
+              fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif',
               fontSize: '1.25rem',
               marginBottom: '1rem',
             }}

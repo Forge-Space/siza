@@ -80,7 +80,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-sora)', 'var(--font-dm-sans)', 'sans-serif'],
+        display: ['var(--font-plus-jakarta)', 'var(--font-dm-sans)', 'sans-serif'],
         mono: ['var(--font-ibm-plex-mono)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {

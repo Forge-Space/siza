@@ -21,7 +21,7 @@ export default function TopBar({ user, isAdmin }: TopBarProps) {
 
   return (
     <>
-      <header className="h-14 border-b border-border bg-background" role="banner">
+      <header className="h-16 border-b border-border bg-background" role="banner">
         <div className="h-full px-4 sm:px-6 lg:px-8">
           <div className="flex h-full items-center justify-between">
             <div className="flex items-center gap-4">
@@ -38,7 +38,7 @@ export default function TopBar({ user, isAdmin }: TopBarProps) {
               <button
                 type="button"
                 onClick={() => setCommandPaletteOpen(true)}
-                className="hidden md:flex items-center gap-2 rounded-md bg-surface px-3 h-8 text-muted-foreground text-sm hover:bg-surface-alt hover:text-foreground transition-colors"
+                className="hidden md:flex items-center gap-2 rounded-md bg-surface px-3 h-8 text-muted-foreground text-sm hover:bg-surface-alt hover:text-foreground hover:ring-1 hover:ring-brand/20 transition-all"
               >
                 <SearchIcon className="h-3.5 w-3.5" />
                 <span>Search...</span>

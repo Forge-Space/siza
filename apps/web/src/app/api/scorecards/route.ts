@@ -26,13 +26,11 @@ export async function GET(req: NextRequest) {
     .single();
 
   if (!project) {
-    return NextResponse.json(
-      { error: 'Project not found or access denied' },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: 'Project not found or access denied' }, { status: 403 });
   }
 
-  const SCORECARD_COLS = 'id, project_id, overall_score, security_score, quality_score, performance_score, compliance_score, breakdowns, violations, recommendations, created_at';
+  const SCORECARD_COLS =
+    'id, project_id, overall_score, security_score, quality_score, performance_score, compliance_score, breakdowns, violations, recommendations, created_at';
   const isHistory = searchParams.get('history') === 'true';
   const rawLimit = parseInt(searchParams.get('limit') ?? '30', 10);
   const limit = Math.min(Math.max(Number.isNaN(rawLimit) ? 30 : rawLimit, 1), 100);

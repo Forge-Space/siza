@@ -1,5 +1,7 @@
-import { redirect } from 'next/navigation';
+export const dynamic = 'force-dynamic';
+
+import { DashboardClient } from './dashboard-client';
 
 export default function DashboardPage() {
-  redirect('/projects');
+  return <DashboardClient />;
 }

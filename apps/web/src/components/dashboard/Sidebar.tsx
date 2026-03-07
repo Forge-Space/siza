@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PlusIcon, ChevronsLeftIcon, ChevronsRightIcon } from 'lucide-react';
+import { PlusIcon, ChevronsLeftIcon } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@siza/ui';
@@ -20,14 +20,14 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
   const navigationItems = getDashboardNavigation(isAdmin);
 
   return (
-    <TooltipProvider delayDuration={300}>
+    <TooltipProvider delayDuration={200}>
       <div
-        className={`hidden md:flex md:flex-col transition-[width] duration-200 ease-siza ${collapsed ? 'md:w-16' : 'md:w-64'}`}
+        className={`group/sidebar hidden md:flex md:flex-col transition-[width] duration-200 ease-siza ${collapsed ? 'md:w-16 hover:md:w-64' : 'md:w-64'}`}
       >
         <div className="flex flex-col flex-grow pt-5 bg-surface-0 border-r border-surface-3 overflow-y-auto overflow-x-hidden">
           <Link
             href="/dashboard"
-            className={`flex items-center flex-shrink-0 gap-3 hover:opacity-80 transition-opacity ${collapsed ? 'justify-center px-2' : 'px-4'}`}
+            className={`flex items-center flex-shrink-0 gap-3 hover:opacity-80 transition-opacity ${collapsed ? 'justify-center px-2 group-hover/sidebar:justify-start group-hover/sidebar:px-4' : 'px-4'}`}
           >
             <Image
               src="/monogram.svg"
@@ -36,103 +36,101 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
               height={32}
               className="flex-shrink-0"
             />
-            {!collapsed && (
-              <h1 className="text-xl font-display font-bold text-text-primary">Siza</h1>
-            )}
+            <h1
+              className={`text-xl font-display font-bold text-text-primary whitespace-nowrap transition-opacity duration-200 ${collapsed ? 'opacity-0 w-0 group-hover/sidebar:opacity-100 group-hover/sidebar:w-auto' : 'opacity-100'}`}
+            >
+              Siza
+            </h1>
           </Link>
-          <div className="mt-8 flex-grow flex flex-col">
+
+          <div className="mt-6 flex-grow flex flex-col">
             <nav className="flex-1 px-2 space-y-1">
-              {collapsed ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button asChild className="w-full mb-4 px-0 justify-center">
-                      <Link href="/generate">
-                        <PlusIcon className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">Generate Component</TooltipContent>
-                </Tooltip>
-              ) : (
-                <Button asChild className="w-full justify-start mb-4">
-                  <Link href="/generate">
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    Generate Component
-                  </Link>
-                </Button>
-              )}
-              {navigationItems.map((item) => {
-                const isActive = pathname.startsWith(item.href);
-                const cls = isActive
-                  ? 'bg-brand/15 text-brand-light hover:bg-brand/20 hover:text-brand-light before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand-light'
-                  : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary';
-                if (collapsed) {
-                  return (
-                    <Tooltip key={item.name}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          asChild
-                          variant="ghost"
-                          className={`w-full justify-center px-0 relative ${cls}`}
-                        >
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        {item.name}
-                        {item.shortcut && (
-                          <span className="ml-2 text-text-muted-foreground text-xs">
-                            {item.shortcut}
-                          </span>
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                }
-                return (
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button
-                    key={item.name}
                     asChild
-                    variant="ghost"
-                    className={`w-full justify-start relative ${cls}`}
+                    className={`w-full mb-3 bg-brand hover:bg-brand-light shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all ${collapsed ? 'px-0 justify-center group-hover/sidebar:justify-start group-hover/sidebar:px-4' : 'justify-start'}`}
                   >
-                    <Link href={item.href}>
-                      <item.icon className="mr-2 h-4 w-4 flex-shrink-0" />
-                      <span className="overflow-hidden whitespace-nowrap">{item.name}</span>
-                      {item.shortcut && (
-                        <span className="ml-auto text-xs text-text-muted-foreground opacity-60">
-                          {item.shortcut}
-                        </span>
-                      )}
+                    <Link href="/generate">
+                      <PlusIcon className="h-5 w-5 flex-shrink-0" />
+                      <span
+                        className={`whitespace-nowrap transition-opacity duration-200 ${collapsed ? 'opacity-0 w-0 ml-0 group-hover/sidebar:opacity-100 group-hover/sidebar:w-auto group-hover/sidebar:ml-2' : 'opacity-100 ml-2'}`}
+                      >
+                        Generate
+                      </span>
                     </Link>
                   </Button>
+                </TooltipTrigger>
+                {collapsed && (
+                  <TooltipContent side="right" className="group-hover/sidebar:hidden">
+                    Generate Component
+                  </TooltipContent>
+                )}
+              </Tooltip>
+
+              {navigationItems.map((item) => {
+                const isActive = pathname.startsWith(item.href);
+                const activeCls = isActive
+                  ? 'bg-brand/15 text-brand-light hover:bg-brand/20 before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand'
+                  : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary';
+
+                return (
+                  <Tooltip key={item.name}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className={`w-full relative h-10 ${activeCls} ${collapsed ? 'justify-center px-0 group-hover/sidebar:justify-start group-hover/sidebar:px-3' : 'justify-start px-3'}`}
+                      >
+                        <Link href={item.href}>
+                          <item.icon
+                            className={`h-[18px] w-[18px] flex-shrink-0 transition-colors ${isActive ? 'text-brand-light' : ''}`}
+                          />
+                          <span
+                            className={`whitespace-nowrap overflow-hidden transition-opacity duration-200 ${collapsed ? 'opacity-0 w-0 ml-0 group-hover/sidebar:opacity-100 group-hover/sidebar:w-auto group-hover/sidebar:ml-2.5' : 'opacity-100 ml-2.5'}`}
+                          >
+                            {item.name}
+                          </span>
+                          {item.shortcut && (
+                            <span
+                              className={`ml-auto text-xs text-text-muted opacity-60 ${collapsed ? 'hidden group-hover/sidebar:inline' : ''}`}
+                            >
+                              {item.shortcut}
+                            </span>
+                          )}
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    {collapsed && (
+                      <TooltipContent side="right" className="group-hover/sidebar:hidden">
+                        {item.name}
+                        {item.shortcut && (
+                          <span className="ml-2 text-xs opacity-60">{item.shortcut}</span>
+                        )}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
                 );
               })}
             </nav>
           </div>
+
           <div className="px-2 pb-4">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={toggleCollapsed}
-                  className="flex items-center justify-center w-full rounded-lg p-2 text-text-muted-foreground hover:text-text-primary hover:bg-surface-2 transition-colors"
-                  aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                >
-                  {collapsed ? (
-                    <ChevronsRightIcon className="h-4 w-4" />
-                  ) : (
-                    <>
-                      <ChevronsLeftIcon className="h-4 w-4 mr-2" />
-                      <span className="text-xs">Collapse</span>
-                    </>
-                  )}
-                </button>
-              </TooltipTrigger>
-              {collapsed && <TooltipContent side="right">Expand sidebar</TooltipContent>}
-            </Tooltip>
+            <button
+              type="button"
+              onClick={toggleCollapsed}
+              className={`flex items-center w-full rounded-lg p-2 text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors ${collapsed ? 'justify-center group-hover/sidebar:justify-start group-hover/sidebar:px-3' : 'justify-start px-3'}`}
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              <ChevronsLeftIcon
+                className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${collapsed ? 'rotate-180 group-hover/sidebar:rotate-0' : ''}`}
+              />
+              <span
+                className={`text-xs whitespace-nowrap transition-opacity duration-200 ${collapsed ? 'opacity-0 w-0 ml-0 group-hover/sidebar:opacity-100 group-hover/sidebar:w-auto group-hover/sidebar:ml-2' : 'opacity-100 ml-2'}`}
+              >
+                Collapse
+              </span>
+            </button>
           </div>
         </div>
       </div>
