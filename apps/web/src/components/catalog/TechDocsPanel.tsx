@@ -1,23 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { marked } from "marked";
-import {
-  FileTextIcon,
-  ExternalLinkIcon,
-  Loader2Icon,
-  AlertTriangleIcon,
-} from "lucide-react";
+import { useState, useEffect } from 'react';
+import { marked } from 'marked';
+import { FileTextIcon, ExternalLinkIcon, Loader2Icon, AlertTriangleIcon } from 'lucide-react';
 
 interface TechDocsPanelProps {
   documentationUrl?: string;
   repositoryUrl?: string;
 }
 
-export default function TechDocsPanel({
-  documentationUrl,
-  repositoryUrl,
-}: TechDocsPanelProps) {
+export default function TechDocsPanel({ documentationUrl, repositoryUrl }: TechDocsPanelProps) {
   const [content, setContent] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +23,7 @@ export default function TechDocsPanel({
 
     fetch(`/api/catalog/docs?url=${encodeURIComponent(docsUrl)}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch documentation");
+        if (!res.ok) throw new Error('Failed to fetch documentation');
         return res.json();
       })
       .then((json) => {
@@ -76,9 +68,7 @@ export default function TechDocsPanel({
         <div className="flex items-start gap-3">
           <AlertTriangleIcon className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-text-primary mb-1">
-              Unable to load documentation
-            </p>
+            <p className="text-sm text-text-primary mb-1">Unable to load documentation</p>
             <p className="text-xs text-text-secondary mb-3">{error}</p>
             <a
               href={docsUrl}
@@ -114,7 +104,7 @@ export default function TechDocsPanel({
       </div>
       <div
         className="prose prose-invert prose-sm max-w-none p-6 prose-headings:text-text-primary prose-a:text-violet-400 prose-code:text-emerald-400 prose-code:bg-surface-2 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-surface-2 prose-pre:border prose-pre:border-surface-3"
-        dangerouslySetInnerHTML={{ __html: content || "" }}
+        dangerouslySetInnerHTML={{ __html: content || '' }}
       />
     </div>
   );
