@@ -48,7 +48,7 @@ jobs:
       - run: npm ci
       - run: npm run test -- --filter=!@siza/desktop -- --coverage
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./apps/web/coverage/coverage-final.json
