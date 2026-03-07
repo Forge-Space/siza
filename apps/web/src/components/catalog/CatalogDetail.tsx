@@ -17,6 +17,7 @@ import {
   UsersIcon,
 } from 'lucide-react';
 import TechDocsPanel from '@/components/catalog/TechDocsPanel';
+import ApiDocsPanel from '@/components/catalog/api-docs/ApiDocsPanel';
 
 interface CatalogEntry {
   id: string;
@@ -36,6 +37,7 @@ interface CatalogEntry {
     overall: number;
     categories: { name: string; score: number }[];
   };
+  metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -270,6 +272,12 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
         documentationUrl={entry.documentation_url}
         repositoryUrl={entry.repository_url}
       />
+
+      {entry.metadata?.openapi_spec != null && (
+        <div className="md:col-span-2">
+          <ApiDocsPanel spec={entry.metadata.openapi_spec as string | Record<string, unknown>} />
+        </div>
+      )}
     </div>
   );
 }
