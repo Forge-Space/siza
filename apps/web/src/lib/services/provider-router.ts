@@ -134,7 +134,12 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
   }
 
   if (!hasOutput) {
-    const fallbackProvider = (process.env.DEFAULT_GENERATION_PROVIDER as AIProvider) || 'google';
+    const validProviders: AIProvider[] = ['google', 'openai', 'anthropic', 'siza'];
+    const envProvider = process.env.DEFAULT_GENERATION_PROVIDER;
+    const fallbackProvider: AIProvider =
+      envProvider && validProviders.includes(envProvider as AIProvider)
+        ? (envProvider as AIProvider)
+        : 'google';
     const fallbackModel = process.env.DEFAULT_GENERATION_MODEL || 'gemini-2.5-flash';
 
     yield {

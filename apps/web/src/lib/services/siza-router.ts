@@ -6,8 +6,14 @@ export interface SizaRoutingResult {
   reason: 'default' | 'vision' | 'quality' | 'free-tier' | 'quota-fallback';
 }
 
+const VALID_PROVIDERS: AIProvider[] = ['google', 'openai', 'anthropic', 'siza'];
+
 function getDefaultProvider(): { provider: AIProvider; model: string } {
-  const provider = (process.env.DEFAULT_GENERATION_PROVIDER as AIProvider) || 'google';
+  const envProvider = process.env.DEFAULT_GENERATION_PROVIDER;
+  const provider: AIProvider =
+    envProvider && VALID_PROVIDERS.includes(envProvider as AIProvider)
+      ? (envProvider as AIProvider)
+      : 'google';
   const model = process.env.DEFAULT_GENERATION_MODEL || 'gemini-2.5-flash';
   return { provider, model };
 }
