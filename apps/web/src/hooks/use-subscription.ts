@@ -20,6 +20,7 @@ interface Usage {
 interface UsageResponse {
   usage: Usage;
   subscription: Subscription;
+  generations_total: number;
 }
 
 async function fetchUsageData(): Promise<UsageResponse> {
@@ -39,6 +40,7 @@ export function useSubscription() {
   return {
     subscription: data?.subscription ?? null,
     usage: data?.usage ?? null,
+    generationsTotal: data?.generations_total ?? 0,
     isLoading,
     error,
     refetch,
