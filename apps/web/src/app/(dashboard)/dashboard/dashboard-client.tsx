@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useProjects } from '@/hooks/use-projects';
-import { useSubscription } from '@/hooks/use-subscription';
-import { useCatalog } from '@/hooks/use-catalog';
-import { useGoldenPaths } from '@/hooks/use-golden-paths';
-import { isFeatureEnabled } from '@/lib/features/flags';
-import { Skeleton } from '@siza/ui';
+import { useProjects } from "@/hooks/use-projects";
+import { useSubscription } from "@/hooks/use-subscription";
+import { useCatalog } from "@/hooks/use-catalog";
+import { useGoldenPaths } from "@/hooks/use-golden-paths";
+import { isFeatureEnabled } from "@/lib/features/flags";
+import { Skeleton } from "@siza/ui";
 import {
   FolderIcon,
   SparklesIcon,
@@ -24,11 +24,11 @@ import {
   GlobeIcon,
   CodeIcon,
   LayersIcon,
-} from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { useMemo, useState } from 'react';
-import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
+} from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useMemo, useState } from "react";
+import type { GoldenPathRow } from "@/lib/repositories/golden-path.repo";
 
 interface StatCardProps {
   label: string;
@@ -40,7 +40,15 @@ interface StatCardProps {
   accentBg: string;
 }
 
-function StatCard({ label, value, subtitle, icon: Icon, href, accent, accentBg }: StatCardProps) {
+function StatCard({
+  label,
+  value,
+  subtitle,
+  icon: Icon,
+  href,
+  accent,
+  accentBg,
+}: StatCardProps) {
   return (
     <Link
       href={href}
@@ -53,9 +61,13 @@ function StatCard({ label, value, subtitle, icon: Icon, href, accent, accentBg }
         </div>
         <ArrowRightIcon className="h-4 w-4 text-text-muted opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
       </div>
-      <p className="relative mt-4 text-2xl font-semibold font-display text-text-primary">{value}</p>
+      <p className="relative mt-4 text-2xl font-semibold font-display text-text-primary">
+        {value}
+      </p>
       <p className="relative mt-1 text-sm text-text-secondary">{label}</p>
-      {subtitle && <p className="relative mt-0.5 text-xs text-text-muted">{subtitle}</p>}
+      {subtitle && (
+        <p className="relative mt-0.5 text-xs text-text-muted">{subtitle}</p>
+      )}
     </Link>
   );
 }
@@ -107,7 +119,9 @@ function RecentProjectCard({
           {name}
         </p>
         {description && (
-          <p className="mt-0.5 truncate text-xs text-text-secondary">{description}</p>
+          <p className="mt-0.5 truncate text-xs text-text-secondary">
+            {description}
+          </p>
         )}
       </div>
       <div className="flex-shrink-0 flex items-center gap-2">
@@ -141,7 +155,7 @@ function QuickAction({
       className="group flex items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-all duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
     >
       <div className="rounded-lg bg-violet-500/10 p-2 group-hover:bg-violet-500/20 transition-colors">
-        <Icon className={`h-4 w-4 ${accent || 'text-violet-400'}`} />
+        <Icon className={`h-4 w-4 ${accent || "text-violet-400"}`} />
       </div>
       <div>
         <p className="text-sm font-medium text-text-primary">{label}</p>
@@ -151,7 +165,15 @@ function QuickAction({
   );
 }
 
-function UsageBar({ used, limit, label }: { used: number; limit: number; label: string }) {
+function UsageBar({
+  used,
+  limit,
+  label,
+}: {
+  used: number;
+  limit: number;
+  label: string;
+}) {
   const percentage = limit === -1 ? 0 : Math.min((used / limit) * 100, 100);
   const isUnlimited = limit === -1;
 
@@ -161,14 +183,18 @@ function UsageBar({ used, limit, label }: { used: number; limit: number; label: 
         <span className="text-xs text-text-secondary">{label}</span>
         <span className="text-xs font-mono text-text-muted">
           {used}
-          {isUnlimited ? '' : ` / ${limit}`}
+          {isUnlimited ? "" : ` / ${limit}`}
         </span>
       </div>
       {!isUnlimited && (
         <div className="h-1.5 rounded-full bg-surface-2 overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
-              percentage > 90 ? 'bg-red-500' : percentage > 70 ? 'bg-amber-500' : 'bg-violet-500'
+              percentage > 90
+                ? "bg-red-500"
+                : percentage > 70
+                  ? "bg-amber-500"
+                  : "bg-violet-500"
             }`}
             style={{ width: `${percentage}%` }}
           />
@@ -179,11 +205,11 @@ function UsageBar({ used, limit, label }: { used: number; limit: number; label: 
 }
 
 const STACK_META: Record<string, { icon: typeof ServerIcon; label: string }> = {
-  nextjs: { icon: GlobeIcon, label: 'Next.js' },
-  'api-service': { icon: ServerIcon, label: 'API Service' },
-  library: { icon: BookOpenIcon, label: 'Library' },
-  worker: { icon: CodeIcon, label: 'Worker' },
-  monorepo: { icon: LayersIcon, label: 'Monorepo' },
+  nextjs: { icon: GlobeIcon, label: "Next.js" },
+  "api-service": { icon: ServerIcon, label: "API Service" },
+  library: { icon: BookOpenIcon, label: "Library" },
+  worker: { icon: CodeIcon, label: "Worker" },
+  monorepo: { icon: LayersIcon, label: "Monorepo" },
 };
 
 function GoldenPathCard({ path }: { path: GoldenPathRow }) {
@@ -207,18 +233,26 @@ function GoldenPathCard({ path }: { path: GoldenPathRow }) {
         </p>
       </div>
       <div className="flex items-center gap-1.5">
-        {path.includes_ci && <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-400" />}
-        {path.is_official && <SparklesIcon className="w-3.5 h-3.5 text-violet-400" />}
+        {path.includes_ci && (
+          <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-400" />
+        )}
+        {path.is_official && (
+          <SparklesIcon className="w-3.5 h-3.5 text-violet-400" />
+        )}
       </div>
     </Link>
   );
 }
 
 function GovernanceOverview() {
-  const catalogEnabled = isFeatureEnabled('ENABLE_SOFTWARE_CATALOG');
-  const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
-  const { data: catalogData, isLoading: catalogLoading } = useCatalog({ limit: 100 });
-  const { data: goldenPathData, isLoading: goldenPathLoading } = useGoldenPaths({ limit: 100 });
+  const catalogEnabled = isFeatureEnabled("ENABLE_SOFTWARE_CATALOG");
+  const goldenPathsEnabled = isFeatureEnabled("ENABLE_GOLDEN_PATHS");
+  const { data: catalogData, isLoading: catalogLoading } = useCatalog({
+    limit: 100,
+  });
+  const { data: goldenPathData, isLoading: goldenPathLoading } = useGoldenPaths(
+    { limit: 100 },
+  );
 
   if (!catalogEnabled && !goldenPathsEnabled) return null;
 
@@ -239,7 +273,7 @@ function GovernanceOverview() {
   }
 
   const entries = catalogData?.entries || [];
-  const production = entries.filter((e) => e.lifecycle === 'production').length;
+  const production = entries.filter((e) => e.lifecycle === "production").length;
   const totalCatalog = catalogData?.pagination?.total ?? 0;
   const paths = goldenPathData?.data || [];
   const totalPaths = goldenPathData?.pagination?.total ?? paths.length;
@@ -250,7 +284,9 @@ function GovernanceOverview() {
         <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
           <ShieldCheckIcon className="h-4 w-4 text-violet-400" />
         </div>
-        <h2 className="text-sm font-semibold text-text-primary">Platform Governance</h2>
+        <h2 className="text-sm font-semibold text-text-primary">
+          Platform Governance
+        </h2>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {catalogEnabled && (
@@ -259,7 +295,9 @@ function GovernanceOverview() {
               <p className="text-2xl font-semibold font-display text-text-primary group-hover:text-violet-300 transition-colors">
                 {totalCatalog}
               </p>
-              <p className="text-xs text-text-secondary mt-0.5">Catalog entries</p>
+              <p className="text-xs text-text-secondary mt-0.5">
+                Catalog entries
+              </p>
             </Link>
             <Link href="/catalog" className="group">
               <p className="text-2xl font-semibold font-display text-emerald-400 group-hover:text-emerald-300 transition-colors">
@@ -292,9 +330,16 @@ function GovernanceOverview() {
 
 export function DashboardClient() {
   const { data: projects, isLoading: projectsLoading } = useProjects();
-  const { usage, subscription, generationsTotal, isLoading: usageLoading } = useSubscription();
-  const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
-  const { data: goldenPathData } = useGoldenPaths(goldenPathsEnabled ? { limit: 3 } : { limit: 0 });
+  const {
+    usage,
+    subscription,
+    generationsTotal,
+    isLoading: usageLoading,
+  } = useSubscription();
+  const goldenPathsEnabled = isFeatureEnabled("ENABLE_GOLDEN_PATHS");
+  const { data: goldenPathData } = useGoldenPaths(
+    goldenPathsEnabled ? { limit: 3 } : { limit: 0 },
+  );
   const [mountTime] = useState(() => Date.now());
 
   const isLoading = projectsLoading || usageLoading;
@@ -340,7 +385,11 @@ export function DashboardClient() {
   const projectsUsed = usage?.projects_count ?? 0;
   const projectsLimit = usage?.projects_limit ?? 2;
   const planLabel =
-    subscription?.plan === 'pro' ? 'Pro' : subscription?.plan === 'enterprise' ? 'Team' : 'Free';
+    subscription?.plan === "pro"
+      ? "Pro"
+      : subscription?.plan === "enterprise"
+        ? "Team"
+        : "Free";
 
   return (
     <div className="space-y-8">
@@ -426,12 +475,22 @@ export function DashboardClient() {
 
       {/* Usage Bars */}
       <div className="rounded-xl border border-surface-3 bg-surface-1 p-5">
-        <h2 className="text-sm font-semibold text-text-primary mb-4">Usage This Month</h2>
+        <h2 className="text-sm font-semibold text-text-primary mb-4">
+          Usage This Month
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <UsageBar used={generationsUsed} limit={generationsLimit} label="Generations" />
-          <UsageBar used={projectsUsed} limit={projectsLimit} label="Projects" />
+          <UsageBar
+            used={generationsUsed}
+            limit={generationsLimit}
+            label="Generations"
+          />
+          <UsageBar
+            used={projectsUsed}
+            limit={projectsLimit}
+            label="Projects"
+          />
         </div>
-        {subscription?.plan === 'free' && (
+        {subscription?.plan === "free" && (
           <div className="mt-4 pt-4 border-t border-surface-3 flex items-center justify-between">
             <p className="text-xs text-text-secondary">
               Upgrade for unlimited generations and projects
@@ -475,7 +534,11 @@ export function DashboardClient() {
                 Describe what you need and Siza generates production-ready code.
               </p>
               <div className="mt-4 flex items-center justify-center gap-3">
-                <Button asChild className="bg-violet-600 hover:bg-violet-500" size="sm">
+                <Button
+                  asChild
+                  className="bg-violet-600 hover:bg-violet-500"
+                  size="sm"
+                >
                   <Link href="/generate">
                     <SparklesIcon className="mr-2 h-4 w-4" />
                     Generate Component
@@ -554,7 +617,7 @@ export function DashboardClient() {
                 description="Past generations"
                 accent="text-sky-400"
               />
-              {subscription?.plan === 'free' && (
+              {subscription?.plan === "free" && (
                 <QuickAction
                   href="/billing"
                   icon={TrendingUpIcon}
