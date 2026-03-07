@@ -1,6 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import CatalogDetail from '@/components/catalog/CatalogDetail';
 
+jest.mock('marked', () => ({
+  marked: { parse: (content) => '<div>' + content + '</div>' },
+}));
+
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, back: jest.fn() }),
