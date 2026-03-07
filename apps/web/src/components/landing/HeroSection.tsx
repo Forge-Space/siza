@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, BookOpen } from 'lucide-react';
+import { AmbientVideoBackground } from '@/components/migration/ambient-video-background';
 import { EASE_SIZA, CONTAINER } from './constants';
 
 interface HeroSectionProps {
@@ -18,7 +19,7 @@ export function HeroSection({ user }: HeroSectionProps) {
       const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
       return x - Math.floor(x);
     };
-    return Array.from({ length: 8 }, (_, i) => ({
+    return Array.from({ length: 14 }, (_, i) => ({
       id: i,
       top: `${seed(i * 7) * 100}%`,
       left: `${seed(i * 13) * 100}%`,
@@ -35,21 +36,30 @@ export function HeroSection({ user }: HeroSectionProps) {
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      <AmbientVideoBackground src="/ambient-bg.webm" />
       <div
-        className="absolute w-[800px] h-[800px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        className="absolute w-[1000px] h-[1000px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
           background:
-            'conic-gradient(from 0deg, rgba(139,92,246,0.12), rgba(99,102,241,0.08), rgba(139,92,246,0.12))',
-          filter: 'blur(80px)',
-          animation: 'mesh-rotate 75s linear infinite',
-          opacity: 0.15,
+            'conic-gradient(from 0deg, rgba(139,92,246,0.20), rgba(6,182,212,0.10), rgba(99,102,241,0.16), rgba(139,92,246,0.20))',
+          filter: 'blur(90px)',
+          animation: 'mesh-rotate 60s linear infinite',
         }}
       />
 
       <div
-        className="absolute inset-0 opacity-[0.6]"
+        className="absolute w-[600px] h-[600px] left-[20%] top-[30%] -translate-x-1/2 -translate-y-1/2"
         style={{
-          backgroundImage: 'radial-gradient(circle, var(--forge-border) 1px, transparent 1px)',
+          background: 'radial-gradient(ellipse, rgba(6,182,212,0.12), transparent 70%)',
+          filter: 'blur(60px)',
+          animation: 'mesh-rotate 90s linear infinite reverse',
+        }}
+      />
+
+      <div
+        className="absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(139,92,246,0.18) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
@@ -77,9 +87,9 @@ export function HeroSection({ user }: HeroSectionProps) {
         ))}
 
       <div
-        className="absolute w-[600px] h-[400px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        className="absolute w-[700px] h-[500px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
-          background: 'radial-gradient(ellipse, rgba(139,92,246,0.20), transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(139,92,246,0.25), transparent 65%)',
           animation: 'pulse-glow 4s ease-in-out infinite',
         }}
       />

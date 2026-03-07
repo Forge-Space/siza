@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Github, Linkedin } from 'lucide-react';
 
 export function LandingFooter() {
@@ -7,7 +8,10 @@ export function LandingFooter() {
       <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-20 py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
-            <div className="font-display font-bold text-lg text-foreground">Siza</div>
+            <div className="flex items-center gap-2">
+              <Image src="/monogram.svg" alt="Siza" width={20} height={20} />
+              <span className="font-display font-bold text-lg text-foreground">Siza</span>
+            </div>
             <p className="mt-2 text-sm text-subtle">The open full-stack AI workspace.</p>
             <div className="flex items-center gap-4 mt-4">
               <Link

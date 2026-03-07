@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
@@ -18,8 +19,11 @@ export default function MarketingNav() {
   return (
     <nav className="fixed left-0 right-0 top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="text-lg font-display font-bold tracking-tight text-foreground">
-          Siza
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/monogram.svg" alt="Siza" width={22} height={22} priority />
+          <span className="text-lg font-display font-bold tracking-tight text-foreground">
+            Siza
+          </span>
         </Link>
 
         <div className="hidden sm:flex items-center gap-1">
@@ -29,7 +33,7 @@ export default function MarketingNav() {
               href={link.href}
               className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                 pathname === link.href
-                  ? 'bg-accent text-foreground'
+                  ? 'bg-violet-500/15 text-violet-300'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -47,7 +51,11 @@ export default function MarketingNav() {
           >
             <Link href="/signin">Sign In</Link>
           </Button>
-          <Button size="sm" asChild className="bg-primary text-white hover:bg-primary-hover">
+          <Button
+            size="sm"
+            asChild
+            className="bg-violet-600 text-white hover:bg-violet-500 shadow-[0_0_16px_rgba(139,92,246,0.25)]"
+          >
             <Link href="/signup">Get Started</Link>
           </Button>
         </div>

@@ -122,6 +122,25 @@ export default function AboutPage() {
   return (
     <div className="relative isolate min-h-screen bg-background overflow-hidden">
       <AmbientVideoBackground src="/ambient-bg.webm" />
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div
+          className="absolute w-[900px] h-[900px] left-1/2 top-[20%] -translate-x-1/2 -translate-y-1/2"
+          style={{
+            background:
+              'conic-gradient(from 120deg, rgba(139,92,246,0.18), rgba(6,182,212,0.10), rgba(99,102,241,0.14), rgba(139,92,246,0.18))',
+            filter: 'blur(90px)',
+            animation: 'mesh-rotate 70s linear infinite',
+          }}
+        />
+        <div
+          className="absolute w-[500px] h-[500px] right-[10%] top-[60%] -translate-y-1/2"
+          style={{
+            background: 'radial-gradient(ellipse, rgba(6,182,212,0.10), transparent 70%)',
+            filter: 'blur(60px)',
+            animation: 'mesh-rotate 100s linear infinite reverse',
+          }}
+        />
+      </div>
       <FadeIn className="pt-24 pb-16 px-6">
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
@@ -142,15 +161,17 @@ export default function AboutPage() {
       <section className="py-16 px-6">
         <div className="relative z-10 max-w-5xl mx-auto">
           <FadeIn>
-            <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-8 text-center">
+            <p className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-8 text-center">
               Philosophy
-            </h2>
+            </p>
           </FadeIn>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {principles.map((principle, i) => (
               <FadeIn key={principle.title} delay={i * 0.1}>
-                <Card className="p-6 h-full bg-card border-border hover:border-primary/30 transition-colors duration-300">
-                  <principle.icon className="w-5 h-5 text-primary mb-4" />
+                <Card className="p-6 h-full bg-card border-border hover:border-violet-500/40 hover:shadow-[0_0_30px_rgba(139,92,246,0.08)] transition-all duration-300">
+                  <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-violet-500/15 mb-4">
+                    <principle.icon className="w-5 h-5 text-violet-400" />
+                  </div>
                   <h3 className="text-lg font-semibold mb-2">{principle.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {principle.description}
@@ -174,10 +195,10 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {ecosystem.map((project, i) => (
               <FadeIn key={project.name} delay={i * 0.08}>
-                <Card className="p-6 h-full bg-card border-border hover:border-primary/30 transition-colors duration-300">
+                <Card className="p-6 h-full bg-card border-border hover:border-violet-500/40 hover:shadow-[0_0_30px_rgba(139,92,246,0.08)] transition-all duration-300">
                   <div className="flex items-start gap-4">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <project.icon className="w-5 h-5 text-primary" />
+                    <div className="p-2 rounded-lg bg-violet-500/15">
+                      <project.icon className="w-5 h-5 text-violet-400" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -185,7 +206,7 @@ export default function AboutPage() {
                         {project.badge && (
                           <Badge
                             variant="secondary"
-                            className="text-xs bg-primary/20 text-primary border-0"
+                            className="text-xs bg-violet-500/20 text-violet-300 border-0"
                           >
                             {project.badge}
                           </Badge>
@@ -206,16 +227,16 @@ export default function AboutPage() {
       <section className="py-16 px-6">
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <FadeIn>
-            <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-8">
+            <p className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-8">
               Tech Stack
-            </h2>
+            </p>
           </FadeIn>
           <div className="flex flex-wrap justify-center gap-3">
             {techStack.map((tech, i) => (
               <FadeIn key={tech} delay={i * 0.05}>
                 <Badge
                   variant="outline"
-                  className="px-4 py-2 text-sm font-mono border-border text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
+                  className="px-4 py-2 text-sm font-mono border-border text-muted-foreground hover:border-violet-500/40 hover:text-violet-300 hover:bg-violet-500/5 transition-all"
                 >
                   {tech}
                 </Badge>
