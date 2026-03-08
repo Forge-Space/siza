@@ -59,25 +59,23 @@ export const test = base.extend<TestFixtures>({
     }
     if (!profileFound) {
       // Profile trigger didn't fire — insert the profile manually
-      await adminSupabase.from('profiles').insert({
+      const { error: insertErr } = await adminSupabase.from('profiles').insert({
         id: testUser.id,
         onboarding_completed_at: new Date().toISOString(),
-        tour_completed_at: new Date().toISOString(),
       });
+      if (insertErr) console.warn('E2E fixture insert error:', insertErr.message);
     } else {
-      await adminSupabase
+      const { error: updateErr } = await adminSupabase
         .from('profiles')
-        .update({
-          onboarding_completed_at: new Date().toISOString(),
-          tour_completed_at: new Date().toISOString(),
-        })
+        .update({ onboarding_completed_at: new Date().toISOString() })
         .eq('id', testUser.id);
+      if (updateErr) console.warn('E2E fixture update error:', updateErr.message);
     }
 
     // Verify the update took effect
     const { data: verifyProfile } = await adminSupabase
       .from('profiles')
-      .select('onboarding_completed_at, tour_completed_at')
+      .select('onboarding_completed_at')
       .eq('id', testUser.id)
       .single();
     if (!verifyProfile?.onboarding_completed_at) {
