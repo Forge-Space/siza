@@ -9,6 +9,7 @@ describe('dashboard navigation', () => {
       'Catalog',
       'Golden Paths',
       'Plugins',
+      'Skills',
       'Templates',
       'History',
       'AI Keys',
