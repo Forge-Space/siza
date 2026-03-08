@@ -34,6 +34,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_SOFTWARE_CATALOG: true,
   ENABLE_GOLDEN_PATHS: true,
   ENABLE_POST_GEN_SCORING: true,
+  ENABLE_PLUGIN_SYSTEM: false,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -234,6 +235,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_POST_GEN_SCORING,
     description: 'Run post-generation quality scoring and show A-F grade in preview',
     category: 'quality',
+  },
+  {
+    name: 'ENABLE_PLUGIN_SYSTEM',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_PLUGIN_SYSTEM,
+    description: 'Enable governance plugin marketplace and widget slot system',
+    category: 'governance',
   },
 ];
 

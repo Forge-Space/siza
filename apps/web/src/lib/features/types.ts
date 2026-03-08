@@ -31,7 +31,8 @@ export type FeatureFlagName =
   | 'ENABLE_SIZA_GEN_CONTEXT'
   | 'ENABLE_SOFTWARE_CATALOG'
   | 'ENABLE_GOLDEN_PATHS'
-  | 'ENABLE_POST_GEN_SCORING';
+  | 'ENABLE_POST_GEN_SCORING'
+  | 'ENABLE_PLUGIN_SYSTEM';
 
 export type FeatureFlagCategory =
   | 'auth'

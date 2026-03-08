@@ -6,6 +6,7 @@ import {
   KeyIcon,
   LayoutDashboardIcon,
   PlusIcon,
+  PuzzleIcon,
   RocketIcon,
   SettingsIcon,
   ClockIcon,
@@ -38,6 +39,10 @@ const goldenPathsNavigation: DashboardNavItem[] = [
   { name: 'Golden Paths', href: '/golden-paths', icon: RocketIcon },
 ];
 
+const pluginsNavigation: DashboardNavItem[] = [
+  { name: 'Plugins', href: '/plugins', icon: PuzzleIcon },
+];
+
 const adminDashboardNavigation: DashboardNavItem[] = [
   { name: 'Admin', href: '/admin', icon: ShieldIcon },
 ];
@@ -45,14 +50,17 @@ const adminDashboardNavigation: DashboardNavItem[] = [
 export function getDashboardNavigation(isAdmin: boolean): DashboardNavItem[] {
   const isCatalogEnabled = getFeatureFlag('ENABLE_SOFTWARE_CATALOG');
   const isGoldenPathsEnabled = getFeatureFlag('ENABLE_GOLDEN_PATHS');
+  const isPluginsEnabled = getFeatureFlag('ENABLE_PLUGIN_SYSTEM');
   const catalogItems = isCatalogEnabled ? catalogNavigation : [];
   const goldenPathItems = isGoldenPathsEnabled ? goldenPathsNavigation : [];
+  const pluginItems = isPluginsEnabled ? pluginsNavigation : [];
 
   const projectsIndex = baseDashboardNavigation.findIndex((item) => item.name === 'Projects');
   const navItems = [
     ...baseDashboardNavigation.slice(0, projectsIndex + 1),
     ...catalogItems,
     ...goldenPathItems,
+    ...pluginItems,
     ...baseDashboardNavigation.slice(projectsIndex + 1),
   ];
 

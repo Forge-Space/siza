@@ -19,6 +19,7 @@ import {
 import TechDocsPanel from '@/components/catalog/TechDocsPanel';
 import CicdPanel from '@/components/catalog/CicdPanel';
 import ApiDocsPanel from '@/components/catalog/api-docs/ApiDocsPanel';
+import { PluginSlot } from '@/components/plugins/PluginSlot';
 
 interface CatalogEntry {
   id: string;
@@ -275,6 +276,8 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
       />
 
       <CicdPanel repositoryUrl={entry.repository_url} />
+
+      <PluginSlot name="catalog-detail" entityId={entry.id} className="space-y-4" />
 
       {entry.metadata?.openapi_spec != null && (
         <div className="md:col-span-2">
