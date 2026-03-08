@@ -29,7 +29,7 @@ export async function checkGenerationQuota(userId: string): Promise<UsageCheckRe
     .single();
 
   if (!data) {
-    return { allowed: true, current: 0, limit: 10, remaining: 10 };
+    return { allowed: true, current: 0, limit: 5, remaining: 5 };
   }
 
   if (data.generations_limit === -1) {

@@ -23,7 +23,7 @@ export async function getUserQuota(userId: string): Promise<UserQuota> {
 
   return {
     plan,
-    generationsPerMonth: limits?.generations_per_month ?? 10,
+    generationsPerMonth: limits?.generations_per_month ?? 5,
     maxProjects: limits?.max_projects ?? 2,
     maxComponentsPerProject: limits?.max_components_per_project ?? 50,
     features: (limits?.features as Record<string, boolean>) ?? {},
