@@ -12,6 +12,7 @@ import {
   ClockIcon,
   ShieldIcon,
   UsersIcon,
+  WandSparklesIcon,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { getFeatureFlag } from '@/lib/features/flags';
@@ -44,6 +45,10 @@ const pluginsNavigation: DashboardNavItem[] = [
   { name: 'Plugins', href: '/plugins', icon: PuzzleIcon },
 ];
 
+const skillsNavigation: DashboardNavItem[] = [
+  { name: 'Skills', href: '/skills', icon: WandSparklesIcon },
+];
+
 const teamsNavigation: DashboardNavItem[] = [{ name: 'Teams', href: '/teams', icon: UsersIcon }];
 
 const adminDashboardNavigation: DashboardNavItem[] = [
@@ -54,10 +59,12 @@ export function getDashboardNavigation(isAdmin: boolean): DashboardNavItem[] {
   const isCatalogEnabled = getFeatureFlag('ENABLE_SOFTWARE_CATALOG');
   const isGoldenPathsEnabled = getFeatureFlag('ENABLE_GOLDEN_PATHS');
   const isPluginsEnabled = getFeatureFlag('ENABLE_PLUGIN_SYSTEM');
+  const isSkillsEnabled = getFeatureFlag('ENABLE_SKILL_MARKETPLACE');
   const isRbacEnabled = getFeatureFlag('ENABLE_RBAC');
   const catalogItems = isCatalogEnabled ? catalogNavigation : [];
   const goldenPathItems = isGoldenPathsEnabled ? goldenPathsNavigation : [];
   const pluginItems = isPluginsEnabled ? pluginsNavigation : [];
+  const skillItems = isSkillsEnabled ? skillsNavigation : [];
   const teamItems = isRbacEnabled ? teamsNavigation : [];
 
   const projectsIndex = baseDashboardNavigation.findIndex((item) => item.name === 'Projects');
@@ -66,6 +73,7 @@ export function getDashboardNavigation(isAdmin: boolean): DashboardNavItem[] {
     ...catalogItems,
     ...goldenPathItems,
     ...pluginItems,
+    ...skillItems,
     ...teamItems,
     ...baseDashboardNavigation.slice(projectsIndex + 1),
   ];
