@@ -4,6 +4,11 @@ import {
   runTypeCheck,
   runAccessibilityCheck,
   runResponsiveCheck,
+  runArchitectureCheck,
+  runErrorHandlingCheck,
+  runScalabilityCheck,
+  runHardcodedValuesCheck,
+  runEngineeringCheck,
   calculateQualityScore,
   runAllGates,
 } from '@/lib/quality/gates';
@@ -164,6 +169,202 @@ describe('runResponsiveCheck', () => {
   });
 });
 
+describe('runArchitectureCheck', () => {
+  it('passes for small clean code', () => {
+    const result = runArchitectureCheck('const x = 1;');
+    expect(result.passed).toBe(true);
+    expect(result.gate).toBe('architecture');
+  });
+
+  it('detects files exceeding 300 lines', () => {
+    const code = Array(350).fill('const x = 1;').join('\n');
+    const result = runArchitectureCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/350 lines/);
+  });
+
+  it('detects too many functions in one file', () => {
+    const fns = Array(12)
+      .fill(0)
+      .map((_, i) => `function fn${i}() { return ${i}; }`)
+      .join('\n');
+    const result = runArchitectureCheck(fns);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/12 functions/);
+  });
+
+  it('detects components with too many props', () => {
+    const props = Array(15)
+      .fill(0)
+      .map((_, i) => `  prop${i}: string;`)
+      .join('\n');
+    const code = `interface CardProps {\n${props}\n}`;
+    const result = runArchitectureCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/15 props/);
+  });
+
+  it('detects deep nesting', () => {
+    const code = '{ { { { { { const x = 1; } } } } } }';
+    const result = runArchitectureCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/depth 6/);
+  });
+
+  it('passes for moderate nesting', () => {
+    const code = '{ { { const x = 1; } } }';
+    const result = runArchitectureCheck(code);
+    expect(result.passed).toBe(true);
+  });
+});
+
+describe('runErrorHandlingCheck', () => {
+  it('passes for clean code', () => {
+    const result = runErrorHandlingCheck('const x = 1;');
+    expect(result.passed).toBe(true);
+    expect(result.gate).toBe('error-handling');
+  });
+
+  it('detects empty catch blocks', () => {
+    const code = 'try { doThing(); } catch (e) { }';
+    const result = runErrorHandlingCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/Empty catch/);
+  });
+
+  it('detects console-only catch blocks', () => {
+    const code = 'try { doThing(); } catch (e) { console.log(e) }';
+    const result = runErrorHandlingCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/only logs to console/);
+  });
+
+  it('detects promise chains without catch', () => {
+    const code = 'fetchData().then(data => process(data))';
+    const result = runErrorHandlingCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/without \.catch/);
+  });
+
+  it('passes for promise with catch', () => {
+    const code = 'fetchData().then(d => d).catch(e => handleError(e))';
+    const result = runErrorHandlingCheck(code);
+    expect(result.passed).toBe(true);
+  });
+});
+
+describe('runScalabilityCheck', () => {
+  it('passes for clean code', () => {
+    const result = runScalabilityCheck('const x = 1;');
+    expect(result.passed).toBe(true);
+    expect(result.gate).toBe('scalability');
+  });
+
+  it('detects fetch inside loop (N+1)', () => {
+    const code = 'for (const id of ids) { await db.query(id); }';
+    const result = runScalabilityCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/N\+1/);
+  });
+
+  it('detects list rendering without pagination', () => {
+    const code = `
+      const data = await fetch('/api/items');
+      return data.map(item => <Item key={item.id} />);
+    `;
+    const result = runScalabilityCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/pagination/);
+  });
+
+  it('passes when pagination params present', () => {
+    const code = `
+      const data = await fetch('/api/items?limit=20&offset=0');
+      return data.map(item => <Item key={item.id} />);
+    `;
+    const result = runScalabilityCheck(code);
+    expect(result.passed).toBe(true);
+  });
+});
+
+describe('runHardcodedValuesCheck', () => {
+  it('passes for clean code', () => {
+    const result = runHardcodedValuesCheck('const x = 1;');
+    expect(result.passed).toBe(true);
+    expect(result.gate).toBe('hardcoded-values');
+  });
+
+  it('detects hardcoded URLs', () => {
+    const code = 'const api = "https://api.production.com/v1/users";';
+    const result = runHardcodedValuesCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/Hardcoded URL/);
+  });
+
+  it('ignores localhost URLs', () => {
+    const code = 'const api = "http://localhost:3000/api";';
+    const result = runHardcodedValuesCheck(code);
+    const urlIssues = result.issues.filter((i) => i.includes('Hardcoded URL'));
+    expect(urlIssues).toHaveLength(0);
+  });
+
+  it('detects hardcoded secrets', () => {
+    const code = 'const api_key = "sk-1234567890abcdef";';
+    const result = runHardcodedValuesCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((i) => i.includes('secret'))).toBe(true);
+  });
+
+  it('detects TODO proliferation', () => {
+    const code = '// TODO: fix\n// TODO: refactor\n// FIXME: broken\n// TODO: cleanup';
+    const result = runHardcodedValuesCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues.some((i) => i.includes('TODO'))).toBe(true);
+  });
+});
+
+describe('runEngineeringCheck', () => {
+  it('passes for clean code', () => {
+    const result = runEngineeringCheck('const x: string = "hello";');
+    expect(result.passed).toBe(true);
+    expect(result.gate).toBe('engineering');
+  });
+
+  it('detects @ts-ignore', () => {
+    const code = '// @ts-ignore\nconst x = badCall();';
+    const result = runEngineeringCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/TypeScript suppression/);
+  });
+
+  it('detects @ts-nocheck', () => {
+    const code = '// @ts-nocheck\nconst x = 1;';
+    const result = runEngineeringCheck(code);
+    expect(result.passed).toBe(false);
+  });
+
+  it('detects synchronous I/O', () => {
+    const code = 'const data = readFileSync("config.json");';
+    const result = runEngineeringCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/Synchronous I\/O/);
+  });
+
+  it('detects excessive inline styles', () => {
+    const code = Array(5).fill('<div style={{ color: "red" }}>text</div>').join('\n');
+    const result = runEngineeringCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/inline styles/);
+  });
+
+  it('detects array index as React key', () => {
+    const code = 'items.map((item, index) => <li key={index}>{item}</li>)';
+    const result = runEngineeringCheck(code);
+    expect(result.passed).toBe(false);
+    expect(result.issues[0]).toMatch(/Array index used as React key/);
+  });
+});
+
 describe('calculateQualityScore', () => {
   it('returns 1 for all passed', () => {
     const results = [
@@ -195,14 +396,19 @@ describe('calculateQualityScore', () => {
 });
 
 describe('runAllGates', () => {
-  it('returns report with all 5 gates', () => {
+  it('returns report with all 10 gates', () => {
     const report = runAllGates('const x = 1;');
-    expect(report.results).toHaveLength(5);
+    expect(report.results).toHaveLength(10);
     expect(report.results.map((r) => r.gate)).toEqual([
       'security',
+      'accessibility',
+      'architecture',
+      'error-handling',
+      'scalability',
+      'hardcoded-values',
+      'engineering',
       'lint',
       'type-check',
-      'accessibility',
       'responsive',
     ]);
     expect(report.timestamp).toBeDefined();
