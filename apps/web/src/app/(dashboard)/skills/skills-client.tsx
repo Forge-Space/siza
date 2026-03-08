@@ -12,6 +12,7 @@ import {
   ShieldCheckIcon,
 } from 'lucide-react';
 import type { SkillRow, SkillCategory } from '@/lib/repositories/skill.types';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 const CATEGORIES: { value: SkillCategory | 'all'; label: string }[] = [
