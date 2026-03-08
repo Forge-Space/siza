@@ -8,7 +8,6 @@ import {
   EyeIcon,
   CodeIcon,
   TagIcon,
-  PlusIcon,
   XIcon,
   InfoIcon,
   CopyIcon,
@@ -60,10 +59,24 @@ const CATEGORIES = [
 ];
 
 const POPULAR_TAGS = [
-  'ui', 'components', 'forms', 'accessibility', 'responsive',
-  'typescript', 'react', 'vue', 'angular', 'svelte',
-  'dashboard', 'charts', 'data-table', 'validation',
-  'design', 'a11y', 'wcag', 'aria',
+  'ui',
+  'components',
+  'forms',
+  'accessibility',
+  'responsive',
+  'typescript',
+  'react',
+  'vue',
+  'angular',
+  'svelte',
+  'dashboard',
+  'charts',
+  'data-table',
+  'validation',
+  'design',
+  'a11y',
+  'wcag',
+  'aria',
 ];
 
 function TagInput({
@@ -107,9 +120,7 @@ function TagInput({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-text-primary mb-1.5">
-        {label}
-      </label>
+      <label className="block text-sm font-medium text-text-primary mb-1.5">{label}</label>
       <div className="flex flex-wrap gap-1.5 p-2 min-h-[42px] bg-surface-1 border border-surface-3 rounded-lg focus-within:ring-1 focus-within:ring-brand focus-within:border-brand">
         {tags.map((tag) => (
           <span
@@ -164,14 +175,10 @@ function SkillMdPreview({ form }: { form: SkillFormState }) {
     if (form.version) lines.push(`version: ${form.version}`);
     if (form.author) lines.push(`author: ${form.author}`);
     if (form.license) lines.push(`license: ${form.license}`);
-    if (form.tags.length)
-      lines.push(`tags: [${form.tags.join(', ')}]`);
-    if (form.allowedTools.length)
-      lines.push(`allowed-tools: [${form.allowedTools.join(', ')}]`);
-    if (form.argumentHint)
-      lines.push(`argument-hint: ${form.argumentHint}`);
-    if (form.invocationMode !== 'user')
-      lines.push(`invocation-mode: ${form.invocationMode}`);
+    if (form.tags.length) lines.push(`tags: [${form.tags.join(', ')}]`);
+    if (form.allowedTools.length) lines.push(`allowed-tools: [${form.allowedTools.join(', ')}]`);
+    if (form.argumentHint) lines.push(`argument-hint: ${form.argumentHint}`);
+    if (form.invocationMode !== 'user') lines.push(`invocation-mode: ${form.invocationMode}`);
     lines.push('---', '');
     lines.push(form.instructions || '# Instructions\n\nDescribe what this skill does...');
     return lines.join('\n');
@@ -222,10 +229,7 @@ export function SkillCreatorClient() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
 
-  const updateField = <K extends keyof SkillFormState>(
-    key: K,
-    value: SkillFormState[K]
-  ) => {
+  const updateField = <K extends keyof SkillFormState>(key: K, value: SkillFormState[K]) => {
     setForm((prev) => {
       const next = { ...prev, [key]: value };
       if (key === 'name') {
@@ -258,12 +262,9 @@ export function SkillCreatorClient() {
     if (form.author) lines.push(`author: ${form.author}`);
     if (form.license) lines.push(`license: ${form.license}`);
     if (form.tags.length) lines.push(`tags: [${form.tags.join(', ')}]`);
-    if (form.allowedTools.length)
-      lines.push(`allowed-tools: [${form.allowedTools.join(', ')}]`);
-    if (form.argumentHint)
-      lines.push(`argument-hint: ${form.argumentHint}`);
-    if (form.invocationMode !== 'user')
-      lines.push(`invocation-mode: ${form.invocationMode}`);
+    if (form.allowedTools.length) lines.push(`allowed-tools: [${form.allowedTools.join(', ')}]`);
+    if (form.argumentHint) lines.push(`argument-hint: ${form.argumentHint}`);
+    if (form.invocationMode !== 'user') lines.push(`invocation-mode: ${form.invocationMode}`);
     lines.push('---', '', form.instructions);
     const content = lines.join('\n');
 
@@ -297,22 +298,14 @@ export function SkillCreatorClient() {
             Create Skill
           </h1>
           <p className="text-sm text-text-secondary mt-1">
-            Build a reusable AI generation skill using the Anthropic Agent
-            Skills standard.
+            Build a reusable AI generation skill using the Anthropic Agent Skills standard.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/skills')}
-          >
+          <Button variant="ghost" onClick={() => router.push('/skills')}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={saving || !isValid}
-            className="gap-2"
-          >
+          <Button onClick={handleSave} disabled={saving || !isValid} className="gap-2">
             <SaveIcon className="h-4 w-4" />
             {saving ? 'Saving...' : 'Save Skill'}
           </Button>
@@ -366,10 +359,14 @@ export function SkillCreatorClient() {
               </h2>
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-1.5">
+                <label
+                  htmlFor="skill-name"
+                  className="block text-sm font-medium text-text-primary mb-1.5"
+                >
                   Name <span className="text-red-400">*</span>
                 </label>
                 <input
+                  id="skill-name"
                   type="text"
                   value={form.name}
                   onChange={(e) => updateField('name', e.target.value)}
@@ -385,14 +382,16 @@ export function SkillCreatorClient() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-1.5">
+                <label
+                  htmlFor="skill-description"
+                  className="block text-sm font-medium text-text-primary mb-1.5"
+                >
                   Description <span className="text-red-400">*</span>
                 </label>
                 <textarea
+                  id="skill-description"
                   value={form.description}
-                  onChange={(e) =>
-                    updateField('description', e.target.value)
-                  }
+                  onChange={(e) => updateField('description', e.target.value)}
                   placeholder="What does this skill do?"
                   maxLength={1024}
                   rows={2}
@@ -405,14 +404,16 @@ export function SkillCreatorClient() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  <label
+                    htmlFor="skill-category"
+                    className="block text-sm font-medium text-text-primary mb-1.5"
+                  >
                     Category
                   </label>
                   <select
+                    id="skill-category"
                     value={form.category}
-                    onChange={(e) =>
-                      updateField('category', e.target.value)
-                    }
+                    onChange={(e) => updateField('category', e.target.value)}
                     className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-lg"
                   >
                     {CATEGORIES.map((cat) => (
@@ -423,16 +424,17 @@ export function SkillCreatorClient() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  <label
+                    htmlFor="skill-invocation-mode"
+                    className="block text-sm font-medium text-text-primary mb-1.5"
+                  >
                     Invocation Mode
                   </label>
                   <select
+                    id="skill-invocation-mode"
                     value={form.invocationMode}
                     onChange={(e) =>
-                      updateField(
-                        'invocationMode',
-                        e.target.value as InvocationMode
-                      )
+                      updateField('invocationMode', e.target.value as InvocationMode)
                     }
                     className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-lg"
                   >
@@ -445,48 +447,52 @@ export function SkillCreatorClient() {
             </div>
 
             <div className="p-4 rounded-xl border border-surface-3 bg-surface-0 space-y-4">
-              <h2 className="text-sm font-semibold text-text-primary">
-                Metadata
-              </h2>
+              <h2 className="text-sm font-semibold text-text-primary">Metadata</h2>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  <label
+                    htmlFor="skill-version"
+                    className="block text-sm font-medium text-text-primary mb-1.5"
+                  >
                     Version
                   </label>
                   <input
+                    id="skill-version"
                     type="text"
                     value={form.version}
-                    onChange={(e) =>
-                      updateField('version', e.target.value)
-                    }
+                    onChange={(e) => updateField('version', e.target.value)}
                     placeholder="1.0.0"
                     className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-lg focus:ring-brand focus:border-brand"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  <label
+                    htmlFor="skill-author"
+                    className="block text-sm font-medium text-text-primary mb-1.5"
+                  >
                     Author
                   </label>
                   <input
+                    id="skill-author"
                     type="text"
                     value={form.author}
-                    onChange={(e) =>
-                      updateField('author', e.target.value)
-                    }
+                    onChange={(e) => updateField('author', e.target.value)}
                     placeholder="Your name"
                     className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-lg focus:ring-brand focus:border-brand"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  <label
+                    htmlFor="skill-license"
+                    className="block text-sm font-medium text-text-primary mb-1.5"
+                  >
                     License
                   </label>
                   <input
+                    id="skill-license"
                     type="text"
                     value={form.license}
-                    onChange={(e) =>
-                      updateField('license', e.target.value)
-                    }
+                    onChange={(e) => updateField('license', e.target.value)}
                     placeholder="MIT"
                     className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-lg focus:ring-brand focus:border-brand"
                   />
@@ -494,21 +500,22 @@ export function SkillCreatorClient() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-1.5">
+                <label
+                  htmlFor="skill-argument-hint"
+                  className="block text-sm font-medium text-text-primary mb-1.5"
+                >
                   Argument Hint
                 </label>
                 <input
+                  id="skill-argument-hint"
                   type="text"
                   value={form.argumentHint}
-                  onChange={(e) =>
-                    updateField('argumentHint', e.target.value)
-                  }
+                  onChange={(e) => updateField('argumentHint', e.target.value)}
                   placeholder="e.g. <component-name> [--variant]"
                   className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-lg focus:ring-brand focus:border-brand font-mono text-xs"
                 />
                 <p className="mt-1 text-xs text-text-muted">
-                  Shows usage hint: /{form.slug || 'skill-name'}{' '}
-                  {form.argumentHint || '<args>'}
+                  Shows usage hint: /{form.slug || 'skill-name'} {form.argumentHint || '<args>'}
                 </p>
               </div>
             </div>
@@ -529,20 +536,22 @@ export function SkillCreatorClient() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-1.5">
+              <label
+                htmlFor="skill-instructions"
+                className="block text-sm font-medium text-text-primary mb-1.5"
+              >
                 Instructions <span className="text-red-400">*</span>
               </label>
               <p className="text-xs text-text-muted mb-2">
                 Markdown instructions that guide the AI. Use{' '}
-                <code className="text-brand">$ARGUMENTS</code> for all
-                args or <code className="text-brand">$0</code>,{' '}
-                <code className="text-brand">$1</code> for positional.
+                <code className="text-brand">$ARGUMENTS</code> for all args or{' '}
+                <code className="text-brand">$0</code>, <code className="text-brand">$1</code> for
+                positional.
               </p>
               <textarea
+                id="skill-instructions"
                 value={form.instructions}
-                onChange={(e) =>
-                  updateField('instructions', e.target.value)
-                }
+                onChange={(e) => updateField('instructions', e.target.value)}
                 placeholder="# My Skill\n\nGenerate a $ARGUMENTS component with...\n\n## Guidelines\n\n1. Use semantic HTML\n2. Add ARIA labels\n3. Make it responsive"
                 rows={20}
                 className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-lg focus:ring-brand focus:border-brand font-mono"
