@@ -5,6 +5,7 @@ import { getLocalAuthBypassUser, isLocalAuthBypassEnabled } from '@/lib/auth/loc
 import Sidebar from '@/components/dashboard/Sidebar';
 import TopBar from '@/components/dashboard/TopBar';
 import { DashboardShell } from '@/components/dashboard/DashboardShell';
+import { TourProvider } from '@/components/tour/TourProvider';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const bypassEnabled = isLocalAuthBypassEnabled();
   let user: User | null = null;
   let isAdmin = false;
+  let tourCompleted = true;
 
   if (bypassEnabled) {
     user = getLocalAuthBypassUser();
@@ -29,7 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     user = sessionUser;
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, onboarding_completed_at')
+      .select('role, onboarding_completed_at, tour_completed_at')
       .eq('id', sessionUser.id)
       .single();
     isAdmin = profile?.role === 'admin';
@@ -37,6 +39,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     if (!profile?.onboarding_completed_at) {
       redirect('/onboarding');
     }
+    tourCompleted = !!profile?.tour_completed_at;
   }
 
   return (
@@ -45,7 +48,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar user={user} isAdmin={isAdmin} />
         <main id="main-content" className="flex-1 overflow-y-auto bg-background p-4 sm:p-6 lg:p-8">
-          <DashboardShell>{children}</DashboardShell>
+          <TourProvider tourCompleted={tourCompleted}>
+            <DashboardShell>{children}</DashboardShell>
+          </TourProvider>
         </main>
       </div>
     </div>
