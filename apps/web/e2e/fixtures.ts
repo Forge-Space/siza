@@ -81,7 +81,10 @@ export const test = base.extend<TestFixtures>({
       .eq('id', testUser.id)
       .single();
     if (!verifyProfile?.onboarding_completed_at) {
-      console.warn('E2E fixture: onboarding_completed_at not set after update, profile:', verifyProfile);
+      console.warn(
+        'E2E fixture: onboarding_completed_at not set after update, profile:',
+        verifyProfile
+      );
     }
 
     await page.goto('/signin');
