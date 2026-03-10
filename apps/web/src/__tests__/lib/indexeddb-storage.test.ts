@@ -184,7 +184,7 @@ describe('IndexedDB Storage', () => {
       });
       const result = await storage.getStorageStats();
       expect(result.apiKeysCount).toBe(2);
-      expect(result.totalSize).toMatch(/\d+\.?\d*\s*(B|KB|MB)/);
+      expect(result.totalSize).toMatch(/^\d+(?:\.\d+)?\s*(?:B|KB|MB)$/);
     });
 
     it('should return zero stats when no keys exist', async () => {

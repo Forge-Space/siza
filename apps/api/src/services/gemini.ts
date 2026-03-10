@@ -194,7 +194,7 @@ export async function* streamComponentGeneration(
 export async function hasCodePatterns(code: string, _language: string): Promise<boolean> {
   try {
     // Heuristic check - detect common code patterns
-    const hasImports = /import\s+.*\s+from\s+['"]/.test(code);
+    const hasImports = /\bimport\s+[^;\n]+\s+from\s+['"]/.test(code);
     const hasFunction = /function\s+\w+|const\s+\w+\s*=|export\s+(default\s+)?function/.test(code);
     const hasReturn = /return\s+[(<]/.test(code);
 

@@ -83,10 +83,10 @@ describe('OllamaClient', () => {
 
   describe('setBaseUrl', () => {
     it('strips trailing slash', () => {
-      client.setBaseUrl('http://custom:1234/');
+      client.setBaseUrl('https://custom:1234/');
       mockFetch.mockResolvedValueOnce({ ok: true });
       client.checkConnection();
-      expect(mockFetch).toHaveBeenCalledWith('http://custom:1234/api/version', expect.anything());
+      expect(mockFetch).toHaveBeenCalledWith('https://custom:1234/api/version', expect.anything());
     });
   });
 });

@@ -26,10 +26,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
           cache: npm
@@ -38,7 +38,7 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@0d579ffd059c29b07949a3cce3983f0780820c98
         with:
           languages: ${{ matrix.language }}
           queries: +security-and-quality
@@ -47,6 +47,6 @@ jobs:
         run: npx turbo build --filter=!@siza/desktop
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@0d579ffd059c29b07949a3cce3983f0780820c98
         with:
           category: "/language:${{ matrix.language }}"

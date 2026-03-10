@@ -21,6 +21,8 @@ interface DNSRecord {
   ttl: number;
 }
 
+const PLACEHOLDER_A_RECORD = 'YOUR_SERVER_IP';
+
 export default function CustomDomain() {
   const [domains, setDomains] = useState<DomainStatus[]>([
     {
@@ -28,7 +30,7 @@ export default function CustomDomain() {
       status: 'pending',
       sslStatus: 'pending',
       dnsRecords: [
-        { type: 'A', name: '@', value: '192.168.1.1', ttl: 3600 },
+        { type: 'A', name: '@', value: PLACEHOLDER_A_RECORD, ttl: 3600 },
         { type: 'CNAME', name: 'www', value: 'siza.pages.dev', ttl: 3600 },
       ],
     },
@@ -49,7 +51,7 @@ export default function CustomDomain() {
         status: 'pending',
         sslStatus: 'pending',
         dnsRecords: [
-          { type: 'A', name: '@', value: '192.168.1.1', ttl: 3600 },
+          { type: 'A', name: '@', value: PLACEHOLDER_A_RECORD, ttl: 3600 },
           { type: 'CNAME', name: 'www', value: 'siza.pages.dev', ttl: 3600 },
         ],
       };

@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Bundle optimization** — removed 4 dead dependencies (@monaco-editor/react, react-icons, react-email, next-themes), moved 9 misplaced root deps to proper workspaces, added serverExternalPackages for 5 server-only libs, lazy-load 3 below-fold landing sections, optimizePackageImports for lucide-react/motion/supabase
 
+### Fixed
+- **SonarCloud hotspot blockers on main** — Removed high-noise hotspot patterns by replacing vulnerable regex scans with safer parsing logic, replacing `Math.random()` IDs with crypto-backed IDs, replacing hardcoded IP test/example literals, narrowing Docker build copy scope in `apps/api/Dockerfile`, and pinning GitHub Actions/reusable workflow `uses:` references to full commit SHAs.
+
 ---
 
 ## [0.41.0] - 2026-03-08

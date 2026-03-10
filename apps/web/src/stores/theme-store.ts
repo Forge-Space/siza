@@ -60,8 +60,14 @@ interface ThemeActions {
   importBrand: (json: string) => string | null;
 }
 
+let fallbackIdCounter = 0;
+
 function generateId(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  fallbackIdCounter += 1;
+  return `theme-${Date.now()}-${fallbackIdCounter}`;
 }
 
 export function parseBrandIdentity(
