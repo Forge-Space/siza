@@ -16,22 +16,29 @@ interface TocEntry {
   level: number;
 }
 
+function stripHtmlTags(value: string): string {
+  const doc = new DOMParser().parseFromString(value, 'text/html');
+  return doc.body.textContent?.trim() || '';
+}
+
 function extractToc(html: string): TocEntry[] {
-  const regex = /<h([1-3])\s*(?:id="([^"]*)")?[^>]*>(.*?)<\/h[1-3]>/gi;
-  const entries: TocEntry[] = [];
-  let m;
-  while ((m = regex.exec(html)) !== null) {
-    const level = parseInt(m[1], 10);
-    const text = m[3].replace(/<[^>]*>/g, '');
-    const id =
-      m[2] ||
-      text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-');
-    entries.push({ id, text, level });
-  }
-  return entries;
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const headings = doc.querySelectorAll('h1, h2, h3');
+
+  return Array.from(headings)
+    .map((heading) => {
+      const level = Number.parseInt(heading.tagName.slice(1), 10);
+      const text = (heading.textContent || '').trim();
+      const id =
+        heading.getAttribute('id') ||
+        text
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-');
+
+      return { id, text, level };
+    })
+    .filter((entry) => entry.text.length > 0);
 }
 
 interface TechDocsPanelProps {
@@ -62,9 +69,8 @@ export default function TechDocsPanel({ documentationUrl, repositoryUrl }: TechD
       .then((json) => {
         const renderer = new marked.Renderer();
         renderer.heading = ({ text, depth }) => {
-          const slug = text
+          const slug = stripHtmlTags(text)
             .toLowerCase()
-            .replace(/<[^>]*>/g, '')
             .replace(/[^\w\s-]/g, '')
             .replace(/\s+/g, '-');
           return `<h${depth} id="${slug}">${text}</h${depth}>`;

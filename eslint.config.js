@@ -25,14 +25,15 @@ export default [
     ],
   },
   js.configs.recommended,
-  // API app rules
+  // API and desktop app rules
   {
-    files: ['apps/api/**/*.{ts,js}'],
+    files: ['apps/api/**/*.{ts,js}', 'apps/desktop/**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
+        ecmaFeatures: { jsx: true },
       },
       globals: {
         console: 'readonly',
@@ -64,6 +65,7 @@ export default [
         afterAll: 'readonly',
         beforeEach: 'readonly',
         afterEach: 'readonly',
+        vi: 'readonly',
       },
     },
     plugins: {

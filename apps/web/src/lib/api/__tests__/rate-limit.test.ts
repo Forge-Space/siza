@@ -96,7 +96,7 @@ describe('Rate Limiting (Supabase-backed)', () => {
         error: null,
       });
       const request = new NextRequest('http://localhost/api/test', {
-        headers: { 'x-forwarded-for': '192.168.1.1' },
+        headers: { 'x-forwarded-for': 'test-client-ip' },
       });
 
       await checkRateLimit(request, 10, 60000);
@@ -104,7 +104,7 @@ describe('Rate Limiting (Supabase-backed)', () => {
       expect(mockRpc).toHaveBeenCalledWith(
         'check_rate_limit',
         expect.objectContaining({
-          p_identifier: 'anon:192.168.1.1',
+          p_identifier: 'anon:test-client-ip',
         })
       );
     });

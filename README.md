@@ -151,6 +151,12 @@ npm run test:e2e        # E2E tests (Playwright)
 npm run type-check      # TypeScript
 ```
 
+## CI Security Hygiene
+
+- GitHub Actions and reusable workflow references in `.github/workflows/` are pinned to full commit SHAs.
+- Placeholder DNS/IP examples in UI/test fixtures avoid real private-network literals.
+- Regex-based content extraction paths use bounded or parser-based logic to reduce ReDoS risk.
+
 Project operation notes for AI agents and contributors are in
 [AGENTS.md](AGENTS.md).
 

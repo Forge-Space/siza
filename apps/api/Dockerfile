@@ -14,7 +14,8 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm cache clean --force
 
 # Copy source code
-COPY . .
+COPY tsconfig.json ./
+COPY src ./src
 
 # Build TypeScript
 RUN npm run build
