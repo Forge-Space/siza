@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `onboarding.spec.ts` — 7 tests: redirect, welcome step, feature cards, project creation, skip
 
 ### Changed
+- **Contributor guidance** — Added `AGENTS.md` project operations guide and linked it from README development docs.
+
+### Changed
 - **Bundle optimization** — removed 4 dead dependencies (@monaco-editor/react, react-icons, react-email, next-themes), moved 9 misplaced root deps to proper workspaces, added serverExternalPackages for 5 server-only libs, lazy-load 3 below-fold landing sections, optimizePackageImports for lucide-react/motion/supabase
 
 ---

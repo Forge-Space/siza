@@ -151,6 +151,9 @@ npm run test:e2e        # E2E tests (Playwright)
 npm run type-check      # TypeScript
 ```
 
+Project operation notes for AI agents and contributors are in
+[AGENTS.md](AGENTS.md).
+
 ## Pricing
 
 Free for individuals, paid for scale and convenience.
