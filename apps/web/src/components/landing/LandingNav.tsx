@@ -8,7 +8,9 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { CONTAINER } from './constants';
 
 export function LandingNav() {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(
+    () => typeof window !== 'undefined' && window.scrollY > 0
+  );
 
   useEffect(() => {
     let rafId = 0;
@@ -31,10 +33,11 @@ export function LandingNav() {
   }, []);
 
   const navLinks = [
-    { label: 'Platform', href: '/generate' },
-    { label: 'Ecosystem', href: '#ecosystem' },
+    { label: 'About', href: '/about' },
+    { label: 'Roadmap', href: '/roadmap' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'Docs', href: '/docs' },
-    { label: 'Dashboard', href: '/generate' },
+    { label: 'Gallery', href: '/gallery' },
   ];
 
   return (
