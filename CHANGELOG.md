@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Core-flow validation telemetry** — Added `GET /api/admin/validation` (admin-only),
+  `POST /api/internal/validation/snapshot` (token-protected), daily snapshot storage
+  (`core_flow_gate_snapshots`), and scheduled snapshot workflow for 50-user gate tracking
 - **Marketing SEO contract** — Added centralized route metadata map for
   `/`, `/about`, `/roadmap`, `/pricing`, `/docs`, `/gallery`,
   `/legal/privacy`, and `/legal/terms` with canonical/Open Graph/Twitter fields

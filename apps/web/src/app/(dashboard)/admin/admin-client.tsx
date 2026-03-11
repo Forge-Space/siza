@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader2, PlusCircle, ShieldCheck, Trash2 } from 'lucide-react';
 import { DashboardSection } from '@/components/migration/migration-primitives';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,64 @@ interface FeatureFlagsResponse {
   error?: string;
 }
 
+type CoreFlowGateReason =
+  | 'PASS'
+  | 'TARGET_NOT_REACHED'
+  | 'INSUFFICIENT_HISTORY'
+  | 'WEEKLY_TARGET_NOT_REACHED'
+  | 'WEEK_OVER_WEEK_DROP_TOO_HIGH';
+
+interface CoreFlowValidationSnapshot {
+  snapshotDate: string;
+  totalUsers: number;
+  onboardedUsers: number;
+  usersWithProject: number;
+  usersWithCompletedGeneration: number;
+  qualifiedUsers: number;
+  qualifiedRatio: number;
+  captured: boolean;
+}
+
+interface CoreFlowValidationResponse {
+  generatedAt: string;
+  current: {
+    snapshotDate: string;
+    totalUsers: number;
+    onboardedUsers: number;
+    usersWithProject: number;
+    usersWithCompletedGeneration: number;
+    qualifiedUsers: number;
+    qualifiedRatio: number;
+  };
+  snapshots: CoreFlowValidationSnapshot[];
+  trend: {
+    previousWeekAvg: number;
+    currentWeekAvg: number;
+    weekOverWeekDropPct: number;
+    maxAllowedDropPct: number;
+    hasTwoFullWeeks: boolean;
+    missingDays: number;
+  };
+  gate: {
+    passed: boolean;
+    reasons: CoreFlowGateReason[];
+    qualifiedTarget: number;
+    maxDropPct: number;
+  };
+}
+
+const reasonCopy: Record<Exclude<CoreFlowGateReason, 'PASS'>, string> = {
+  TARGET_NOT_REACHED: 'Current qualified users are still below the 50-user target.',
+  INSUFFICIENT_HISTORY: 'Two full weeks of daily snapshots are required to evaluate stability.',
+  WEEKLY_TARGET_NOT_REACHED: 'At least one of the last two full weeks averaged below 50 users.',
+  WEEK_OVER_WEEK_DROP_TOO_HIGH: 'Week-over-week qualified-user drop is above the 10% threshold.',
+};
+
+function formatDateLabel(dateKey: string) {
+  const date = new Date(`${dateKey}T00:00:00.000Z`);
+  return date.toLocaleDateString(undefined, { month: 'short', day: '2-digit' });
+}
+
 const categories = [
   'auth',
   'ui',
@@ -39,6 +98,8 @@ const categories = [
 export function AdminClient() {
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [validation, setValidation] = useState<CoreFlowValidationResponse | null>(null);
+  const [isValidationLoading, setIsValidationLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [newFlagName, setNewFlagName] = useState('');
   const [newFlagDescription, setNewFlagDescription] = useState('');
@@ -55,6 +116,14 @@ export function AdminClient() {
       }),
     [flags]
   );
+
+  const maxSnapshotQualifiedUsers = useMemo(() => {
+    if (!validation) return 1;
+    return Math.max(
+      validation.gate.qualifiedTarget,
+      ...validation.snapshots.map((snapshot) => snapshot.qualifiedUsers)
+    );
+  }, [validation]);
 
   const loadFlags = useCallback(async () => {
     try {
@@ -79,9 +148,31 @@ export function AdminClient() {
     }
   }, [toast]);
 
+  const loadValidation = useCallback(async () => {
+    try {
+      setIsValidationLoading(true);
+      const response = await fetch('/api/admin/validation', { cache: 'no-store' });
+      const payload = (await response.json()) as CoreFlowValidationResponse & { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error || 'Failed to fetch validation metrics');
+      }
+      setValidation(payload);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch validation metrics';
+      toast({
+        variant: 'destructive',
+        title: 'Could not load core-flow validation',
+        description: message,
+      });
+    } finally {
+      setIsValidationLoading(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
     void loadFlags();
-  }, [loadFlags]);
+    void loadValidation();
+  }, [loadFlags, loadValidation]);
 
   const setBusy = (id: string, value: boolean) => {
     setBusyIds((prev) => {
@@ -206,6 +297,137 @@ export function AdminClient() {
         description="Manage feature flags and system behavior for all users."
         actions={<ShieldCheck className="h-5 w-5 text-text-muted-foreground" />}
       />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Core-Flow Validation</CardTitle>
+          <CardDescription>
+            Tracks the 50-user gate with live metrics and daily snapshot trends.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {isValidationLoading ? (
+            <div className="flex items-center justify-center py-12 text-text-secondary">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading validation metrics...
+            </div>
+          ) : !validation ? (
+            <p className="text-sm text-text-secondary">No validation data is available yet.</p>
+          ) : (
+            <>
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge
+                  className={
+                    validation.gate.passed
+                      ? 'bg-success/20 text-success border border-success/40'
+                      : 'bg-error/20 text-error border border-error/40'
+                  }
+                >
+                  {validation.gate.passed ? 'Gate passed' : 'Gate not passed'}
+                </Badge>
+                <p className="text-sm text-text-secondary">
+                  Qualified users: {validation.current.qualifiedUsers} /{' '}
+                  {validation.gate.qualifiedTarget}
+                </p>
+              </div>
+
+              {!validation.gate.passed ? (
+                <ul className="list-disc space-y-1 pl-5 text-sm text-text-secondary">
+                  {validation.gate.reasons
+                    .filter((reason) => reason !== 'PASS')
+                    .map((reason) => (
+                      <li key={reason}>
+                        {reasonCopy[reason as Exclude<CoreFlowGateReason, 'PASS'>]}
+                      </li>
+                    ))}
+                </ul>
+              ) : null}
+
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-md border border-surface-3 p-3">
+                  <p className="text-xs text-text-muted-foreground">Total users</p>
+                  <p className="text-lg font-semibold text-text-primary">
+                    {validation.current.totalUsers}
+                  </p>
+                </div>
+                <div className="rounded-md border border-surface-3 p-3">
+                  <p className="text-xs text-text-muted-foreground">Onboarded users</p>
+                  <p className="text-lg font-semibold text-text-primary">
+                    {validation.current.onboardedUsers}
+                  </p>
+                </div>
+                <div className="rounded-md border border-surface-3 p-3">
+                  <p className="text-xs text-text-muted-foreground">Users with project</p>
+                  <p className="text-lg font-semibold text-text-primary">
+                    {validation.current.usersWithProject}
+                  </p>
+                </div>
+                <div className="rounded-md border border-surface-3 p-3">
+                  <p className="text-xs text-text-muted-foreground">
+                    Users with completed generation
+                  </p>
+                  <p className="text-lg font-semibold text-text-primary">
+                    {validation.current.usersWithCompletedGeneration}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="rounded-md border border-surface-3 p-3">
+                  <p className="text-xs text-text-muted-foreground">Previous week average</p>
+                  <p className="text-lg font-semibold text-text-primary">
+                    {validation.trend.previousWeekAvg}
+                  </p>
+                </div>
+                <div className="rounded-md border border-surface-3 p-3">
+                  <p className="text-xs text-text-muted-foreground">Current week average</p>
+                  <p className="text-lg font-semibold text-text-primary">
+                    {validation.trend.currentWeekAvg}
+                  </p>
+                </div>
+                <div className="rounded-md border border-surface-3 p-3">
+                  <p className="text-xs text-text-muted-foreground">WoW drop</p>
+                  <p className="text-lg font-semibold text-text-primary">
+                    {validation.trend.weekOverWeekDropPct}% / {validation.trend.maxAllowedDropPct}%
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-wide text-text-muted-foreground">
+                  Last 14 days
+                </p>
+                <div className="space-y-1">
+                  {validation.snapshots.map((snapshot) => {
+                    const pct = snapshot.captured
+                      ? Math.round((snapshot.qualifiedUsers / maxSnapshotQualifiedUsers) * 100)
+                      : 0;
+                    return (
+                      <div
+                        key={snapshot.snapshotDate}
+                        className="grid grid-cols-[64px_1fr_44px] gap-2"
+                      >
+                        <span className="text-xs text-text-muted-foreground">
+                          {formatDateLabel(snapshot.snapshotDate)}
+                        </span>
+                        <div className="h-2 overflow-hidden rounded bg-surface-3">
+                          <div
+                            className={`h-2 rounded ${snapshot.captured ? 'bg-brand' : 'bg-surface-4'}`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="text-right text-xs text-text-secondary">
+                          {snapshot.captured ? snapshot.qualifiedUsers : '-'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
