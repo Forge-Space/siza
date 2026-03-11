@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 
 type JwtSigningJwk = {
@@ -14,13 +15,31 @@ type JwtSigningJwk = {
 
 let cachedKey: string | null = null;
 let cachedUrl = '';
-const FIXED_PATH = '/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin';
+let cachedDockerBinaryPath: string | null = null;
+const DOCKER_BINARY_CANDIDATES = [
+  '/usr/local/bin/docker',
+  '/opt/homebrew/bin/docker',
+  '/usr/bin/docker',
+];
 
-function commandEnv(): NodeJS.ProcessEnv {
-  return {
-    ...process.env,
-    PATH: FIXED_PATH,
-  };
+function resolveDockerBinaryPath(): string {
+  if (cachedDockerBinaryPath) {
+    return cachedDockerBinaryPath;
+  }
+
+  const binaryPath = DOCKER_BINARY_CANDIDATES.find((candidate) => existsSync(candidate));
+  if (!binaryPath) {
+    throw new Error('Docker binary not found in expected locations');
+  }
+
+  cachedDockerBinaryPath = binaryPath;
+  return binaryPath;
+}
+
+function runDocker(args: string[]): string {
+  return execFileSync(resolveDockerBinaryPath(), args, {
+    encoding: 'utf8',
+  });
 }
 
 function requiredEnv(name: string): string {
@@ -41,10 +60,7 @@ function isLocalSupabaseUrl(supabaseUrl: string): boolean {
 }
 
 function resolveAuthContainerName(): string {
-  const output = execFileSync('docker', ['ps', '--format', '{{.Names}}'], {
-    encoding: 'utf8',
-    env: commandEnv(),
-  });
+  const output = runDocker(['ps', '--format', '{{.Names}}']);
   const name = output
     .split('\n')
     .map((line) => line.trim())
@@ -58,14 +74,12 @@ function resolveAuthContainerName(): string {
 }
 
 function readJwtSigningKey(containerName: string): JwtSigningJwk {
-  const envOutput = execFileSync(
-    'docker',
-    ['inspect', '-f', '{{range .Config.Env}}{{println .}}{{end}}', containerName],
-    {
-      encoding: 'utf8',
-      env: commandEnv(),
-    }
-  );
+  const envOutput = runDocker([
+    'inspect',
+    '-f',
+    '{{range .Config.Env}}{{println .}}{{end}}',
+    containerName,
+  ]);
   const line = envOutput
     .split('\n')
     .map((value) => value.trim())
