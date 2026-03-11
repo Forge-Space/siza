@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import Image from 'next/image';
 import { OAuthButton } from '@/components/auth/oauth-button';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 import { signInWithGoogle, signInWithGitHub } from '@/lib/auth/oauth';
+import { getStoredLeadAttribution } from '@/lib/analytics/lead-attribution';
 import { AuthCardShell } from '@/components/migration/migration-primitives';
 
 export function SignUpClient() {
@@ -24,19 +26,38 @@ export function SignUpClient() {
     setError(null);
 
     const supabase = createClient();
+    const attribution = getStoredLeadAttribution();
+    const leadSource = attribution?.utm_source ?? 'direct';
+
+    trackEvent({
+      action: 'lead_signup_started',
+      category: 'Lead',
+      label: `email:${leadSource}`,
+    });
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: attribution ? { marketing_attribution: attribution } : undefined,
       },
     });
 
     if (error) {
+      trackEvent({
+        action: 'lead_signup_error',
+        category: 'Lead',
+        label: 'email',
+      });
       setError(error.message);
       setLoading(false);
     } else {
+      trackEvent({
+        action: 'lead_signup_success',
+        category: 'Lead',
+        label: `email:${leadSource}`,
+      });
       setSuccess(true);
       setLoading(false);
     }
@@ -45,10 +66,23 @@ export function SignUpClient() {
   const handleGoogleSignUp = async () => {
     setOAuthLoading('google');
     setError(null);
+    const attribution = getStoredLeadAttribution();
+    const leadSource = attribution?.utm_source ?? 'direct';
+
+    trackEvent({
+      action: 'lead_signup_oauth_start',
+      category: 'Lead',
+      label: `google:${leadSource}`,
+    });
 
     const { error } = await signInWithGoogle();
 
     if (error) {
+      trackEvent({
+        action: 'lead_signup_error',
+        category: 'Lead',
+        label: 'oauth_google',
+      });
       setError(error.message);
       setOAuthLoading(null);
     }
@@ -57,10 +91,23 @@ export function SignUpClient() {
   const handleGitHubSignUp = async () => {
     setOAuthLoading('github');
     setError(null);
+    const attribution = getStoredLeadAttribution();
+    const leadSource = attribution?.utm_source ?? 'direct';
+
+    trackEvent({
+      action: 'lead_signup_oauth_start',
+      category: 'Lead',
+      label: `github:${leadSource}`,
+    });
 
     const { error } = await signInWithGitHub();
 
     if (error) {
+      trackEvent({
+        action: 'lead_signup_error',
+        category: 'Lead',
+        label: 'oauth_github',
+      });
       setError(error.message);
       setOAuthLoading(null);
     }

@@ -86,19 +86,33 @@ Create `apps/web/.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-local-service-role-key
+NEXT_PUBLIC_GA_TRACKING_ID=G-XXXXXXXXXX
 GEMINI_API_KEY=your-gemini-key
 # Optional backup capacity for quota/rate-limit fallback
 ANTHROPIC_API_KEY=your-anthropic-key
+DEFAULT_GENERATION_PROVIDER=google
 NEXT_PUBLIC_ENABLE_BYOK=true
 NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
+NEXT_PUBLIC_E2E_DISABLE_TOUR=false
+SIZA_AGENT_LOCAL_FALLBACK=false
 ```
 
 ### Generation reliability behavior
 
 - Siza defaults to `siza -> google` routing for shared free-tier generation
 - On provider quota/rate-limit, the server falls back to Anthropic when `ANTHROPIC_API_KEY` is configured
+- If enabled (`SIZA_AGENT_LOCAL_FALLBACK=true`), provider failures without chunks can fallback to local `@forgespace/siza-gen`
 - Fallback never reuses the primary provider BYOK key for backup provider calls
 - When no backup capacity is configured, users get explicit capacity guidance with BYOK next steps
+
+### Lead attribution and signup events
+
+- First-touch attribution is captured from URL params and stored in browser local storage:
+  `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `gclid`, `gbraid`,
+  `wbraid`, `landing_path`, `first_seen_at`
+- Signup now sends `marketing_attribution` in Supabase auth metadata
+- GA4 lead events emitted during signup:
+  `lead_signup_started`, `lead_signup_success`, `lead_signup_oauth_start`, `lead_signup_error`
 
 ### MCP-first routing policy
 
@@ -212,6 +226,20 @@ npm run type-check      # TypeScript
 npm run sync:golden-paths # Sync official Golden Paths seeds
 npm run sync:skills     # Sync official skills from skills/*/SKILL.md
 ```
+
+### Lead-readiness and ads prepublish checks
+
+```bash
+cd apps/web
+npm run test:e2e:lead:preflight
+npm run test:e2e:lead:chromium
+npm run ads:google:prepublish
+```
+
+- `test:e2e:lead:preflight` validates generation backend readiness (MCP gateway, provider key, or local fallback)
+- `test:e2e:lead:chromium` runs Chromium smoke for lead-critical flows
+- `ads:google:prepublish` runs preflight + marketplace smoke and prints manual GA4/Ads checks
+- Campaign assets for `siza_br_en_leadtest_v1` are in `apps/web/marketing/google-ads/siza_br_en_leadtest_v1`
 
 ### Playwright MCP Wrapper (Codex Runtime)
 
