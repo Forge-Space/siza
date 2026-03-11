@@ -15,6 +15,7 @@ function makeThenable(result: unknown) {
     },
     gte: jest.fn(() => obj),
     eq: jest.fn(() => obj),
+    not: jest.fn(() => obj),
   };
   return obj;
 }
@@ -29,6 +30,12 @@ function setupMocks(counts: {
   completed: number;
   projects: number;
   activeRows: Array<{ user_id: string }>;
+  onboardingRows: Array<{ id: string }>;
+  projectRows: Array<{ owner_id: string }>;
+  feedbackRows: Array<{ user_feedback: string | null }>;
+  revisions: number;
+  mcpTotal: number;
+  mcp30d: number;
 }) {
   const responses = [
     { count: counts.profiles, error: null, data: null },
@@ -40,6 +47,12 @@ function setupMocks(counts: {
     { count: counts.completed, error: null, data: null },
     { count: counts.projects, error: null, data: null },
     { data: counts.activeRows, error: null, count: null },
+    { data: counts.onboardingRows, error: null, count: null },
+    { data: counts.projectRows, error: null, count: null },
+    { data: counts.feedbackRows, error: null, count: null },
+    { count: counts.revisions, error: null, data: null },
+    { count: counts.mcpTotal, error: null, data: null },
+    { count: counts.mcp30d, error: null, data: null },
   ];
 
   let callIndex = 0;
@@ -63,7 +76,7 @@ function setupErrorMock(errorIndex: number) {
       return makeThenable({
         count: 0,
         error: null,
-        data: idx === 8 ? [] : null,
+        data: idx >= 8 && idx <= 11 ? [] : null,
       });
     }),
   }));
@@ -138,6 +151,16 @@ describe('GET /api/metrics', () => {
         { user_id: 'u2' },
         { user_id: 'u3' },
       ],
+      onboardingRows: [{ id: 'u1' }, { id: 'u2' }, { id: 'u4' }, { id: 'u5' }],
+      projectRows: [{ owner_id: 'u1' }, { owner_id: 'u2' }, { owner_id: 'u3' }, { owner_id: 'u6' }],
+      feedbackRows: [
+        { user_feedback: 'thumbs_up' },
+        { user_feedback: 'thumbs_up' },
+        { user_feedback: 'thumbs_down' },
+      ],
+      revisions: 40,
+      mcpTotal: 120,
+      mcp30d: 60,
     });
 
     const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
@@ -151,8 +174,25 @@ describe('GET /api/metrics', () => {
         last24h: 10,
         last7d: 50,
         successRate: 90,
+        revisions: { total: 40, rate: 20 },
+        satisfaction: { responses: 3, positive: 2, rate: 67 },
       },
       projects: { total: 30 },
+      adoption: {
+        gate50: { qualifiedUsers: 2, requiredUsers: 50, validated: false },
+        onboarding: { completedUsers: 4, completionRate: 10 },
+        coreFlow: {
+          usersWithProjects: 4,
+          usersWithGenerations: 3,
+          usersWithProjectAndGeneration: 3,
+          projectAdoptionRate: 10,
+          generationAdoptionRate: 7,
+          coreFlowAdoptionRate: 7,
+        },
+      },
+      routing: {
+        mcp: { total: 120, last30d: 60, coverageRate: 60 },
+      },
     });
     expect(body.timestamp).toBeDefined();
   });
@@ -168,6 +208,12 @@ describe('GET /api/metrics', () => {
       completed: 4,
       projects: 2,
       activeRows: [{ user_id: 'u1' }, { user_id: 'u2' }, { user_id: 'u3' }, { user_id: 'u4' }],
+      onboardingRows: [],
+      projectRows: [],
+      feedbackRows: [],
+      revisions: 0,
+      mcpTotal: 0,
+      mcp30d: 0,
     });
 
     const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
@@ -186,11 +232,21 @@ describe('GET /api/metrics', () => {
       completed: 0,
       projects: 0,
       activeRows: [],
+      onboardingRows: [],
+      projectRows: [],
+      feedbackRows: [],
+      revisions: 0,
+      mcpTotal: 0,
+      mcp30d: 0,
     });
 
     const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
     const body = await res.json();
     expect(body.generations.successRate).toBe(0);
+    expect(body.generations.revisions.rate).toBe(0);
+    expect(body.generations.satisfaction.rate).toBe(0);
+    expect(body.adoption.gate50.validated).toBe(false);
+    expect(body.routing.mcp.coverageRate).toBe(0);
   });
 
   it('returns 500 when a database query fails', async () => {

@@ -7,6 +7,7 @@ import { captureServerError } from '@/lib/sentry/server';
 
 export interface RouteGenerationOptions {
   mcpEnabled: boolean;
+  allowDirectProviderFallback?: boolean;
   prompt: string;
   framework: string;
   componentLibrary?: string;
@@ -97,6 +98,16 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
   }
 
   if (!hasOutput) {
+    if (!opts.allowDirectProviderFallback) {
+      yield {
+        type: 'error',
+        message:
+          'MCP gateway generation failed. Direct-provider fallback is disabled by policy. Retry once MCP is available.',
+        timestamp: Date.now(),
+      };
+      return;
+    }
+
     const validProviders: AIProvider[] = ['google', 'openai', 'anthropic'];
     const envProvider = process.env.DEFAULT_GENERATION_PROVIDER;
     const fallbackProvider: AIProvider =

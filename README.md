@@ -100,6 +100,21 @@ NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 - Fallback never reuses the primary provider BYOK key for backup provider calls
 - When no backup capacity is configured, users get explicit capacity guidance with BYOK next steps
 
+### MCP-first routing policy
+
+- `ENABLE_MCP_GATEWAY=true` with `MCP_GATEWAY_URL` configured keeps generation on the MCP path
+- `ENABLE_MCP_DIRECT_PROVIDER_FALLBACK` is disabled by default to avoid silent direct-provider failover in MCP mode
+- If you need emergency fallback behavior, set `NEXT_PUBLIC_ENABLE_MCP_DIRECT_PROVIDER_FALLBACK=true`
+
+### Validation and quality metrics
+
+`GET /api/metrics` now reports:
+
+- 50-user gate readiness (`adoption.gate50`)
+- Core-flow adoption (onboarding/project/generation rates)
+- Generation quality indicators (success rate, satisfaction rate, revision rate)
+- MCP routing coverage (`routing.mcp`)
+
 ### Grant admin access locally
 
 Create/sign in the target user first, then run:

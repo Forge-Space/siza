@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Deterministic Theme Generator** — New preset + seed-color + mood generator in Generate design context with Apply/Save actions
 - **Golden Paths API route tests** — Coverage for hook-facing response contract and rate-limit behavior
 - **Official skills parser sweep test** — Validates all `skills/*/SKILL.md` files parse cleanly
+- **Roadmap gate metrics contract** — `/api/metrics` now returns 50-user gate status,
+  core-flow adoption metrics, revision rate, satisfaction rate, and MCP routing coverage
+- **MCP fallback policy flag** — Added `ENABLE_MCP_DIRECT_PROVIDER_FALLBACK` (default: off)
+  to control whether MCP failures may fallback to direct providers
 
 ### Changed
 - **Project MCP defaults** — Added wrapper-first `playwright` server entry in
@@ -77,6 +81,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Landing link prefetch policy** — Disabled automatic Next.js prefetch on
   homepage internal marketing links to avoid eager downloading of non-critical
   route bundles from `/`
+- **MCP-first generation behavior** — In MCP mode, direct-provider fallback is policy-gated
+  and disabled by default; failures now return explicit MCP-availability guidance
 
 ### Fixed
 - **Deferred dependency alerts remediation (`#448`)** — Upgraded desktop test

@@ -19,6 +19,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_STRIPE_BILLING: false,
   ENABLE_USAGE_LIMITS: false,
   ENABLE_MCP_GATEWAY: true,
+  ENABLE_MCP_DIRECT_PROVIDER_FALLBACK: false,
   ENABLE_DESIGN_CONTEXT: true,
   ENABLE_PROMPT_AUTOCOMPLETE: true,
   ENABLE_CODE_INTELLISENSE: true,
@@ -146,6 +147,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     name: 'ENABLE_MCP_GATEWAY',
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_MCP_GATEWAY,
     description: 'Route AI generation through MCP gateway instead of direct Gemini',
+    category: 'generation',
+  },
+  {
+    name: 'ENABLE_MCP_DIRECT_PROVIDER_FALLBACK',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_MCP_DIRECT_PROVIDER_FALLBACK,
+    description: 'Allow MCP generation failures to fallback to direct provider calls',
     category: 'generation',
   },
   {
