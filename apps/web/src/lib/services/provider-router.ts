@@ -4,6 +4,7 @@ import type { GenerationEvent } from './generation-types';
 import { generateWithProvider } from './generation';
 import { generateComponentStream as mcpStream } from '@/lib/mcp/client';
 import { captureServerError } from '@/lib/sentry/server';
+import { generateWithSizaLocalAgent, isSizaLocalFallbackEnabled } from './siza-local-agent';
 
 export interface RouteGenerationOptions {
   mcpEnabled: boolean;
@@ -21,6 +22,7 @@ export interface RouteGenerationOptions {
   model: string;
   correlationId?: string;
   accessToken?: string;
+  allowLocalSizaFallback?: boolean;
 }
 
 export async function* routeGeneration(
@@ -54,6 +56,7 @@ async function* routeViaSizaAI(opts: RouteGenerationOptions): AsyncGenerator<Gen
     ...opts,
     provider: routing.provider,
     model: routing.model,
+    allowLocalSizaFallback: true,
   });
 }
 
@@ -73,18 +76,11 @@ async function* streamDirectProviderFallback(
   provider: AIProvider,
   model: string
 ): AsyncGenerator<GenerationEvent> {
-  for await (const event of generateWithProvider({
+  for await (const event of routeViaProvider({
+    ...opts,
     provider,
     model,
-    prompt: opts.prompt,
-    framework: opts.framework,
-    componentLibrary: opts.componentLibrary,
-    style: opts.style,
-    typescript: opts.typescript,
-    apiKey: opts.userApiKey,
-    contextAddition: opts.contextAddition,
-    imageBase64: opts.imageBase64,
-    imageMimeType: opts.imageMimeType,
+    allowLocalSizaFallback: true,
   })) {
     if (event.type !== 'complete') {
       yield event;
@@ -187,6 +183,8 @@ function canFallbackToAnthropic(opts: RouteGenerationOptions): boolean {
 
 async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
   let quotaError: GenerationEvent | null = null;
+  let providerError: GenerationEvent | null = null;
+  let hasChunk = false;
 
   for await (const event of generateWithProvider({
     provider: opts.provider as AIProvider,
@@ -201,15 +199,68 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
     imageBase64: opts.imageBase64,
     imageMimeType: opts.imageMimeType,
   })) {
-    if (event.type === 'complete') break;
+    if (event.type === 'chunk' && event.content) {
+      hasChunk = true;
+    }
+
+    if (event.type === 'complete') {
+      break;
+    }
+
     if (event.type === 'error' && isQuotaError(event.message)) {
       quotaError = event;
       break;
     }
+
+    if (event.type === 'error') {
+      providerError = event;
+      break;
+    }
+
     yield event;
   }
 
-  if (!quotaError) return;
+  if (providerError) {
+    const canUseLocalFallback =
+      opts.allowLocalSizaFallback && isSizaLocalFallbackEnabled() && !hasChunk;
+
+    if (!canUseLocalFallback) {
+      yield providerError;
+      return;
+    }
+
+    try {
+      const localCode = generateWithSizaLocalAgent({
+        prompt: opts.prompt,
+        framework: opts.framework,
+        componentLibrary: opts.componentLibrary,
+      });
+
+      yield {
+        type: 'fallback',
+        provider: 'siza-local',
+        message: 'Primary provider unavailable, using Siza local agent.',
+        timestamp: Date.now(),
+      };
+      yield {
+        type: 'chunk',
+        content: localCode,
+        timestamp: Date.now(),
+      };
+      return;
+    } catch (fallbackError) {
+      captureServerError(fallbackError, {
+        route: '/api/generate',
+        extra: { fallback: 'siza-local' },
+      });
+      yield providerError;
+      return;
+    }
+  }
+
+  if (!quotaError) {
+    return;
+  }
 
   if (!canFallbackToAnthropic(opts)) {
     yield {
@@ -248,7 +299,10 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
     imageBase64: opts.imageBase64,
     imageMimeType: opts.imageMimeType,
   })) {
-    if (event.type === 'complete') break;
+    if (event.type === 'complete') {
+      break;
+    }
+
     yield event;
   }
 }

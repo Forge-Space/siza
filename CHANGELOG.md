@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Lead-readiness E2E coverage** — Added `lead-readiness.spec.ts` for disposable signup-to-generation smoke and `marketplace.spec.ts` for templates/plugins/gallery marketplace funnel checks
+- **Lead prepublish automation** — Added `test:e2e:lead:preflight`, `test:e2e:lead:chromium`, and `ads:google:prepublish` scripts plus supporting shell runners
+- **Google Ads pilot assets** — Added campaign package for `siza_br_en_leadtest_v1` under `apps/web/marketing/google-ads/siza_br_en_leadtest_v1` (campaign config, keywords, negatives, RSA copy, day-1 ops)
+- **Lead attribution module** — Added first-touch attribution capture/storage and unit coverage (`lead-attribution.test.ts`)
 - **Core-flow validation telemetry** — Added `GET /api/admin/validation` (admin-only),
   `POST /api/internal/validation/snapshot` (token-protected), daily snapshot storage
   (`core_flow_gate_snapshots`), and scheduled snapshot workflow for 50-user gate tracking
@@ -40,6 +44,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to control whether MCP failures may fallback to direct providers
 
 ### Changed
+- **Signup and analytics flow** — Wrapped app layout with `AnalyticsProvider`; signup now emits GA4 lead events and includes `marketing_attribution` metadata on auth signup
+- **Template ownership querying** — Templates UI/API now uses explicit ownership filter (`all|official|mine`) with auth-checked `mine` behavior and route tests
+- **Lead E2E determinism** — Playwright config now supports explicit lead smoke port/reuse controls and disables onboarding tour overlays by env for automation runs
 - **Project MCP defaults** — Added wrapper-first `playwright` server entry in
   `.mcp.json` and documented global-registry recovery flow + restart step for
   Codex runtime MCP reload
@@ -88,6 +95,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and disabled by default; failures now return explicit MCP-availability guidance
 
 ### Fixed
+- **Auth callback failure handling** — Sanitized callback `next` parameter and route failures to `/auth/auth-code-error` with explicit reason handling
+- **Marketplace resilience surfaces** — Improved templates/plugins/gallery handling for ownership filtering, empty-state messaging, and API failure/retry behavior used by marketplace smoke
+- **Onboarding completion idempotency** — Switched onboarding completion route to profile upsert-by-id to avoid missing-row failures
 - **Deferred dependency alerts remediation (`#448`)** — Upgraded desktop test
   toolchain to `vitest@4` (removing vulnerable `vite-node/esbuild` path) and
   upgraded web Jest/JSDOM environment to v30 (removing vulnerable

@@ -3,10 +3,23 @@ import { saveProviderToken } from '@/lib/auth/tokens';
 import { sendWelcomeEmail } from '@/lib/email/auth-emails';
 import { NextResponse } from 'next/server';
 
+function normalizeNextPath(rawNext: string | null): string {
+  if (!rawNext) return '/projects';
+  if (!rawNext.startsWith('/')) return '/projects';
+  if (rawNext.startsWith('//')) return '/projects';
+  return rawNext;
+}
+
+function buildAuthCodeErrorUrl(origin: string, reason: string): string {
+  const url = new URL('/auth/auth-code-error', origin);
+  url.searchParams.set('reason', reason);
+  return url.toString();
+}
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/projects';
+  const next = normalizeNextPath(searchParams.get('next'));
 
   if (code) {
     const supabase = await createClient();
@@ -42,7 +55,9 @@ export async function GET(request: Request) {
 
       return NextResponse.redirect(`${origin}${next}`);
     }
+
+    return NextResponse.redirect(buildAuthCodeErrorUrl(origin, 'exchange_failed'));
   }
 
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  return NextResponse.redirect(buildAuthCodeErrorUrl(origin, 'missing_code'));
 }

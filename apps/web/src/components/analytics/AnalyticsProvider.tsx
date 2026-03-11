@@ -2,18 +2,20 @@
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { captureLeadAttributionFromCurrentUrl } from '@/lib/analytics/lead-attribution';
 
 interface AnalyticsEvent {
   action: string;
   category: string;
   label?: string;
   value?: number;
+  params?: Record<string, string | number | boolean | null>;
 }
 
 declare global {
   interface Window {
-    gtag: (command: string, targetId: string, config?: Record<string, any>) => void;
-    dataLayer: any[];
+    gtag: (command: string, targetId: string, config?: Record<string, unknown>) => void;
+    dataLayer: unknown[];
   }
 }
 
@@ -22,6 +24,7 @@ const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID;
 export default function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
 
   useEffect(() => {
     if (!GA_TRACKING_ID) return;
@@ -51,21 +54,27 @@ export default function AnalyticsProvider({ children }: { children: React.ReactN
 
   useEffect(() => {
     if (!GA_TRACKING_ID || typeof window.gtag !== 'function') return;
-    const url = pathname + (searchParams.toString() ? '?' + searchParams.toString() : '');
+    const url = pathname + (searchParamsString ? `?${searchParamsString}` : '');
     window.gtag('config', GA_TRACKING_ID, {
       page_location: url,
     });
-  }, [pathname, searchParams]);
+  }, [pathname, searchParamsString]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    captureLeadAttributionFromCurrentUrl(new URL(window.location.href));
+  }, [pathname, searchParamsString]);
 
   return <>{children}</>;
 }
 
-export const trackEvent = ({ action, category, label, value }: AnalyticsEvent) => {
+export const trackEvent = ({ action, category, label, value, params }: AnalyticsEvent) => {
   if (typeof window.gtag === 'function') {
     window.gtag('event', action, {
       event_category: category,
       event_label: label,
       value: value,
+      ...params,
     });
   }
 };
