@@ -56,6 +56,11 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 - Migrated mapped route visuals across landing/about/auth/dashboard surfaces while preserving behavior contracts (middleware, OAuth callback, query-param pages)
 - Redesigned gap routes (`reset-password`, legal pages, maintenance, billing success) into the current Siza visual language
 - Added role-aware dashboard navigation and a new Admin page for feature flag management
+- Landing page performance pass: removed force-dynamic homepage personalization,
+  switched to static public CTAs, and replaced Motion-heavy above-the-fold effects
+  with server-rendered sections and CSS transitions
+- Lighthouse accessibility pass: raised subtle text contrast token and aligned
+  footer/code-surface secondary text to contrast-safe values
 
 ## Quick Start
 
