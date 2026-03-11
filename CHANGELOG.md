@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `E2E_LIVE_PROVIDER=true` for real provider + preview integration validation
 - **Live ecosystem sync module (marketing)** — Server-only GitHub metadata fetch with 11-repo allowlist, latest release enrichment, resilient fallback snapshot, and 6-hour revalidation
 - **Marketing ecosystem tests** — Coverage for mapping, release fallback, and full fallback snapshot behavior
+- **Governance asset sync commands** — `npm run sync:golden-paths` and `npm run sync:skills` to upsert official Golden Paths and SKILL.md-based official skills from repository sources
+- **Deterministic Theme Generator** — New preset + seed-color + mood generator in Generate design context with Apply/Save actions
+- **Golden Paths API route tests** — Coverage for hook-facing response contract and rate-limit behavior
+- **Official skills parser sweep test** — Validates all `skills/*/SKILL.md` files parse cleanly
 
 ### Changed
 - **Contributor guidance** — Added `AGENTS.md` project operations guide and linked it from README development docs.
@@ -31,6 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Docs refresh** — Updated README ecosystem narrative to 11 product repositories and documented `FORGE_SPACE_GITHUB_TOKEN` with `GITHUB_TOKEN` fallback
 - **Core follow-up tracking** — Opened issue to remove `@forgespace/core` import-time
   CLI side effects: [Forge-Space/core#124](https://github.com/Forge-Space/core/issues/124)
+- **Golden Paths API contract** — `GET /api/golden-paths` now returns `data + pagination` shape aligned with frontend hooks
+- **Golden Paths filter support** — Added end-to-end `stack` and `language` query filtering
+- **Generate workspace layout polish** — Replaced brittle edge-to-edge negative margins with stable bordered container and improved responsive split-pane sizing
+- **UI capitalization consistency** — Standardized key labels/headings to Title Case across Generate/Billing/Plugins/Golden Paths surfaces and page metadata (`Generate` label)
 
 ### Fixed
 - **Generation fallback reliability** — Quota/rate-limit provider failures now return
