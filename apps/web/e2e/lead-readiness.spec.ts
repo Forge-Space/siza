@@ -39,53 +39,82 @@ async function confirmSignupByActionLink(page: Page, actionLink: string): Promis
   await page.waitForURL((url) => !url.pathname.includes('/auth/callback'), { timeout: 15000 });
 }
 
+async function selectReactFramework(page: Page): Promise<void> {
+  const frameworkSelect = page.locator('#framework');
+  if (await frameworkSelect.count()) {
+    await frameworkSelect.selectOption('react');
+    return;
+  }
+
+  const frameworkCombobox = page.getByRole('combobox').first();
+  if (!(await frameworkCombobox.count())) {
+    return;
+  }
+
+  await frameworkCombobox.click();
+  const reactOption = page.getByRole('option', { name: /react/i }).first();
+  if (await reactOption.count()) {
+    await reactOption.click();
+  }
+}
+
+async function clickGetStartedIfVisible(page: Page): Promise<boolean> {
+  const getStarted = page.getByRole('button', { name: /get started/i });
+  if (!(await getStarted.count())) {
+    return false;
+  }
+
+  await getStarted.first().click();
+  await page.waitForTimeout(200);
+  return true;
+}
+
+async function createOnboardingProjectIfVisible(page: Page): Promise<boolean> {
+  const projectName = page.locator('#name');
+  const createProject = page.getByRole('button', { name: /create project/i });
+  if (!(await projectName.count()) || !(await createProject.count())) {
+    return false;
+  }
+
+  await projectName.fill('Lead Smoke Project');
+  await selectReactFramework(page);
+  await createProject.first().click();
+  await page.waitForTimeout(400);
+  return true;
+}
+
+async function skipOnboardingIfStillVisible(page: Page): Promise<void> {
+  if (!page.url().includes('/onboarding')) {
+    return;
+  }
+
+  const skipButton = page.getByRole('button', { name: /skip/i });
+  if (await skipButton.count()) {
+    await skipButton.first().click();
+  }
+  await page
+    .waitForURL((url) => !url.pathname.includes('/onboarding'), { timeout: 5000 })
+    .catch(() => {});
+}
+
 async function completeOnboarding(page: Page): Promise<void> {
   if (!page.url().includes('/onboarding')) {
     return;
   }
 
   for (let step = 0; step < 5 && page.url().includes('/onboarding'); step++) {
-    const getStarted = page.getByRole('button', { name: /get started/i });
-    if (await getStarted.count()) {
-      await getStarted.first().click();
-      await page.waitForTimeout(200);
+    if (await clickGetStartedIfVisible(page)) {
       continue;
     }
 
-    const projectName = page.locator('#name');
-    const createProject = page.getByRole('button', { name: /create project/i });
-    if ((await projectName.count()) && (await createProject.count())) {
-      await projectName.fill('Lead Smoke Project');
-      const frameworkSelect = page.locator('#framework');
-      if (await frameworkSelect.count()) {
-        await frameworkSelect.selectOption('react');
-      } else {
-        const frameworkCombobox = page.getByRole('combobox').first();
-        if (await frameworkCombobox.count()) {
-          await frameworkCombobox.click();
-          const reactOption = page.getByRole('option', { name: /react/i }).first();
-          if (await reactOption.count()) {
-            await reactOption.click();
-          }
-        }
-      }
-      await createProject.first().click();
-      await page.waitForTimeout(400);
+    if (await createOnboardingProjectIfVisible(page)) {
       continue;
     }
 
     break;
   }
 
-  if (page.url().includes('/onboarding')) {
-    const skipButton = page.getByRole('button', { name: /skip/i });
-    if (await skipButton.count()) {
-      await skipButton.first().click();
-    }
-    await page
-      .waitForURL((url) => !url.pathname.includes('/onboarding'), { timeout: 5000 })
-      .catch(() => {});
-  }
+  await skipOnboardingIfStillVisible(page);
 }
 
 async function createProjectFromPage(page: Page, projectName: string): Promise<void> {
@@ -98,19 +127,7 @@ async function createProjectFromPage(page: Page, projectName: string): Promise<v
   await expect(nameInput).toBeVisible({ timeout: 10000 });
   await nameInput.fill(projectName);
 
-  const frameworkSelect = page.locator('#framework');
-  if (await frameworkSelect.count()) {
-    await frameworkSelect.first().selectOption('react');
-  } else {
-    const frameworkCombobox = page.getByRole('combobox').first();
-    if (await frameworkCombobox.count()) {
-      await frameworkCombobox.click();
-      const reactOption = page.getByRole('option', { name: /react/i }).first();
-      if (await reactOption.count()) {
-        await reactOption.click();
-      }
-    }
-  }
+  await selectReactFramework(page);
 
   await page
     .getByRole('button', { name: /create project/i })

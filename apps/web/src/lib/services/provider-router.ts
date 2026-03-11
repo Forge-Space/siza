@@ -181,24 +181,43 @@ function canFallbackToAnthropic(opts: RouteGenerationOptions): boolean {
   return !!opts.userApiKey;
 }
 
-async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
-  let quotaError: GenerationEvent | null = null;
-  let providerError: GenerationEvent | null = null;
-  let hasChunk = false;
+type ProviderStreamOutcome = {
+  quotaError: GenerationEvent | null;
+  providerError: GenerationEvent | null;
+  hasChunk: boolean;
+};
 
-  for await (const event of generateWithProvider({
-    provider: opts.provider as AIProvider,
-    model: opts.model,
+function buildProviderRequest(
+  opts: RouteGenerationOptions,
+  provider: AIProvider,
+  model: string,
+  apiKey: string | undefined
+) {
+  return {
+    provider,
+    model,
     prompt: opts.prompt,
     framework: opts.framework,
     componentLibrary: opts.componentLibrary,
     style: opts.style,
     typescript: opts.typescript,
-    apiKey: opts.userApiKey,
+    apiKey,
     contextAddition: opts.contextAddition,
     imageBase64: opts.imageBase64,
     imageMimeType: opts.imageMimeType,
-  })) {
+  };
+}
+
+async function* streamPrimaryProvider(
+  opts: RouteGenerationOptions
+): AsyncGenerator<GenerationEvent, ProviderStreamOutcome> {
+  let quotaError: GenerationEvent | null = null;
+  let providerError: GenerationEvent | null = null;
+  let hasChunk = false;
+
+  for await (const event of generateWithProvider(
+    buildProviderRequest(opts, opts.provider as AIProvider, opts.model, opts.userApiKey)
+  )) {
     if (event.type === 'chunk' && event.content) {
       hasChunk = true;
     }
@@ -207,61 +226,64 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
       break;
     }
 
-    if (event.type === 'error' && isQuotaError(event.message)) {
-      quotaError = event;
-      break;
-    }
-
     if (event.type === 'error') {
-      providerError = event;
+      if (isQuotaError(event.message)) {
+        quotaError = event;
+      } else {
+        providerError = event;
+      }
       break;
     }
 
     yield event;
   }
 
-  if (providerError) {
-    const canUseLocalFallback =
-      opts.allowLocalSizaFallback && isSizaLocalFallbackEnabled() && !hasChunk;
+  return { quotaError, providerError, hasChunk };
+}
 
-    if (!canUseLocalFallback) {
-      yield providerError;
-      return;
-    }
-
-    try {
-      const localCode = generateWithSizaLocalAgent({
-        prompt: opts.prompt,
-        framework: opts.framework,
-        componentLibrary: opts.componentLibrary,
-      });
-
-      yield {
-        type: 'fallback',
-        provider: 'siza-local',
-        message: 'Primary provider unavailable, using Siza local agent.',
-        timestamp: Date.now(),
-      };
-      yield {
-        type: 'chunk',
-        content: localCode,
-        timestamp: Date.now(),
-      };
-      return;
-    } catch (fallbackError) {
-      captureServerError(fallbackError, {
-        route: '/api/generate',
-        extra: { fallback: 'siza-local' },
-      });
-      yield providerError;
-      return;
-    }
-  }
-
-  if (!quotaError) {
+async function* handleProviderErrorWithLocalFallback(
+  opts: RouteGenerationOptions,
+  providerError: GenerationEvent,
+  hasChunk: boolean
+): AsyncGenerator<GenerationEvent> {
+  const canUseLocalFallback =
+    opts.allowLocalSizaFallback && isSizaLocalFallbackEnabled() && !hasChunk;
+  if (!canUseLocalFallback) {
+    yield providerError;
     return;
   }
 
+  try {
+    const localCode = generateWithSizaLocalAgent({
+      prompt: opts.prompt,
+      framework: opts.framework,
+      componentLibrary: opts.componentLibrary,
+    });
+
+    yield {
+      type: 'fallback',
+      provider: 'siza-local',
+      message: 'Primary provider unavailable, using Siza local agent.',
+      timestamp: Date.now(),
+    };
+    yield {
+      type: 'chunk',
+      content: localCode,
+      timestamp: Date.now(),
+    };
+  } catch (fallbackError) {
+    captureServerError(fallbackError, {
+      route: '/api/generate',
+      extra: { fallback: 'siza-local' },
+    });
+    yield providerError;
+  }
+}
+
+async function* handleQuotaFallback(
+  opts: RouteGenerationOptions,
+  quotaError: GenerationEvent
+): AsyncGenerator<GenerationEvent> {
   if (!canFallbackToAnthropic(opts)) {
     yield {
       type: 'error',
@@ -271,7 +293,7 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
     return;
   }
 
-  captureServerError(new Error(quotaError.message), {
+  captureServerError(new Error(quotaError.message || CAPACITY_MESSAGE), {
     route: '/api/generate',
     extra: { fallback: `${opts.provider}-to-anthropic` },
   });
@@ -286,23 +308,37 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
     timestamp: Date.now(),
   };
 
-  for await (const event of generateWithProvider({
-    provider: 'anthropic',
-    model: 'claude-haiku-4-5-20251001',
-    prompt: opts.prompt,
-    framework: opts.framework,
-    componentLibrary: opts.componentLibrary,
-    style: opts.style,
-    typescript: opts.typescript,
-    apiKey: undefined,
-    contextAddition: opts.contextAddition,
-    imageBase64: opts.imageBase64,
-    imageMimeType: opts.imageMimeType,
-  })) {
+  for await (const event of generateWithProvider(
+    buildProviderRequest(opts, 'anthropic', 'claude-haiku-4-5-20251001', undefined)
+  )) {
     if (event.type === 'complete') {
       break;
     }
-
     yield event;
   }
+}
+
+async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
+  const providerStream = streamPrimaryProvider(opts);
+  let outcome: ProviderStreamOutcome | null = null;
+
+  while (!outcome) {
+    const next = await providerStream.next();
+    if (next.done) {
+      outcome = next.value;
+      continue;
+    }
+    yield next.value;
+  }
+
+  if (outcome.providerError) {
+    yield* handleProviderErrorWithLocalFallback(opts, outcome.providerError, outcome.hasChunk);
+    return;
+  }
+
+  if (!outcome.quotaError) {
+    return;
+  }
+
+  yield* handleQuotaFallback(opts, outcome.quotaError);
 }
