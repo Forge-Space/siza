@@ -20,7 +20,7 @@ describe('Feature Flags', () => {
 
   describe('DEFAULT_FEATURE_FLAGS', () => {
     it('should have all flags defined', () => {
-      expect(Object.keys(DEFAULT_FEATURE_FLAGS)).toHaveLength(36);
+      expect(Object.keys(DEFAULT_FEATURE_FLAGS)).toHaveLength(37);
     });
 
     it('should have auth flags enabled by default', () => {
@@ -38,11 +38,15 @@ describe('Feature Flags', () => {
       expect(DEFAULT_FEATURE_FLAGS.ENABLE_BETA_FEATURES).toBe(false);
       expect(DEFAULT_FEATURE_FLAGS.ENABLE_MAINTENANCE_MODE).toBe(false);
     });
+
+    it('should keep direct-provider fallback disabled by default for MCP-first routing', () => {
+      expect(DEFAULT_FEATURE_FLAGS.ENABLE_MCP_DIRECT_PROVIDER_FALLBACK).toBe(false);
+    });
   });
 
   describe('FEATURE_FLAGS array', () => {
     it('should have all flag entries', () => {
-      expect(FEATURE_FLAGS).toHaveLength(36);
+      expect(FEATURE_FLAGS).toHaveLength(37);
     });
 
     it('should have required fields on each entry', () => {
@@ -93,9 +97,10 @@ describe('Feature Flags', () => {
       delete process.env.NEXT_PUBLIC_ENABLE_STRIPE_BILLING;
       delete process.env.NEXT_PUBLIC_ENABLE_USAGE_LIMITS;
       const flags = getAllFeatureFlags();
-      expect(Object.keys(flags)).toHaveLength(36);
+      expect(Object.keys(flags)).toHaveLength(37);
       expect(flags.ENABLE_GOOGLE_SSO).toBe(true);
       expect(flags.ENABLE_STRIPE_BILLING).toBe(false);
+      expect(flags.ENABLE_MCP_DIRECT_PROVIDER_FALLBACK).toBe(false);
     });
 
     it('should respect env var overrides', () => {

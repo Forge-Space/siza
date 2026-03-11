@@ -68,13 +68,15 @@ describe('routeGeneration', () => {
       expect(events.some((e) => e.type === 'chunk')).toBe(true);
     });
 
-    it('yields fallback event on MCP failure and falls back to default provider', async () => {
+    it('yields fallback event on MCP failure when direct-provider fallback is enabled', async () => {
       const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
       const { generateWithProvider } = require('@/lib/services/generation');
       const { captureServerError } = require('@/lib/sentry/server');
 
-      // eslint-disable-next-line require-yield
       mcpStream.mockImplementation(async function* () {
+        if (Date.now() < 0) {
+          yield { type: 'start', timestamp: 0 };
+        }
         throw new Error('Gateway down');
       });
       generateWithProvider.mockImplementation(async function* () {
@@ -83,13 +85,40 @@ describe('routeGeneration', () => {
       });
 
       const events = await collectEvents(
-        routeGeneration({ ...baseOpts, mcpEnabled: true, accessToken: 'tok-123' })
+        routeGeneration({
+          ...baseOpts,
+          mcpEnabled: true,
+          accessToken: 'tok-123',
+          allowDirectProviderFallback: true,
+        })
       );
 
       expect(captureServerError).toHaveBeenCalled();
       const fallbackEvent = events.find((e) => e.type === 'fallback');
       expect(fallbackEvent).toBeDefined();
       expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(true);
+    });
+
+    it('returns an error on MCP failure when direct-provider fallback is disabled', async () => {
+      const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
+      const { generateWithProvider } = require('@/lib/services/generation');
+
+      // eslint-disable-next-line require-yield
+      mcpStream.mockImplementation(async function* () {
+        throw new Error('Gateway down');
+      });
+      generateWithProvider.mockImplementation(async function* () {
+        yield { type: 'chunk', content: 'fallback-code', timestamp: 11 };
+      });
+
+      const events = await collectEvents(
+        routeGeneration({ ...baseOpts, mcpEnabled: true, accessToken: 'tok-123' })
+      );
+
+      expect(events.find((e) => e.type === 'fallback')).toBeUndefined();
+      expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(false);
+      expect(events.some((e) => e.type === 'error')).toBe(true);
+      expect(generateWithProvider).not.toHaveBeenCalled();
     });
 
     it('does not yield fallback when MCP succeeds', async () => {

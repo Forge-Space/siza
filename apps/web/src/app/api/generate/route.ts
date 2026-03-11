@@ -33,6 +33,10 @@ function shouldUseMcpGateway(): boolean {
   return getFeatureFlag('ENABLE_MCP_GATEWAY') && isMcpConfigured();
 }
 
+function allowMcpDirectProviderFallback(): boolean {
+  return getFeatureFlag('ENABLE_MCP_DIRECT_PROVIDER_FALLBACK');
+}
+
 async function getAccessToken(): Promise<string | undefined> {
   if (isLocalAuthBypassEnabled()) return undefined;
   try {
@@ -115,6 +119,7 @@ export async function POST(request: NextRequest) {
 
     const correlationId = randomUUID();
     const mcpEnabled = shouldUseMcpGateway();
+    const allowDirectProviderFallback = allowMcpDirectProviderFallback();
     const activeProvider = mcpEnabled ? 'mcp-gateway' : input.provider;
     const activeModel = mcpEnabled ? 'mcp-specialist' : input.model || 'gemini-2.5-flash';
     const conversationCtx: ConversationContext | undefined =
@@ -151,6 +156,7 @@ export async function POST(request: NextRequest) {
           let routingReason: string | undefined;
           for await (const event of routeGeneration({
             mcpEnabled,
+            allowDirectProviderFallback,
             prompt: streamPrompt,
             framework: input.framework,
             componentLibrary: input.componentLibrary,
@@ -284,6 +290,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   const mcpEnabled = shouldUseMcpGateway();
+  const allowDirectProviderFallback = allowMcpDirectProviderFallback();
   const conversationEnabled = getFeatureFlag('ENABLE_CONVERSATION_MODE');
   return new Response(
     JSON.stringify({
@@ -297,6 +304,7 @@ export async function GET() {
         'streaming',
         'image-input',
         ...(mcpEnabled ? ['mcp-gateway'] : []),
+        ...(mcpEnabled && allowDirectProviderFallback ? ['mcp-direct-provider-fallback'] : []),
         ...(conversationEnabled ? ['conversation-mode'] : []),
         ...(getFeatureFlag('ENABLE_SKILLS') ? ['skills'] : []),
       ],

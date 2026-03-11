@@ -7,6 +7,7 @@ import { captureServerError } from '@/lib/sentry/server';
 
 export interface RouteGenerationOptions {
   mcpEnabled: boolean;
+  allowDirectProviderFallback?: boolean;
   prompt: string;
   framework: string;
   componentLibrary?: string;
@@ -56,6 +57,41 @@ async function* routeViaSizaAI(opts: RouteGenerationOptions): AsyncGenerator<Gen
   });
 }
 
+function resolveDirectProviderFallback(): { provider: AIProvider; model: string } {
+  const validProviders: AIProvider[] = ['google', 'openai', 'anthropic'];
+  const envProvider = process.env.DEFAULT_GENERATION_PROVIDER;
+  const provider: AIProvider =
+    envProvider && validProviders.includes(envProvider as AIProvider)
+      ? (envProvider as AIProvider)
+      : 'google';
+  const model = process.env.DEFAULT_GENERATION_MODEL || 'gemini-2.5-flash';
+  return { provider, model };
+}
+
+async function* streamDirectProviderFallback(
+  opts: RouteGenerationOptions,
+  provider: AIProvider,
+  model: string
+): AsyncGenerator<GenerationEvent> {
+  for await (const event of generateWithProvider({
+    provider,
+    model,
+    prompt: opts.prompt,
+    framework: opts.framework,
+    componentLibrary: opts.componentLibrary,
+    style: opts.style,
+    typescript: opts.typescript,
+    apiKey: opts.userApiKey,
+    contextAddition: opts.contextAddition,
+    imageBase64: opts.imageBase64,
+    imageMimeType: opts.imageMimeType,
+  })) {
+    if (event.type !== 'complete') {
+      yield event;
+    }
+  }
+}
+
 async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
   if (!opts.accessToken) {
     yield {
@@ -96,39 +132,28 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
     });
   }
 
-  if (!hasOutput) {
-    const validProviders: AIProvider[] = ['google', 'openai', 'anthropic'];
-    const envProvider = process.env.DEFAULT_GENERATION_PROVIDER;
-    const fallbackProvider: AIProvider =
-      envProvider && validProviders.includes(envProvider as AIProvider)
-        ? (envProvider as AIProvider)
-        : 'google';
-    const fallbackModel = process.env.DEFAULT_GENERATION_MODEL || 'gemini-2.5-flash';
+  if (hasOutput) {
+    return;
+  }
 
+  if (!opts.allowDirectProviderFallback) {
     yield {
-      type: 'fallback',
-      provider: fallbackProvider,
-      message: `MCP gateway unavailable, falling back to ${fallbackProvider}`,
+      type: 'error',
+      message:
+        'MCP gateway generation failed. Direct-provider fallback is disabled by policy. Retry once MCP is available.',
       timestamp: Date.now(),
     };
-    for await (const event of generateWithProvider({
-      provider: fallbackProvider,
-      model: fallbackModel,
-      prompt: opts.prompt,
-      framework: opts.framework,
-      componentLibrary: opts.componentLibrary,
-      style: opts.style,
-      typescript: opts.typescript,
-      apiKey: opts.userApiKey,
-      contextAddition: opts.contextAddition,
-      imageBase64: opts.imageBase64,
-      imageMimeType: opts.imageMimeType,
-    })) {
-      if (event.type !== 'complete') {
-        yield event;
-      }
-    }
+    return;
   }
+
+  const fallback = resolveDirectProviderFallback();
+  yield {
+    type: 'fallback',
+    provider: fallback.provider,
+    message: `MCP gateway unavailable, falling back to ${fallback.provider}`,
+    timestamp: Date.now(),
+  };
+  yield* streamDirectProviderFallback(opts, fallback.provider, fallback.model);
 }
 
 const QUOTA_ERROR_PATTERNS = [

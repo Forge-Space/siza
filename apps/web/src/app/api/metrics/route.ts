@@ -1,11 +1,60 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+const REQUIRED_QUALIFIED_USERS = 50;
+const POSITIVE_FEEDBACK = 'thumbs_up';
+
+type RecordRow = Record<string, unknown>;
+
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new Error('Supabase service config missing');
   return createClient(url, key);
+}
+
+function asRows(data: unknown): RecordRow[] {
+  if (!Array.isArray(data)) return [];
+  return data.filter((item): item is RecordRow => item !== null && typeof item === 'object');
+}
+
+function toIdSet(data: unknown, key: string): Set<string> {
+  const ids = new Set<string>();
+  for (const row of asRows(data)) {
+    const value = row[key];
+    if (typeof value === 'string' && value.length > 0) ids.add(value);
+  }
+  return ids;
+}
+
+function roundRate(numerator: number, denominator: number): number {
+  if (denominator <= 0) return 0;
+  return Math.round((numerator / denominator) * 100);
+}
+
+function countActiveUsers(data: unknown): number {
+  const counts = new Map<string, number>();
+  for (const row of asRows(data)) {
+    const userId = row.user_id;
+    if (typeof userId !== 'string' || userId.length === 0) continue;
+    counts.set(userId, (counts.get(userId) || 0) + 1);
+  }
+
+  let activeUsers = 0;
+  for (const count of counts.values()) {
+    if (count >= 3) activeUsers++;
+  }
+  return activeUsers;
+}
+
+function intersectionCount(...sets: Set<string>[]): number {
+  if (sets.length === 0) return 0;
+  const [smallest, ...rest] = [...sets].sort((a, b) => a.size - b.size);
+  let count = 0;
+  for (const value of smallest) {
+    if (rest.every((set) => set.has(value))) count++;
+  }
+  return count;
 }
 
 export async function GET(request: Request) {
@@ -51,7 +100,34 @@ export async function GET(request: Request) {
       .eq('status', 'completed'),
     supabase.from('projects').select('id', { count: 'exact', head: true }),
     supabase.from('generations').select('user_id').eq('status', 'completed'),
+    supabase.from('profiles').select('id').not('onboarding_completed_at', 'is', null),
+    supabase.from('projects').select('owner_id'),
+    supabase.from('generations').select('user_feedback').not('user_feedback', 'is', null),
+    supabase
+      .from('generations')
+      .select('id', { count: 'exact', head: true })
+      .not('parent_generation_id', 'is', null),
+    supabase
+      .from('generations')
+      .select('id', { count: 'exact', head: true })
+      .eq('ai_provider', 'mcp-gateway'),
+    supabase
+      .from('generations')
+      .select('id', { count: 'exact', head: true })
+      .eq('ai_provider', 'mcp-gateway')
+      .gte('created_at', last30d),
   ]);
+
+  const errors = results.filter((result) => result.error);
+  if (errors.length > 0) {
+    return NextResponse.json(
+      {
+        error: 'Database query failed',
+        details: errors.map((result) => result.error),
+      },
+      { status: 500 }
+    );
+  }
 
   const [
     totalUsers,
@@ -62,50 +138,85 @@ export async function GET(request: Request) {
     gen7d,
     completedGens,
     totalProjects,
-    activeUsersResult,
+    completedGenerationUsers,
+    onboardingUsersResult,
+    projectOwnersResult,
+    feedbackRowsResult,
+    revisionsResult,
+    mcpTotalResult,
+    mcp30dResult,
   ] = results;
 
-  const errors = results.filter((r) => r.error);
-  if (errors.length > 0) {
-    return NextResponse.json(
-      {
-        error: 'Database query failed',
-        details: errors.map((e) => e.error),
-      },
-      { status: 500 }
-    );
-  }
+  const usersTotal = totalUsers.count ?? 0;
+  const generationsTotal = totalGenerations.count ?? 0;
+  const completedTotal = completedGens.count ?? 0;
+  const revisionsTotal = revisionsResult.count ?? 0;
+  const mcpTotal = mcpTotalResult.count ?? 0;
+  const mcp30d = mcp30dResult.count ?? 0;
 
-  const userGenCounts = new Map<string, number>();
-  for (const row of activeUsersResult.data ?? []) {
-    const uid = (row as Record<string, unknown>).user_id as string;
-    userGenCounts.set(uid, (userGenCounts.get(uid) || 0) + 1);
-  }
-  let activeUsers = 0;
-  for (const count of userGenCounts.values()) {
-    if (count >= 3) activeUsers++;
-  }
+  const generationUsers = toIdSet(completedGenerationUsers.data, 'user_id');
+  const onboardingUsers = toIdSet(onboardingUsersResult.data, 'id');
+  const projectUsers = toIdSet(projectOwnersResult.data, 'owner_id');
+  const usersWithProjectAndGeneration = intersectionCount(projectUsers, generationUsers);
+  const qualifiedUsers = intersectionCount(onboardingUsers, projectUsers, generationUsers);
 
-  const total = totalGenerations.count ?? 0;
-  const completed = completedGens.count ?? 0;
-  const successRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const feedbackRows = asRows(feedbackRowsResult.data);
+  const satisfactionResponses = feedbackRows.length;
+  const positiveFeedback = feedbackRows.filter(
+    (row) => row.user_feedback === POSITIVE_FEEDBACK
+  ).length;
 
   return NextResponse.json({
     timestamp: now.toISOString(),
     users: {
-      total: totalUsers.count ?? 0,
+      total: usersTotal,
       last7d: users7d.count ?? 0,
       last30d: users30d.count ?? 0,
-      active: activeUsers,
+      active: countActiveUsers(completedGenerationUsers.data),
     },
     generations: {
-      total,
+      total: generationsTotal,
       last24h: gen24h.count ?? 0,
       last7d: gen7d.count ?? 0,
-      successRate,
+      successRate: roundRate(completedTotal, generationsTotal),
+      revisions: {
+        total: revisionsTotal,
+        rate: roundRate(revisionsTotal, generationsTotal),
+      },
+      satisfaction: {
+        responses: satisfactionResponses,
+        positive: positiveFeedback,
+        rate: roundRate(positiveFeedback, satisfactionResponses),
+      },
     },
     projects: {
       total: totalProjects.count ?? 0,
+    },
+    adoption: {
+      gate50: {
+        qualifiedUsers,
+        requiredUsers: REQUIRED_QUALIFIED_USERS,
+        validated: qualifiedUsers >= REQUIRED_QUALIFIED_USERS,
+      },
+      onboarding: {
+        completedUsers: onboardingUsers.size,
+        completionRate: roundRate(onboardingUsers.size, usersTotal),
+      },
+      coreFlow: {
+        usersWithProjects: projectUsers.size,
+        usersWithGenerations: generationUsers.size,
+        usersWithProjectAndGeneration,
+        projectAdoptionRate: roundRate(projectUsers.size, usersTotal),
+        generationAdoptionRate: roundRate(generationUsers.size, usersTotal),
+        coreFlowAdoptionRate: roundRate(usersWithProjectAndGeneration, usersTotal),
+      },
+    },
+    routing: {
+      mcp: {
+        total: mcpTotal,
+        last30d: mcp30d,
+        coverageRate: roundRate(mcpTotal, generationsTotal),
+      },
     },
   });
 }

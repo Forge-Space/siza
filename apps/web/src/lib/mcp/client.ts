@@ -78,7 +78,7 @@ export async function listTools(accessToken: string): Promise<McpToolDefinition[
 
   if (!response.ok) {
     throw new Error(
-      `MCP gateway is unavailable (HTTP ${response.status}). Generation will use direct provider instead.`
+      `MCP gateway is unavailable (HTTP ${response.status}). Check gateway health and auth configuration.`
     );
   }
 
