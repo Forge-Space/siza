@@ -161,8 +161,7 @@ export function runArchitectureCheck(code: string): QualityResult {
   }
 
   const functionPattern = /^(?:export\s+)?(?:async\s+)?function\s+\w+/gm;
-  const arrowPattern =
-    /^(?:export\s+)?const\s+\w+\s*=\s*(?:async\s+)?(?:\([^)]*\)|\w+)\s*(?::\s*[^=]+)?\s*=>/gm;
+  const arrowPattern = /^(?:export\s+)?const\s+\w+\s*=.*=>/gm;
   const functions =
     (code.match(functionPattern) || []).length + (code.match(arrowPattern) || []).length;
   if (functions > 10) {
@@ -252,7 +251,7 @@ export function runScalabilityCheck(code: string): QualityResult {
     issues.push('Renders list from API without pagination — add limit/offset');
   }
 
-  const unboundedState = /useState\s*<\s*(?:any)?\s*\[\]\s*>\s*\(\s*\[\s*\]\s*\)/;
+  const unboundedState = /useState\s*<\s*any\[\]\s*>\s*\(\s*\[\s*\]\s*\)/;
   const hasAppend = /set\w+\s*\(\s*(?:\[\s*\.{3}|prev\s*=>)/.test(code);
   if (unboundedState.test(code) && hasAppend) {
     issues.push('Unbounded array state growth — implement windowing or limits');
@@ -285,16 +284,14 @@ export function runHardcodedValuesCheck(code: string): QualityResult {
   }
 
   const magicNumbers: number[] = [];
-  const numberPattern = /(?<![\w.])(-?\d+\.?\d*)(?![\w.])/g;
-  let match;
-  while ((match = numberPattern.exec(code)) !== null) {
-    const n = parseFloat(match[1]);
-    if (!isNaN(n) && ![-1, 0, 1, 2, 100].includes(n) && n !== Math.floor(n * 10) / 10) {
-      continue;
-    }
-    if (!isNaN(n) && ![-1, 0, 1, 2, 100].includes(n) && Math.abs(n) > 2) {
-      magicNumbers.push(n);
-    }
+  const numberPattern = /\b-?\d+(?:\.\d+)?\b/g;
+  const numbers = code.match(numberPattern) || [];
+  for (const rawNumber of numbers) {
+    const n = Number(rawNumber);
+    if (!Number.isFinite(n)) continue;
+    if ([-1, 0, 1, 2, 100].includes(n)) continue;
+    if (Math.abs(n) <= 2) continue;
+    magicNumbers.push(n);
   }
   const uniqueMagic = [...new Set(magicNumbers)];
   if (uniqueMagic.length > 3) {

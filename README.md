@@ -170,6 +170,11 @@ npm run type-check      # TypeScript
 - If Gemini is quota-limited and Anthropic key is unavailable, smoke skips with an explicit reason
 - Live smoke prerequisites: `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, and at least one provider key (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`)
 
+## CI Security Hygiene
+
+- GitHub Actions and reusable workflow references in `.github/workflows/` are pinned to full commit SHAs.
+- Placeholder DNS/IP examples in UI/test fixtures avoid real private-network literals.
+- Regex-based content extraction paths use bounded or parser-based logic to reduce ReDoS risk.
 Project operation notes for AI agents and contributors are in
 [AGENTS.md](AGENTS.md).
 

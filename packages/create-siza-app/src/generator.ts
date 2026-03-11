@@ -315,7 +315,7 @@ function jsxToSvelteTemplate(jsx: string): string {
   result = result.replace(
     mapRegex,
     (_match: string, array: string, item: string, inner: string) => {
-      const cleanInner = inner.replace(/\s*key=\{[^}]*\}/g, '');
+      const cleanInner = inner.replaceAll(` key={${item}}`, '').replaceAll(`key={${item}}`, '');
       return `{#each ${array} as ${item}}${cleanInner}{/each}`;
     }
   );

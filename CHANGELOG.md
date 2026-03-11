@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   side-effect-safe core subpath instead of importing `@forgespace/core` root
 - **E2E auth fixture setup** — Playwright fixtures now mark both onboarding and tour
   completion, preventing overlay/interstitial interference in dashboard tests
+- **SonarCloud hotspot blockers on main** — Removed high-noise hotspot patterns by replacing vulnerable regex scans with safer parsing logic, replacing `Math.random()` IDs with crypto-backed IDs, replacing hardcoded IP test/example literals, narrowing Docker build copy scope in `apps/api/Dockerfile`, and pinning GitHub Actions/reusable workflow `uses:` references to full commit SHAs.
 
 ---
 

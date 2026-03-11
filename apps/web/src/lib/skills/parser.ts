@@ -47,10 +47,12 @@ function extractFrontmatter(content: string): { data: Record<string, unknown>; b
   const data: Record<string, unknown> = {};
 
   for (const line of yamlBlock.split('\n')) {
-    const kv = line.match(/^([a-z][a-z0-9-]*)\s*:\s*(.*)$/i);
-    if (kv) {
-      data[kv[1]] = parseYamlValue(kv[2]);
-    }
+    const separator = line.indexOf(':');
+    if (separator <= 0) continue;
+    const key = line.slice(0, separator).trim();
+    if (!/^[a-z][a-z0-9-]*$/i.test(key)) continue;
+    const value = line.slice(separator + 1);
+    data[key] = parseYamlValue(value);
   }
 
   return { data, body };

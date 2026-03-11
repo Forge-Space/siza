@@ -16,7 +16,7 @@ function generateBranchName(componentName: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
-  const shortId = Math.random().toString(36).substring(2, 8);
+  const shortId = crypto.randomUUID().replaceAll('-', '').slice(0, 6);
   return `siza/generate-${slug}-${shortId}`;
 }
 

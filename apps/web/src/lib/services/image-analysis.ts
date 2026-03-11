@@ -41,10 +41,12 @@ export async function analyzeDesignImage(
   ]);
 
   const text = result.response.text();
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
+  const jsonStart = text.indexOf('{');
+  const jsonEnd = text.lastIndexOf('}');
+  if (jsonStart === -1 || jsonEnd <= jsonStart) {
     throw new Error('Failed to parse design analysis response');
   }
+  const jsonPayload = text.slice(jsonStart, jsonEnd + 1);
 
-  return JSON.parse(jsonMatch[0]) as DesignAnalysis;
+  return JSON.parse(jsonPayload) as DesignAnalysis;
 }
