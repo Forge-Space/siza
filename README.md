@@ -125,6 +125,32 @@ npm run admin:grant -- lucas.diassantana@gmail.com
 
 This updates `public.profiles.role` to `admin` for that email.
 
+### Core-flow validation snapshots
+
+Siza now tracks roadmap gate progress in Admin (`/admin`) with:
+
+- live gate metrics (`GET /api/admin/validation`, admin-only)
+- daily trend snapshots (`POST /api/internal/validation/snapshot`, bearer token protected)
+
+Required runtime env:
+
+```env
+METRICS_SNAPSHOT_TOKEN=replace-with-strong-random-token
+```
+
+GitHub automation:
+
+- Workflow: `.github/workflows/core-flow-validation-snapshot.yml`
+- Repository variable: `SIZA_BASE_URL` (for example `https://siza.forgespace.co`)
+- Repository secret: `METRICS_SNAPSHOT_TOKEN`
+
+Manual snapshot trigger:
+
+```bash
+curl -X POST "$SIZA_BASE_URL/api/internal/validation/snapshot" \
+  -H "Authorization: Bearer $METRICS_SNAPSHOT_TOKEN"
+```
+
 ## Architecture
 
 ```
