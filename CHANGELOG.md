@@ -39,6 +39,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Golden Paths filter support** — Added end-to-end `stack` and `language` query filtering
 - **Generate workspace layout polish** — Replaced brittle edge-to-edge negative margins with stable bordered container and improved responsive split-pane sizing
 - **UI capitalization consistency** — Standardized key labels/headings to Title Case across Generate/Billing/Plugins/Golden Paths surfaces and page metadata (`Generate` label)
+- **Landing architecture** — Homepage is now static (removed force-dynamic user lookup),
+  with public `/signin` and `/signup` CTAs to improve cacheability and bfcache behavior
+- **Landing JS budget** — Removed Motion-based wrappers from hero/capabilities/ecosystem/
+  dashboard/CTA/stats surfaces; non-interactive sections now render as server components
+- **Landing contrast tokens** — Updated subtle text token to higher-contrast value and
+  applied contrast-safe text colors across marketing code snippets/footer metadata
 
 ### Fixed
 - **Generation fallback reliability** — Quota/rate-limit provider failures now return
@@ -51,6 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **E2E auth fixture setup** — Playwright fixtures now mark both onboarding and tour
   completion, preventing overlay/interstitial interference in dashboard tests
 - **SonarCloud hotspot blockers on main** — Removed high-noise hotspot patterns by replacing vulnerable regex scans with safer parsing logic, replacing `Math.random()` IDs with crypto-backed IDs, replacing hardcoded IP test/example literals, narrowing Docker build copy scope in `apps/api/Dockerfile`, and pinning GitHub Actions/reusable workflow `uses:` references to full commit SHAs.
+- **Homepage hydration stability** — `LandingNav` now initializes deterministic scroll
+  state (`false`) and updates after mount, removing window-derived initial render mismatch
 
 ---
 
