@@ -11,9 +11,9 @@ import {
 import { useThemeStore } from '@/stores/theme-store';
 
 interface ThemeGeneratorProps {
-  projectId: string;
-  values: DesignContextValues;
-  onApply: (values: DesignContextValues) => void;
+  readonly projectId: string;
+  readonly values: DesignContextValues;
+  readonly onApply: (values: DesignContextValues) => void;
 }
 
 function buildThemeName(preset: ThemeGeneratorPreset): string {

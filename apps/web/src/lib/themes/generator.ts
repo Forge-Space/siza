@@ -124,9 +124,9 @@ function hueToRgb(p: number, q: number, t: number): number {
 
 function hexToHsl(hex: string): { h: number; s: number; l: number } {
   const clean = normalizeHex(hex).slice(1);
-  const r = parseInt(clean.slice(0, 2), 16) / 255;
-  const g = parseInt(clean.slice(2, 4), 16) / 255;
-  const b = parseInt(clean.slice(4, 6), 16) / 255;
+  const r = Number.parseInt(clean.slice(0, 2), 16) / 255;
+  const g = Number.parseInt(clean.slice(2, 4), 16) / 255;
+  const b = Number.parseInt(clean.slice(4, 6), 16) / 255;
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
   let h = 0;
@@ -175,7 +175,7 @@ function hslToHex(h: number, s: number, l: number): string {
 function hashText(input: string): number {
   let hash = 0;
   for (const char of input) {
-    hash = (hash * 31 + char.charCodeAt(0)) % 2147483647;
+    hash = (hash * 31 + (char.codePointAt(0) ?? 0)) % 2147483647;
   }
   return hash;
 }

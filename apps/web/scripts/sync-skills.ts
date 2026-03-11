@@ -1,21 +1,13 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createClient } from '@supabase/supabase-js';
 import { parseSkillMd } from '../src/lib/skills/parser.ts';
 import type { SkillCategory } from '../src/lib/repositories/skill.types.ts';
+import { createServiceRoleClient } from './sync-helpers.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../../..');
 const SKILLS_ROOT = resolve(REPO_ROOT, 'skills');
-
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
 
 function humanizeSlug(slug: string): string {
   return slug
@@ -47,18 +39,7 @@ function inferFrameworks(tags: string[]): string[] {
 }
 
 async function main() {
-  const supabaseUrl =
-    process.env.SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL_LOCAL;
-  if (!supabaseUrl) {
-    throw new Error('Missing SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL for skills synchronization.');
-  }
-
-  const serviceRoleKey = getRequiredEnv('SUPABASE_SERVICE_ROLE_KEY');
-  const supabase = createClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const supabase = createServiceRoleClient('skills synchronization');
 
   const { data: currentData, error: currentError } = await supabase
     .from('skills')
@@ -129,7 +110,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+try {
+  await main();
+} catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exit(1);
-});
+}

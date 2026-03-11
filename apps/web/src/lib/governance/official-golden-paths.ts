@@ -33,8 +33,45 @@ export interface OfficialGoldenPathSeed {
   icon: string;
 }
 
+type GoldenPathDefaults = Pick<
+  OfficialGoldenPathSeed,
+  | 'is_official'
+  | 'includes_ci'
+  | 'includes_testing'
+  | 'includes_linting'
+  | 'includes_monitoring'
+  | 'includes_docker'
+  | 'catalog_lifecycle'
+>;
+
+type OfficialGoldenPathInput = Omit<OfficialGoldenPathSeed, keyof GoldenPathDefaults> &
+  Partial<GoldenPathDefaults>;
+
+const DEFAULT_GOLDEN_PATH_VALUES: GoldenPathDefaults = {
+  is_official: true,
+  includes_ci: true,
+  includes_testing: true,
+  includes_linting: true,
+  includes_monitoring: true,
+  includes_docker: false,
+  catalog_lifecycle: 'production',
+};
+
+function registerCatalogStep(description: string): OfficialGoldenPathSeed['steps'][number] {
+  return {
+    id: 'register',
+    name: 'Register in Catalog',
+    action: 'register-catalog',
+    description,
+  };
+}
+
+function defineOfficialGoldenPath(input: OfficialGoldenPathInput): OfficialGoldenPathSeed {
+  return { ...DEFAULT_GOLDEN_PATH_VALUES, ...input };
+}
+
 export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
-  {
+  defineOfficialGoldenPath({
     name: 'forge-next-service',
     display_name: 'Next.js Service',
     description: 'Production-ready Next.js service with Supabase auth, Tailwind, and CI/CD.',
@@ -90,24 +127,12 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
         action: 'create-files',
         description: 'Add GitHub Actions workflows.',
       },
-      {
-        id: 'register',
-        name: 'Register in catalog',
-        action: 'register-catalog',
-        description: 'Create catalog entry for the new service.',
-      },
+      registerCatalogStep('Create catalog entry for the new service.'),
     ],
-    is_official: true,
-    includes_ci: true,
-    includes_testing: true,
-    includes_linting: true,
-    includes_monitoring: true,
-    includes_docker: false,
     catalog_type: 'service',
-    catalog_lifecycle: 'production',
     icon: 'globe',
-  },
-  {
+  }),
+  defineOfficialGoldenPath({
     name: 'forge-mcp-server',
     display_name: 'MCP Server',
     description: 'MCP server template with tool definitions, testing, and npm publishing.',
@@ -156,24 +181,12 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
         action: 'create-files',
         description: 'Configure testing.',
       },
-      {
-        id: 'register',
-        name: 'Register in catalog',
-        action: 'register-catalog',
-        description: 'Create catalog entry.',
-      },
+      registerCatalogStep('Create catalog entry.'),
     ],
-    is_official: true,
-    includes_ci: true,
-    includes_testing: true,
-    includes_linting: true,
-    includes_monitoring: true,
-    includes_docker: false,
     catalog_type: 'service',
-    catalog_lifecycle: 'production',
     icon: 'server',
-  },
-  {
+  }),
+  defineOfficialGoldenPath({
     name: 'forge-react-library',
     display_name: 'React Component Library',
     description: 'Shared React component library with Storybook, tests, and npm publishing.',
@@ -210,24 +223,12 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
         action: 'create-files',
         description: 'Configure Storybook.',
       },
-      {
-        id: 'register',
-        name: 'Register in catalog',
-        action: 'register-catalog',
-        description: 'Create catalog entry.',
-      },
+      registerCatalogStep('Create catalog entry.'),
     ],
-    is_official: true,
-    includes_ci: true,
-    includes_testing: true,
-    includes_linting: true,
-    includes_monitoring: true,
-    includes_docker: false,
     catalog_type: 'library',
-    catalog_lifecycle: 'production',
     icon: 'book-open',
-  },
-  {
+  }),
+  defineOfficialGoldenPath({
     name: 'forge-python-api',
     display_name: 'Python API Service',
     description: 'FastAPI service with Docker, pytest, and CI/CD.',
@@ -283,24 +284,14 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
         action: 'create-files',
         description: 'Add Dockerfile and compose config.',
       },
-      {
-        id: 'register',
-        name: 'Register in catalog',
-        action: 'register-catalog',
-        description: 'Create catalog entry.',
-      },
+      registerCatalogStep('Create catalog entry.'),
     ],
-    is_official: true,
-    includes_ci: true,
-    includes_testing: true,
-    includes_linting: true,
     includes_monitoring: false,
     includes_docker: true,
     catalog_type: 'api',
-    catalog_lifecycle: 'production',
     icon: 'server',
-  },
-  {
+  }),
+  defineOfficialGoldenPath({
     name: 'forge-cloudflare-worker',
     display_name: 'Cloudflare Worker',
     description: 'Edge worker with KV storage, rate limiting, and wrangler deploy.',
@@ -337,21 +328,10 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
         action: 'create-files',
         description: 'Setup wrangler.toml and deploy scripts.',
       },
-      {
-        id: 'register',
-        name: 'Register in catalog',
-        action: 'register-catalog',
-        description: 'Create catalog entry.',
-      },
+      registerCatalogStep('Create catalog entry.'),
     ],
-    is_official: true,
-    includes_ci: true,
-    includes_testing: true,
-    includes_linting: true,
     includes_monitoring: false,
-    includes_docker: false,
     catalog_type: 'worker',
-    catalog_lifecycle: 'production',
     icon: 'code',
-  },
+  }),
 ];

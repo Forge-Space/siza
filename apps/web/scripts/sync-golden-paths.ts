@@ -1,29 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
 import { OFFICIAL_GOLDEN_PATHS } from '../src/lib/governance/official-golden-paths.ts';
+import { createServiceRoleClient } from './sync-helpers.ts';
 
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
+const SYNC_CONTEXT = 'golden paths synchronization';
 
 async function main() {
-  const supabaseUrl =
-    process.env.SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL_LOCAL;
-  if (!supabaseUrl) {
-    throw new Error(
-      'Missing SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL for golden paths synchronization.'
-    );
-  }
-
-  const serviceRoleKey = getRequiredEnv('SUPABASE_SERVICE_ROLE_KEY');
-  const supabase = createClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const supabase = createServiceRoleClient(SYNC_CONTEXT);
 
   const payload = OFFICIAL_GOLDEN_PATHS.map((item) => ({
     name: item.name,
@@ -64,7 +45,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+try {
+  await main();
+} catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exit(1);
-});
+}
