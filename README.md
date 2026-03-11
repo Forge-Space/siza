@@ -42,6 +42,7 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 - **Multi-LLM** — Swap between Gemini, Claude, GPT without code changes
 - **Production Ready** — Monaco editor, live preview, Stripe billing, feature flags
 - **IDP Governance** — Software catalog, golden path templates, post-gen scorecard, dependency graph, API docs viewer, CI/CD visibility, governance plugins
+- **Theme Generator** — Deterministic preset + seed-color theme generation in Generate flow
 
 ## UI Migration Status (March 2026)
 
@@ -159,7 +160,23 @@ npm run lint            # ESLint
 npm test                # Unit tests (Jest)
 npm run test:e2e        # E2E tests (Playwright)
 npm run type-check      # TypeScript
+npm run sync:golden-paths # Sync official Golden Paths seeds
+npm run sync:skills     # Sync official skills from skills/*/SKILL.md
 ```
+
+### Governance Asset Sync
+
+Siza keeps official governance assets (Golden Paths and Skills) syncable from repository sources.
+
+```bash
+npm run sync:golden-paths
+npm run sync:skills
+```
+
+Required environment variables:
+
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_URL`
 
 ### Generation E2E modes
 
