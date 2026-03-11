@@ -38,11 +38,11 @@ beforeEach(() => {
     resetAt: Date.now() + 60000,
   });
   mockVerifySession.mockResolvedValue({ user: { id: 'user-1' } } as any);
-  mockSuccessResponse.mockImplementation(
-    (data) => NextResponse.json({ success: true, data }, { status: 200 })
+  mockSuccessResponse.mockImplementation((data) =>
+    NextResponse.json({ success: true, data }, { status: 200 })
   );
-  mockErrorResponse.mockImplementation(
-    (msg, code) => NextResponse.json({ error: msg }, { status: code || 500 })
+  mockErrorResponse.mockImplementation((msg, code) =>
+    NextResponse.json({ error: msg }, { status: code || 500 })
   );
 });
 
