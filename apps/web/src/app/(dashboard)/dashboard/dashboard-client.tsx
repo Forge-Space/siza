@@ -1,6 +1,6 @@
 'use client';
 
-import { useProjects } from '@/hooks/use-projects';
+import { useProjects, useCreateProject } from '@/hooks/use-projects';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useCatalog } from '@/hooks/use-catalog';
 import { useGoldenPaths } from '@/hooks/use-golden-paths';
@@ -27,6 +27,7 @@ import {
   LayersIcon,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useMemo, useState } from 'react';
 import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
@@ -314,9 +315,13 @@ interface DashboardClientProps {
 function CoreFlowProgressChecklist({
   progress,
   generationHref,
+  onCreateProject,
+  isCreatingProject,
 }: {
   progress: CoreFlowUserProgress;
   generationHref: string;
+  onCreateProject: (() => Promise<void>) | null;
+  isCreatingProject: boolean;
 }) {
   const items = [
     {
@@ -362,9 +367,20 @@ function CoreFlowProgressChecklist({
             <p className="text-xs uppercase tracking-wide text-violet-200">Next step</p>
             <p className="text-sm text-text-primary">{nextAction.label}</p>
           </div>
-          <Button asChild size="sm" className="bg-violet-600 hover:bg-violet-500 text-xs">
-            <Link href={nextAction.href}>{nextAction.cta}</Link>
-          </Button>
+          {nextAction.id === 'project' && onCreateProject ? (
+            <Button
+              size="sm"
+              className="bg-violet-600 hover:bg-violet-500 text-xs"
+              onClick={onCreateProject}
+              disabled={isCreatingProject}
+            >
+              {isCreatingProject ? 'Creating...' : nextAction.cta}
+            </Button>
+          ) : (
+            <Button asChild size="sm" className="bg-violet-600 hover:bg-violet-500 text-xs">
+              <Link href={nextAction.href}>{nextAction.cta}</Link>
+            </Button>
+          )}
         </div>
       ) : null}
       <div className="mt-4 space-y-2">
@@ -390,7 +406,9 @@ function CoreFlowProgressChecklist({
 }
 
 export function DashboardClient({ initialActivationProgress = null }: DashboardClientProps) {
+  const router = useRouter();
   const { data: projects, isLoading: projectsLoading } = useProjects();
+  const createProject = useCreateProject();
   const { usage, subscription, generationsTotal, isLoading: usageLoading } = useSubscription();
   const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
   const { data: goldenPathData } = useGoldenPaths(goldenPathsEnabled ? { limit: 3 } : { limit: 0 });
@@ -440,6 +458,18 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
     activationProgress.project && firstProjectId
       ? `/generate?projectId=${firstProjectId}`
       : '/generate';
+
+  const handleCreateStarterProject = async () => {
+    try {
+      const project = await createProject.mutateAsync({
+        name: 'My First Project',
+        framework: 'react',
+      });
+      router.push(`/generate?projectId=${project.id}&source=dashboard&step=project`);
+    } catch {
+      router.push('/projects/new?source=dashboard&step=project');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -507,6 +537,8 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
         <CoreFlowProgressChecklist
           progress={activationProgress}
           generationHref={generationChecklistHref}
+          onCreateProject={activationProgress.project ? null : handleCreateStarterProject}
+          isCreatingProject={createProject.isPending}
         />
       ) : null}
 

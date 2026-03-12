@@ -175,8 +175,12 @@ Activation UX is now surfaced directly in product:
   step views/completions/skips/CTA clicks
 - Onboarding skip/complete routes now push users toward the next qualifying action
   (project creation or project-aware generation route)
+- Onboarding done-step primary CTA now supports one-click starter project creation
+  and routes directly to a project-aware Generate flow
 - Dashboard shows a persistent Core Flow Progress checklist with a single primary
   next-action CTA until the user is qualified
+- Dashboard "Create project" next-action CTA now supports one-click starter project
+  creation and routes directly to Generate with `projectId`
 
 Required runtime env:
 
