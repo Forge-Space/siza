@@ -83,6 +83,38 @@ describe('GET /api/admin/validation', () => {
           { reason: 'NO_PROJECT', count: 6 },
           { reason: 'NO_COMPLETED_GENERATION', count: 4 },
         ],
+        activation: {
+          counts: {
+            onboardedWithoutProject: 6,
+            projectWithoutCompletedGeneration: 4,
+            qualifiedUsers: 16,
+          },
+          nextBestAction: 'CREATE_PROJECT',
+          nextBestActionDistribution: {
+            CREATE_PROJECT: 6,
+            COMPLETE_GENERATION: 4,
+          },
+          primaryBottleneck: {
+            stage: 'ONBOARDED_TO_PROJECT',
+            count: 6,
+          },
+        },
+      },
+      activation: {
+        counts: {
+          onboardedWithoutProject: 6,
+          projectWithoutCompletedGeneration: 4,
+          qualifiedUsers: 16,
+        },
+        nextBestAction: 'CREATE_PROJECT',
+        nextBestActionDistribution: {
+          CREATE_PROJECT: 6,
+          COMPLETE_GENERATION: 4,
+        },
+        primaryBottleneck: {
+          stage: 'ONBOARDED_TO_PROJECT',
+          count: 6,
+        },
       },
     };
 

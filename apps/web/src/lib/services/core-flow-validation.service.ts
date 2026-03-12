@@ -3,6 +3,7 @@ import type { MetricsWindowDays } from '@/lib/analytics/metrics';
 import {
   getCoreFlowActivationFunnel,
   type CoreFlowActivationFunnel,
+  type CoreFlowActivationInsights,
 } from '@/lib/services/core-flow-activation.service';
 
 export const CORE_FLOW_QUALIFIED_TARGET = 50;
@@ -63,6 +64,7 @@ export interface CoreFlowValidationReport {
   trend: CoreFlowWeeklyTrend;
   gate: CoreFlowGateStatus;
   activationFunnel: CoreFlowActivationFunnel;
+  activation: CoreFlowActivationInsights;
   capturedSnapshotDate?: string;
 }
 
@@ -339,6 +341,7 @@ function buildValidationReport(
     trend,
     gate,
     activationFunnel,
+    activation: activationFunnel.activation,
     ...(capturedSnapshotDate ? { capturedSnapshotDate } : {}),
   };
 }

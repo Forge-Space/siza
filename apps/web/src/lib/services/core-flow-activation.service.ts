@@ -6,6 +6,9 @@ export type CoreFlowDropoffReason =
   | 'NO_PROJECT'
   | 'NO_COMPLETED_GENERATION';
 
+export type CoreFlowNextBestAction = 'CREATE_PROJECT' | 'COMPLETE_GENERATION';
+export type CoreFlowActivationBottleneckStage = 'ONBOARDED_TO_PROJECT' | 'PROJECT_TO_GENERATION';
+
 export interface CoreFlowUserProgress {
   userId: string;
   onboarding: boolean;
@@ -36,6 +39,21 @@ export interface CoreFlowActivationFunnel {
     reason: CoreFlowDropoffReason;
     count: number;
   }>;
+  activation: CoreFlowActivationInsights;
+}
+
+export interface CoreFlowActivationInsights {
+  counts: {
+    onboardedWithoutProject: number;
+    projectWithoutCompletedGeneration: number;
+    qualifiedUsers: number;
+  };
+  nextBestAction: CoreFlowNextBestAction;
+  nextBestActionDistribution: Record<CoreFlowNextBestAction, number>;
+  primaryBottleneck: {
+    stage: CoreFlowActivationBottleneckStage;
+    count: number;
+  };
 }
 
 interface ProfileRow {
@@ -95,6 +113,63 @@ function getFirstDateByUser(rows: EventRow[]) {
   return firstByUser;
 }
 
+function buildDropoffSummary(progressRows: CoreFlowUserProgress[]) {
+  const dropoff = new Map<CoreFlowDropoffReason, number>();
+  for (const progress of progressRows) {
+    if (progress.qualified) continue;
+    const reason = progress.reasons[0];
+    if (!reason) continue;
+    dropoff.set(reason, (dropoff.get(reason) ?? 0) + 1);
+  }
+  return [...dropoff.entries()]
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1];
+      return a[0].localeCompare(b[0]);
+    })
+    .map(([reason, count]) => ({ reason, count }));
+}
+
+function buildActivationInsights(progressRows: CoreFlowUserProgress[]): CoreFlowActivationInsights {
+  let onboardedWithoutProject = 0;
+  let projectWithoutCompletedGeneration = 0;
+  let qualifiedUsers = 0;
+
+  for (const progress of progressRows) {
+    if (progress.qualified) {
+      qualifiedUsers += 1;
+      continue;
+    }
+    if (progress.onboarding && !progress.project) {
+      onboardedWithoutProject += 1;
+      continue;
+    }
+    if (progress.project && !progress.completedGeneration) {
+      projectWithoutCompletedGeneration += 1;
+    }
+  }
+
+  const distribution = {
+    CREATE_PROJECT: onboardedWithoutProject,
+    COMPLETE_GENERATION: projectWithoutCompletedGeneration,
+  } satisfies Record<CoreFlowNextBestAction, number>;
+
+  const createProjectPriority = distribution.CREATE_PROJECT >= distribution.COMPLETE_GENERATION;
+
+  return {
+    counts: {
+      onboardedWithoutProject,
+      projectWithoutCompletedGeneration,
+      qualifiedUsers,
+    },
+    nextBestAction: createProjectPriority ? 'CREATE_PROJECT' : 'COMPLETE_GENERATION',
+    nextBestActionDistribution: distribution,
+    primaryBottleneck: {
+      stage: createProjectPriority ? 'ONBOARDED_TO_PROJECT' : 'PROJECT_TO_GENERATION',
+      count: createProjectPriority ? distribution.CREATE_PROJECT : distribution.COMPLETE_GENERATION,
+    },
+  };
+}
+
 export function evaluateCoreFlowUserProgress(row: {
   userId: string;
   onboardingCompletedAt: string | null;
@@ -133,29 +208,16 @@ export function buildCoreFlowActivationFunnel(
   let firstProject = 0;
   let firstCompletedGeneration = 0;
   let qualifiedUsers = 0;
-  const dropoff = new Map<CoreFlowDropoffReason, number>();
 
   for (const progress of progressRows) {
     if (progress.onboarding) completedOnboarding += 1;
     if (progress.project) firstProject += 1;
     if (progress.completedGeneration) firstCompletedGeneration += 1;
-    if (progress.qualified) {
-      qualifiedUsers += 1;
-      continue;
-    }
-    const reason = progress.reasons[0];
-    if (reason) {
-      dropoff.set(reason, (dropoff.get(reason) ?? 0) + 1);
-    }
+    if (progress.qualified) qualifiedUsers += 1;
   }
 
   const startedOnboarding = progressRows.length;
-  const topDropoffReasons = [...dropoff.entries()]
-    .sort((a, b) => {
-      if (b[1] !== a[1]) return b[1] - a[1];
-      return a[0].localeCompare(b[0]);
-    })
-    .map(([reason, count]) => ({ reason, count }));
+  const topDropoffReasons = buildDropoffSummary(progressRows);
 
   return {
     windowDays,
@@ -175,6 +237,7 @@ export function buildCoreFlowActivationFunnel(
       qualification: toPercentage(qualifiedUsers, startedOnboarding),
     },
     topDropoffReasons,
+    activation: buildActivationInsights(progressRows),
   };
 }
 

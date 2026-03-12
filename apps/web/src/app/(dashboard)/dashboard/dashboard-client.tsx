@@ -311,7 +311,13 @@ interface DashboardClientProps {
   initialActivationProgress?: CoreFlowUserProgress | null;
 }
 
-function CoreFlowProgressChecklist({ progress }: { progress: CoreFlowUserProgress }) {
+function CoreFlowProgressChecklist({
+  progress,
+  generationHref,
+}: {
+  progress: CoreFlowUserProgress;
+  generationHref: string;
+}) {
   const items = [
     {
       id: 'onboarding',
@@ -331,10 +337,11 @@ function CoreFlowProgressChecklist({ progress }: { progress: CoreFlowUserProgres
       id: 'generation',
       label: 'Complete your first generation',
       done: progress.completedGeneration,
-      href: '/generate',
+      href: generationHref,
       cta: 'Generate component',
     },
   ];
+  const nextAction = items.find((item) => !item.done) ?? null;
 
   return (
     <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-5">
@@ -349,6 +356,17 @@ function CoreFlowProgressChecklist({ progress }: { progress: CoreFlowUserProgres
           {items.filter((item) => item.done).length}/{items.length} complete
         </span>
       </div>
+      {nextAction ? (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-violet-500/40 bg-violet-500/10 px-3 py-2">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-violet-200">Next step</p>
+            <p className="text-sm text-text-primary">{nextAction.label}</p>
+          </div>
+          <Button asChild size="sm" className="bg-violet-600 hover:bg-violet-500 text-xs">
+            <Link href={nextAction.href}>{nextAction.cta}</Link>
+          </Button>
+        </div>
+      ) : null}
       <div className="mt-4 space-y-2">
         {items.map((item) => (
           <div
@@ -363,11 +381,7 @@ function CoreFlowProgressChecklist({ progress }: { progress: CoreFlowUserProgres
               )}
               <span className="text-sm text-text-primary">{item.label}</span>
             </div>
-            {!item.done ? (
-              <Button asChild size="sm" variant="outline" className="text-xs">
-                <Link href={item.href}>{item.cta}</Link>
-              </Button>
-            ) : null}
+            {!item.done ? <span className="text-xs text-text-secondary">{item.cta}</span> : null}
           </div>
         ))}
       </div>
@@ -403,6 +417,7 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
   const topPaths = useMemo(() => {
     return goldenPathData?.data || [];
   }, [goldenPathData?.data]);
+  const firstProjectId = useMemo(() => projects?.[0]?.id ?? null, [projects]);
   const fallbackActivationProgress = useMemo(() => {
     const onboarding = true;
     const project = (usage?.projects_count ?? 0) > 0;
@@ -421,6 +436,10 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
     };
   }, [generationsTotal, usage?.projects_count]);
   const activationProgress = initialActivationProgress ?? fallbackActivationProgress;
+  const generationChecklistHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}`
+      : '/generate';
 
   if (isLoading) {
     return (
@@ -485,7 +504,10 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
       </div>
 
       {!activationProgress.qualified ? (
-        <CoreFlowProgressChecklist progress={activationProgress} />
+        <CoreFlowProgressChecklist
+          progress={activationProgress}
+          generationHref={generationChecklistHref}
+        />
       ) : null}
 
       {/* Stat Cards */}

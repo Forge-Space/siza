@@ -15,33 +15,43 @@ interface DoneStepProps {
 export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
   const router = useRouter();
   const [completing, setCompleting] = useState(false);
+  const generationDestination = project
+    ? `/generate?projectId=${project.id}&source=onboarding&step=done`
+    : '/projects/new?source=onboarding&step=done';
 
   const handleComplete = async () => {
     setCompleting(true);
-    onCtaClick?.('get_started');
+    onCtaClick?.(generationDestination);
     onComplete?.();
     trackEvent({
       action: 'onboarding_cta_clicked',
       category: 'Onboarding',
       label: 'done',
-      params: { step: 'done', cta: 'get_started' },
+      params: {
+        step: 'done',
+        cta: project ? 'continue_to_generate' : 'create_project',
+        destination: generationDestination,
+      },
     });
     try {
       await fetch('/api/onboarding/complete', { method: 'POST' });
-      router.push(project ? `/projects/${project.id}` : '/projects');
+      router.push(generationDestination);
     } catch {
-      router.push('/projects');
+      router.push(generationDestination);
     }
   };
 
-  const links = [
-    {
-      label: 'View your project',
-      href: project ? `/projects/${project.id}` : '/projects',
-    },
-    { label: 'Browse templates', href: '/templates' },
-    { label: 'Read the docs', href: '/docs' },
-  ];
+  const links = project
+    ? [
+        { label: 'Generate your first component', href: generationDestination },
+        { label: 'View your project', href: `/projects/${project.id}` },
+        { label: 'Browse templates', href: '/templates' },
+      ]
+    : [
+        { label: 'Create your first project', href: '/projects/new?source=onboarding&step=done' },
+        { label: 'Browse projects', href: '/projects' },
+        { label: 'Browse templates', href: '/templates' },
+      ];
 
   return (
     <div className="space-y-8 text-center">
@@ -52,8 +62,8 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
         <h1 className="text-3xl font-bold text-white">You&apos;re all set!</h1>
         <p className="text-white/60">
           {project
-            ? `You created "${project.name}" and generated your first component`
-            : "You're ready to start building with Siza"}
+            ? `You created "${project.name}". Generate once more to strengthen your core-flow progress.`
+            : 'Create your first project to keep your qualification progress moving.'}
         </p>
       </div>
 
@@ -84,7 +94,7 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
       </div>
 
       <Button onClick={handleComplete} disabled={completing} size="lg">
-        {completing ? 'Finishing...' : 'Get started'}
+        {completing ? 'Finishing...' : project ? 'Continue to Generate' : 'Create Project'}
       </Button>
     </div>
   );

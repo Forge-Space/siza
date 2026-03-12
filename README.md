@@ -162,6 +162,10 @@ Siza now tracks roadmap gate progress in Admin (`/admin`) with:
 - live gate metrics (`GET /api/admin/validation`, admin-only)
 - activation funnel telemetry (`windowDays=7|30|90`) with onboarding/project/generation
   conversion and top drop-off reasons
+- additive activation bottleneck block in `GET /api/admin/validation` with:
+  - `onboardedWithoutProject`
+  - `projectWithoutCompletedGeneration`
+  - deterministic `nextBestAction` (`CREATE_PROJECT` or `COMPLETE_GENERATION`)
 - daily trend snapshots (`POST /api/internal/validation/snapshot`, bearer token protected)
 - internal gate status report (`GET /api/internal/validation/report`, bearer token protected)
 
@@ -169,7 +173,10 @@ Activation UX is now surfaced directly in product:
 
 - Onboarding includes qualification nudges and deterministic telemetry events for
   step views/completions/skips/CTA clicks
-- Dashboard shows a persistent Core Flow Progress checklist until the user is qualified
+- Onboarding skip/complete routes now push users toward the next qualifying action
+  (project creation or project-aware generation route)
+- Dashboard shows a persistent Core Flow Progress checklist with a single primary
+  next-action CTA until the user is qualified
 
 Required runtime env:
 
