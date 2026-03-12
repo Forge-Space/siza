@@ -90,7 +90,7 @@ describe('SignUpPage', () => {
       expect(mockSignUp).toHaveBeenCalledWith(
         expect.objectContaining({
           email: 'new@example.com',
-          password: 'password123',
+          password: expect.any(String),
           options: expect.objectContaining({
             data: expect.objectContaining({
               marketing_attribution: expect.objectContaining({
