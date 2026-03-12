@@ -16,32 +16,39 @@ const mockGetSecurityTelemetryReport = getSecurityTelemetryReport as jest.Mocked
   typeof getSecurityTelemetryReport
 >;
 
-function makeRequest(search = '') {
-  return new Request(`http://localhost:3000/api/admin/security${search}`);
+const makeRequest = (windowDays?: number) =>
+  new Request(
+    windowDays
+      ? `http://localhost:3000/api/admin/security?windowDays=${windowDays}`
+      : 'http://localhost:3000/api/admin/security'
+  );
+
+function setupAdmin(isAdmin: boolean) {
+  mockCreateClient.mockResolvedValue({} as any);
+  mockVerifyAdmin.mockResolvedValue(isAdmin ? ({ id: 'admin-1' } as any) : null);
 }
 
 describe('GET /api/admin/security', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockParseWindowDays.mockImplementation((value) => {
-      const parsed = Number(value);
-      return parsed === 7 || parsed === 30 || parsed === 90 ? parsed : 30;
+      const candidate = Number(value);
+      return candidate === 7 || candidate === 30 || candidate === 90 ? candidate : 30;
     });
   });
 
-  it('returns 403 for non-admin users', async () => {
-    mockCreateClient.mockResolvedValue({} as any);
-    mockVerifyAdmin.mockResolvedValue(null);
+  it('blocks non-admin callers', async () => {
+    setupAdmin(false);
 
     const response = await GET(makeRequest());
 
     expect(response.status).toBe(403);
     expect(await response.json()).toEqual({ error: 'Forbidden' });
+    expect(mockGetSecurityTelemetryReport).not.toHaveBeenCalled();
   });
 
-  it('returns security telemetry for admin users', async () => {
-    mockCreateClient.mockResolvedValue({} as any);
-    mockVerifyAdmin.mockResolvedValue({ id: 'admin-1' } as any);
+  it('returns telemetry and forwards the requested window', async () => {
+    setupAdmin(true);
     mockGetSecurityTelemetryReport.mockResolvedValue({
       timestamp: '2026-03-12T00:00:00.000Z',
       windowDays: 7,
@@ -52,48 +59,37 @@ describe('GET /api/admin/security', () => {
         highRiskGenerations: 2,
         scannerErrors: 1,
       },
-      severityDistribution: {
-        critical: 1,
-        high: 2,
-        medium: 2,
-        low: 1,
-        info: 0,
-      },
-      riskDistribution: {
-        high: 3,
-        medium: 2,
-        low: 1,
-      },
-      topRules: [
-        {
-          ruleId: 'SEC-INJ-001',
-          count: 2,
-          maxSeverity: 'high',
-          maxRiskLevel: 'high',
-        },
-      ],
+      severityDistribution: { critical: 1, high: 2, medium: 2, low: 1, info: 0 },
+      riskDistribution: { high: 3, medium: 2, low: 1 },
+      topRules: [{ ruleId: 'SEC-INJ-001', count: 2, maxSeverity: 'high', maxRiskLevel: 'high' }],
       recentHighRiskGenerations: [],
     });
 
-    const response = await GET(makeRequest('?windowDays=7'));
+    const response = await GET(makeRequest(7));
 
     expect(response.status).toBe(200);
     expect(mockParseWindowDays).toHaveBeenCalledWith('7');
     expect(mockGetSecurityTelemetryReport).toHaveBeenCalledWith(7);
   });
 
-  it('returns 503 when service config is missing', async () => {
-    mockCreateClient.mockResolvedValue({} as any);
-    mockVerifyAdmin.mockResolvedValue({ id: 'admin-1' } as any);
-    mockGetSecurityTelemetryReport.mockRejectedValue(
-      new Error('Security telemetry service configuration missing')
-    );
+  it.each([
+    {
+      failure: new Error('Security telemetry service configuration missing'),
+      status: 503,
+      error: 'Security telemetry service is not configured',
+    },
+    {
+      failure: new Error('Unexpected failure'),
+      status: 500,
+      error: 'Failed to load security telemetry',
+    },
+  ])('maps telemetry failure to HTTP $status', async ({ failure, status, error }) => {
+    setupAdmin(true);
+    mockGetSecurityTelemetryReport.mockRejectedValue(failure);
 
     const response = await GET(makeRequest());
 
-    expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({
-      error: 'Security telemetry service is not configured',
-    });
+    expect(response.status).toBe(status);
+    expect(await response.json()).toEqual({ error });
   });
 });

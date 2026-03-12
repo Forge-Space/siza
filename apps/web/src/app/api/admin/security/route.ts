@@ -4,30 +4,31 @@ import { verifyAdmin } from '@/lib/api/admin';
 import { parseWindowDays } from '@/lib/services/metrics.service';
 import { getSecurityTelemetryReport } from '@/lib/services/security-telemetry.service';
 
-function toErrorResponse(error: unknown) {
-  const message = error instanceof Error ? error.message : 'Failed to load security telemetry';
-  if (message.includes('configuration missing')) {
-    return NextResponse.json(
-      { error: 'Security telemetry service is not configured' },
-      { status: 503 }
-    );
+function resolveFailureStatus(error: unknown): 503 | 500 {
+  if (error instanceof Error && error.message.includes('configuration missing')) {
+    return 503;
   }
-  return NextResponse.json({ error: 'Failed to load security telemetry' }, { status: 500 });
+  return 500;
 }
 
 export async function GET(request: Request) {
-  try {
-    const supabase = await createClient();
-    const user = await verifyAdmin(supabase);
-    if (!user) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  const url = new URL(request.url);
+  const windowDays = parseWindowDays(url.searchParams.get('windowDays'));
+  const supabase = await createClient();
+  const adminUser = await verifyAdmin(supabase);
+  if (!adminUser) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
-    const url = new URL(request.url);
-    const windowDays = parseWindowDays(url.searchParams.get('windowDays'));
+  try {
     const report = await getSecurityTelemetryReport(windowDays);
     return NextResponse.json(report);
   } catch (error) {
-    return toErrorResponse(error);
+    const status = resolveFailureStatus(error);
+    const message =
+      status === 503
+        ? 'Security telemetry service is not configured'
+        : 'Failed to load security telemetry';
+    return NextResponse.json({ error: message }, { status });
   }
 }
