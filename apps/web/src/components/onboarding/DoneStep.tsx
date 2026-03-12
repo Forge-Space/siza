@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@siza/ui';
 import { trackEvent } from '@/components/analytics/AnalyticsProvider';
+import { useCreateProject } from '@/hooks/use-projects';
 
 interface DoneStepProps {
   project: { id: string; name: string } | null;
@@ -14,14 +15,30 @@ interface DoneStepProps {
 
 export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
   const router = useRouter();
+  const createProject = useCreateProject();
   const [completing, setCompleting] = useState(false);
   const generationDestination = project
     ? `/generate?projectId=${project.id}&source=onboarding&step=done`
     : '/projects/new?source=onboarding&step=done';
+  const createProjectFallback = '/projects/new?source=onboarding&step=done';
+
+  const resolveDestination = async () => {
+    if (project) return generationDestination;
+    try {
+      const createdProject = await createProject.mutateAsync({
+        name: 'My First Project',
+        framework: 'react',
+      });
+      return `/generate?projectId=${createdProject.id}&source=onboarding&step=done`;
+    } catch {
+      return createProjectFallback;
+    }
+  };
 
   const handleComplete = async () => {
     setCompleting(true);
-    onCtaClick?.(generationDestination);
+    const destination = await resolveDestination();
+    onCtaClick?.(destination);
     onComplete?.();
     trackEvent({
       action: 'onboarding_cta_clicked',
@@ -29,15 +46,15 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
       label: 'done',
       params: {
         step: 'done',
-        cta: project ? 'continue_to_generate' : 'create_project',
-        destination: generationDestination,
+        cta: project ? 'continue_to_generate' : 'create_project_and_generate',
+        destination,
       },
     });
     try {
       await fetch('/api/onboarding/complete', { method: 'POST' });
-      router.push(generationDestination);
+      router.push(destination);
     } catch {
-      router.push(generationDestination);
+      router.push(destination);
     }
   };
 
@@ -94,7 +111,11 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
       </div>
 
       <Button onClick={handleComplete} disabled={completing} size="lg">
-        {completing ? 'Finishing...' : project ? 'Continue to Generate' : 'Create Project'}
+        {completing
+          ? 'Finishing...'
+          : project
+            ? 'Continue to Generate'
+            : 'Create Project and Generate'}
       </Button>
     </div>
   );

@@ -74,6 +74,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Activation routing nudges** — Onboarding skip/complete routing now drives users
   to project creation or project-aware generation paths, and dashboard Core Flow
   Progress now highlights a single primary next-action CTA
+- **Activation project-conversion CTAs** — Onboarding done-step and dashboard Core
+  Flow primary "Create project" actions now support one-click starter project
+  creation and route directly to project-aware Generate flow
 - **Lead E2E determinism** — Playwright config now supports explicit lead smoke port/reuse controls and disables onboarding tour overlays by env for automation runs
 - **Project MCP defaults** — Added wrapper-first `playwright` server entry in
   `.mcp.json` and documented global-registry recovery flow + restart step for

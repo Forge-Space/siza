@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { DashboardClient } from '@/app/(dashboard)/dashboard/dashboard-client';
-import { useProjects } from '@/hooks/use-projects';
+import { useProjects, useCreateProject } from '@/hooks/use-projects';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useAIKeys } from '@/stores/ai-keys';
 import { useCatalog } from '@/hooks/use-catalog';
@@ -12,9 +13,10 @@ jest.mock('@/hooks/use-subscription');
 jest.mock('@/stores/ai-keys');
 jest.mock('@/hooks/use-catalog');
 jest.mock('@/hooks/use-golden-paths');
+const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: mockPush,
     replace: jest.fn(),
     back: jest.fn(),
     forward: jest.fn(),
@@ -54,10 +56,12 @@ jest.mock('@/components/ui/button', () => ({
 }));
 
 const mockUseProjects = useProjects as jest.MockedFunction<typeof useProjects>;
+const mockUseCreateProject = useCreateProject as jest.MockedFunction<typeof useCreateProject>;
 const mockUseSubscription = useSubscription as jest.MockedFunction<typeof useSubscription>;
 const mockUseAIKeys = useAIKeys as jest.MockedFunction<typeof useAIKeys>;
 const mockUseCatalog = useCatalog as jest.MockedFunction<typeof useCatalog>;
 const mockUseGoldenPaths = useGoldenPaths as jest.MockedFunction<typeof useGoldenPaths>;
+const mockCreateProject = jest.fn();
 
 const createMockQueryClient = () =>
   new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -87,6 +91,11 @@ describe('DashboardClient', () => {
   beforeEach(() => {
     queryClient = createMockQueryClient();
     jest.clearAllMocks();
+    mockUseCreateProject.mockReturnValue({
+      mutateAsync: mockCreateProject,
+      isPending: false,
+    } as any);
+    mockCreateProject.mockResolvedValue({ id: 'starter-1', name: 'My First Project' });
     mockUseAIKeys.mockReturnValue([]);
     mockUseCatalog.mockReturnValue({
       data: {
@@ -616,8 +625,54 @@ describe('DashboardClient', () => {
       );
 
       expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Create project' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Create project' })).toBeInTheDocument();
       expect(screen.getByText('Complete your first generation')).toBeInTheDocument();
+    });
+
+    it('creates starter project from primary next-action CTA', async () => {
+      const user = userEvent.setup();
+      mockUseProjects.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 0,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: false,
+            completedGeneration: false,
+            qualified: false,
+            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
+          }}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Create project' }));
+
+      await waitFor(() => {
+        expect(mockCreateProject).toHaveBeenCalledWith({
+          name: 'My First Project',
+          framework: 'react',
+        });
+        expect(mockPush).toHaveBeenCalledWith(
+          '/generate?projectId=starter-1&source=dashboard&step=project'
+        );
+      });
     });
 
     it('uses project-aware generate link for generation next step', () => {
