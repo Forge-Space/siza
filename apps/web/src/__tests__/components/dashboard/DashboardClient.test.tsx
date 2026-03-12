@@ -115,6 +115,41 @@ describe('DashboardClient', () => {
 
   const renderWithQueryClient = (component: React.ReactElement) =>
     render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
+  const noProjectActivationProgress = {
+    onboarding: true,
+    project: false,
+    completedGeneration: false,
+    qualified: false,
+    reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
+  };
+
+  const mockFreeNoProjectState = () => {
+    mockUseProjects.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as any);
+    mockUseSubscription.mockReturnValue({
+      subscription: { plan: 'free', status: 'active' },
+      usage: {
+        generations_count: 0,
+        generations_limit: 50,
+        projects_count: 0,
+        projects_limit: 2,
+        tokens_used: 0,
+      },
+      generationsTotal: 0,
+      isLoading: false,
+      error: null,
+    } as any);
+  };
+
+  const renderNoProjectDashboard = () => {
+    mockFreeNoProjectState();
+    return renderWithQueryClient(
+      <DashboardClient initialActivationProgress={noProjectActivationProgress} />
+    );
+  };
 
   describe('Loading State', () => {
     it('shows skeleton loading when projects are loading', () => {
@@ -562,25 +597,7 @@ describe('DashboardClient', () => {
 
   describe('Quick Actions', () => {
     it('shows all quick action links', () => {
-      mockUseProjects.mockReturnValue({
-        data: [],
-        isLoading: false,
-        error: null,
-      } as any);
-      mockUseSubscription.mockReturnValue({
-        subscription: { plan: 'free', status: 'active' },
-        usage: {
-          generations_count: 0,
-          generations_limit: 50,
-          projects_count: 0,
-          projects_limit: 2,
-          tokens_used: 0,
-        },
-        generationsTotal: 0,
-        isLoading: false,
-        error: null,
-      } as any);
-
+      mockFreeNoProjectState();
       renderWithQueryClient(<DashboardClient />);
 
       expect(screen.getByText('Quick Actions')).toBeInTheDocument();
@@ -593,36 +610,7 @@ describe('DashboardClient', () => {
 
   describe('Core Flow Progress', () => {
     it('shows guided prompt and checklist for onboarding-complete users without a project', () => {
-      mockUseProjects.mockReturnValue({
-        data: [],
-        isLoading: false,
-        error: null,
-      } as any);
-      mockUseSubscription.mockReturnValue({
-        subscription: { plan: 'free', status: 'active' },
-        usage: {
-          generations_count: 0,
-          generations_limit: 50,
-          projects_count: 0,
-          projects_limit: 2,
-          tokens_used: 0,
-        },
-        generationsTotal: 0,
-        isLoading: false,
-        error: null,
-      } as any);
-
-      renderWithQueryClient(
-        <DashboardClient
-          initialActivationProgress={{
-            onboarding: true,
-            project: false,
-            completedGeneration: false,
-            qualified: false,
-            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
-          }}
-        />
-      );
+      renderNoProjectDashboard();
 
       expect(screen.getByText('Start your first project')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Create Starter Project' })).toBeInTheDocument();
@@ -652,36 +640,7 @@ describe('DashboardClient', () => {
 
     it('creates starter project from guided prompt confirm action', async () => {
       const user = userEvent.setup();
-      mockUseProjects.mockReturnValue({
-        data: [],
-        isLoading: false,
-        error: null,
-      } as any);
-      mockUseSubscription.mockReturnValue({
-        subscription: { plan: 'free', status: 'active' },
-        usage: {
-          generations_count: 0,
-          generations_limit: 50,
-          projects_count: 0,
-          projects_limit: 2,
-          tokens_used: 0,
-        },
-        generationsTotal: 0,
-        isLoading: false,
-        error: null,
-      } as any);
-
-      renderWithQueryClient(
-        <DashboardClient
-          initialActivationProgress={{
-            onboarding: true,
-            project: false,
-            completedGeneration: false,
-            qualified: false,
-            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
-          }}
-        />
-      );
+      renderNoProjectDashboard();
 
       await user.click(screen.getByRole('button', { name: 'Create Starter Project' }));
 
@@ -698,36 +657,7 @@ describe('DashboardClient', () => {
 
     it('hides guided starter prompt after Not now without creating a project', async () => {
       const user = userEvent.setup();
-      mockUseProjects.mockReturnValue({
-        data: [],
-        isLoading: false,
-        error: null,
-      } as any);
-      mockUseSubscription.mockReturnValue({
-        subscription: { plan: 'free', status: 'active' },
-        usage: {
-          generations_count: 0,
-          generations_limit: 50,
-          projects_count: 0,
-          projects_limit: 2,
-          tokens_used: 0,
-        },
-        generationsTotal: 0,
-        isLoading: false,
-        error: null,
-      } as any);
-
-      renderWithQueryClient(
-        <DashboardClient
-          initialActivationProgress={{
-            onboarding: true,
-            project: false,
-            completedGeneration: false,
-            qualified: false,
-            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
-          }}
-        />
-      );
+      renderNoProjectDashboard();
 
       await user.click(screen.getByRole('button', { name: 'Not now' }));
 
@@ -740,36 +670,7 @@ describe('DashboardClient', () => {
     it('routes to manual project creation when starter project creation fails', async () => {
       const user = userEvent.setup();
       mockCreateProject.mockRejectedValueOnce(new Error('creation failed'));
-      mockUseProjects.mockReturnValue({
-        data: [],
-        isLoading: false,
-        error: null,
-      } as any);
-      mockUseSubscription.mockReturnValue({
-        subscription: { plan: 'free', status: 'active' },
-        usage: {
-          generations_count: 0,
-          generations_limit: 50,
-          projects_count: 0,
-          projects_limit: 2,
-          tokens_used: 0,
-        },
-        generationsTotal: 0,
-        isLoading: false,
-        error: null,
-      } as any);
-
-      renderWithQueryClient(
-        <DashboardClient
-          initialActivationProgress={{
-            onboarding: true,
-            project: false,
-            completedGeneration: false,
-            qualified: false,
-            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
-          }}
-        />
-      );
+      renderNoProjectDashboard();
 
       await user.click(screen.getByRole('button', { name: 'Create Starter Project' }));
 
@@ -822,7 +723,10 @@ describe('DashboardClient', () => {
       expect(screen.queryByText('Start your first project')).not.toBeInTheDocument();
       expect(
         screen.getByRole('link', { name: 'Generate Component AI-powered code generation' })
-      ).toHaveAttribute('href', '/generate?projectId=1&source=dashboard&entry=quick_action_generate');
+      ).toHaveAttribute(
+        'href',
+        '/generate?projectId=1&source=dashboard&entry=quick_action_generate'
+      );
     });
 
     it('hides checklist when user is qualified', () => {
