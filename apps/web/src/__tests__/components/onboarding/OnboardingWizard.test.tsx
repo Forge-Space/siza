@@ -143,7 +143,7 @@ describe('OnboardingWizard', () => {
     });
   });
 
-  it('tracks skip telemetry and redirects to projects', async () => {
+  it('tracks skip telemetry and routes project-missing users to project creation', async () => {
     const user = userEvent.setup();
     render(<OnboardingWizard />);
 
@@ -164,7 +164,32 @@ describe('OnboardingWizard', () => {
         })
       );
       expect(globalThis.fetch).toHaveBeenCalledWith('/api/onboarding/complete', { method: 'POST' });
-      expect(mockPush).toHaveBeenCalledWith('/projects');
+      expect(mockPush).toHaveBeenCalledWith('/projects/new?source=onboarding&step=welcome');
+    });
+  });
+
+  it('routes generation skip to generate flow with project context', async () => {
+    const user = userEvent.setup();
+    render(<OnboardingWizard />);
+
+    await user.click(screen.getByRole('button', { name: 'welcome-next' }));
+    await user.click(screen.getByRole('button', { name: 'project-next' }));
+    await user.click(screen.getByRole('button', { name: 'generate-skip' }));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith(
+        '/generate?projectId=p-1&source=onboarding&step=generate'
+      );
+      expect(trackEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: 'onboarding_cta_clicked',
+          label: 'generate',
+          params: expect.objectContaining({
+            cta: 'skip',
+            destination: '/generate?projectId=p-1&source=onboarding&step=generate',
+          }),
+        })
+      );
     });
   });
 });

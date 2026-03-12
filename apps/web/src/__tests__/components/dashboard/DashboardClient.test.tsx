@@ -616,8 +616,44 @@ describe('DashboardClient', () => {
       );
 
       expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
-      expect(screen.getByText('Create project')).toBeInTheDocument();
-      expect(screen.getByText('Generate component')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Create project' })).toBeInTheDocument();
+      expect(screen.getByText('Complete your first generation')).toBeInTheDocument();
+    });
+
+    it('uses project-aware generate link for generation next step', () => {
+      mockUseProjects.mockReturnValue({
+        data: mockProjects,
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 1,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: true,
+            completedGeneration: false,
+            qualified: false,
+            reasons: ['NO_COMPLETED_GENERATION'],
+          }}
+        />
+      );
+
+      const cta = screen.getByRole('link', { name: 'Generate component' });
+      expect(cta).toHaveAttribute('href', '/generate?projectId=1');
     });
 
     it('hides checklist when user is qualified', () => {

@@ -46,7 +46,7 @@ describe('core-flow activation service', () => {
     ]);
   });
 
-  it('builds funnel counts, conversion rates, and top drop-off reasons', () => {
+  it('builds funnel counts, conversion rates, top drop-off reasons, and action priorities', () => {
     const now = new Date('2026-03-12T00:00:00.000Z');
     const rows = [
       makeRow(
@@ -87,6 +87,22 @@ describe('core-flow activation service', () => {
       { reason: 'NO_PROJECT', count: 1 },
       { reason: 'ONBOARDING_NOT_COMPLETED', count: 1 },
     ]);
+    expect(funnel.activation).toEqual({
+      counts: {
+        onboardedWithoutProject: 1,
+        projectWithoutCompletedGeneration: 1,
+        qualifiedUsers: 1,
+      },
+      nextBestAction: 'CREATE_PROJECT',
+      nextBestActionDistribution: {
+        CREATE_PROJECT: 1,
+        COMPLETE_GENERATION: 1,
+      },
+      primaryBottleneck: {
+        stage: 'ONBOARDED_TO_PROJECT',
+        count: 1,
+      },
+    });
   });
 
   it('returns zeroed rates and empty drop-offs with no cohort data', () => {
@@ -100,6 +116,51 @@ describe('core-flow activation service', () => {
       qualification: 0,
     });
     expect(funnel.topDropoffReasons).toEqual([]);
+    expect(funnel.activation).toEqual({
+      counts: {
+        onboardedWithoutProject: 0,
+        projectWithoutCompletedGeneration: 0,
+        qualifiedUsers: 0,
+      },
+      nextBestAction: 'CREATE_PROJECT',
+      nextBestActionDistribution: {
+        CREATE_PROJECT: 0,
+        COMPLETE_GENERATION: 0,
+      },
+      primaryBottleneck: {
+        stage: 'ONBOARDED_TO_PROJECT',
+        count: 0,
+      },
+    });
+  });
+
+  it('prioritizes COMPLETE_GENERATION when generation gap is larger', () => {
+    const now = new Date('2026-03-12T00:00:00.000Z');
+    const rows = [
+      makeRow(
+        'u-1',
+        '2026-03-10T00:00:00.000Z',
+        '2026-03-10T00:10:00.000Z',
+        '2026-03-10T01:00:00.000Z',
+        null
+      ),
+      makeRow(
+        'u-2',
+        '2026-03-10T00:00:00.000Z',
+        '2026-03-10T00:10:00.000Z',
+        '2026-03-10T01:00:00.000Z',
+        null
+      ),
+      makeRow('u-3', '2026-03-11T00:00:00.000Z', '2026-03-11T00:10:00.000Z', null, null),
+    ];
+
+    const funnel = buildCoreFlowActivationFunnel(rows, 30, now);
+
+    expect(funnel.activation.nextBestAction).toBe('COMPLETE_GENERATION');
+    expect(funnel.activation.primaryBottleneck).toEqual({
+      stage: 'PROJECT_TO_GENERATION',
+      count: 2,
+    });
   });
 
   it('respects 7/30/90 window boundaries', () => {

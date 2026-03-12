@@ -63,19 +63,24 @@ export function OnboardingWizard() {
     [currentStep]
   );
 
-  const handleSkip = useCallback(
-    async (step: OnboardingStepKey) => {
-      trackOnboardingEvent('onboarding_step_skipped', step, { stepIndex: currentStep + 1 });
-      trackOnboardingEvent('onboarding_cta_clicked', step, { cta: 'skip' });
-      try {
-        await fetch('/api/onboarding/complete', { method: 'POST' });
-      } catch {
-        // Non-blocking
-      }
-      router.push('/projects');
-    },
-    [currentStep, router]
-  );
+  const getSkipDestination = (step: OnboardingStepKey) => {
+    if (step === 'generate' && stepData.project?.id) {
+      return `/generate?projectId=${stepData.project.id}&source=onboarding&step=${step}`;
+    }
+    return `/projects/new?source=onboarding&step=${step}`;
+  };
+
+  const handleSkip = async (step: OnboardingStepKey) => {
+    const destination = getSkipDestination(step);
+    trackOnboardingEvent('onboarding_step_skipped', step, { stepIndex: currentStep + 1 });
+    trackOnboardingEvent('onboarding_cta_clicked', step, { cta: 'skip', destination });
+    try {
+      await fetch('/api/onboarding/complete', { method: 'POST' });
+    } catch {
+      // Non-blocking
+    }
+    router.push(destination);
+  };
 
   return (
     <div className="w-full max-w-2xl space-y-10">

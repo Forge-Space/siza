@@ -34,6 +34,8 @@ type CoreFlowGateReason =
   | 'WEEK_OVER_WEEK_DROP_TOO_HIGH';
 
 type CoreFlowDropoffReason = 'ONBOARDING_NOT_COMPLETED' | 'NO_PROJECT' | 'NO_COMPLETED_GENERATION';
+type CoreFlowNextBestAction = 'CREATE_PROJECT' | 'COMPLETE_GENERATION';
+type CoreFlowActivationBottleneckStage = 'ONBOARDED_TO_PROJECT' | 'PROJECT_TO_GENERATION';
 
 interface CoreFlowValidationSnapshot {
   snapshotDate: string;
@@ -93,6 +95,32 @@ interface CoreFlowValidationResponse {
       reason: CoreFlowDropoffReason;
       count: number;
     }>;
+    activation: {
+      counts: {
+        onboardedWithoutProject: number;
+        projectWithoutCompletedGeneration: number;
+        qualifiedUsers: number;
+      };
+      nextBestAction: CoreFlowNextBestAction;
+      nextBestActionDistribution: Record<CoreFlowNextBestAction, number>;
+      primaryBottleneck: {
+        stage: CoreFlowActivationBottleneckStage;
+        count: number;
+      };
+    };
+  };
+  activation: {
+    counts: {
+      onboardedWithoutProject: number;
+      projectWithoutCompletedGeneration: number;
+      qualifiedUsers: number;
+    };
+    nextBestAction: CoreFlowNextBestAction;
+    nextBestActionDistribution: Record<CoreFlowNextBestAction, number>;
+    primaryBottleneck: {
+      stage: CoreFlowActivationBottleneckStage;
+      count: number;
+    };
   };
 }
 
@@ -146,6 +174,16 @@ const dropoffReasonCopy: Record<CoreFlowDropoffReason, string> = {
   ONBOARDING_NOT_COMPLETED: 'Onboarding not completed',
   NO_PROJECT: 'No first project created',
   NO_COMPLETED_GENERATION: 'No completed generation',
+};
+
+const nextActionCopy: Record<CoreFlowNextBestAction, string> = {
+  CREATE_PROJECT: 'Create Project',
+  COMPLETE_GENERATION: 'Complete Generation',
+};
+
+const bottleneckStageCopy: Record<CoreFlowActivationBottleneckStage, string> = {
+  ONBOARDED_TO_PROJECT: 'Onboarded → Project',
+  PROJECT_TO_GENERATION: 'Project → Generation',
 };
 
 function formatDateLabel(dateKey: string) {
@@ -731,6 +769,50 @@ export function AdminClient() {
                     <p className="text-xs text-text-muted-foreground">Qualification</p>
                     <p className="text-lg font-semibold text-text-primary">
                       {validation.activationFunnel.conversionRates.qualification}%
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Onboarded without project</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activation.counts.onboardedWithoutProject}
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">
+                      Project without completed generation
+                    </p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activation.counts.projectWithoutCompletedGeneration}
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Qualified users</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activation.counts.qualifiedUsers}
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Primary bottleneck</p>
+                    <p className="text-sm font-semibold text-text-primary">
+                      {bottleneckStageCopy[validation.activation.primaryBottleneck.stage]}
+                    </p>
+                    <p className="text-xs text-text-secondary">
+                      {validation.activation.primaryBottleneck.count} users
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Next best action</p>
+                    <p className="text-sm font-semibold text-text-primary">
+                      {nextActionCopy[validation.activation.nextBestAction]}
+                    </p>
+                    <p className="text-xs text-text-secondary">
+                      Create project:{' '}
+                      {validation.activation.nextBestActionDistribution.CREATE_PROJECT} · Complete
+                      generation:{' '}
+                      {validation.activation.nextBestActionDistribution.COMPLETE_GENERATION}
                     </p>
                   </div>
                 </div>

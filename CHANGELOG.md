@@ -61,12 +61,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to control whether MCP failures may fallback to direct providers
 - **Core-flow activation UX** — Added onboarding nudges + deterministic onboarding telemetry
   events and a dashboard Core Flow Progress checklist that persists until qualification
+- **Core-flow activation v2** — Added deterministic activation bottleneck telemetry
+  (`onboardedWithoutProject`, `projectWithoutCompletedGeneration`, `qualifiedUsers`)
+  plus next-action prioritization (`CREATE_PROJECT`/`COMPLETE_GENERATION`) in
+  `GET /api/admin/validation`
 
 ### Changed
 - **Signup and analytics flow** — Wrapped app layout with `AnalyticsProvider`; signup now emits GA4 lead events and includes `marketing_attribution` metadata on auth signup
 - **Template ownership querying** — Templates UI/API now uses explicit ownership filter (`all|official|mine`) with auth-checked `mine` behavior and route tests
 - **Admin validation API** — `GET /api/admin/validation` now accepts
   `windowDays=7|30|90` and returns additive `activationFunnel` data for conversion/drop-off analysis
+- **Activation routing nudges** — Onboarding skip/complete routing now drives users
+  to project creation or project-aware generation paths, and dashboard Core Flow
+  Progress now highlights a single primary next-action CTA
 - **Lead E2E determinism** — Playwright config now supports explicit lead smoke port/reuse controls and disables onboarding tour overlays by env for automation runs
 - **Project MCP defaults** — Added wrapper-first `playwright` server entry in
   `.mcp.json` and documented global-registry recovery flow + restart step for
