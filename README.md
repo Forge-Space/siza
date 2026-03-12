@@ -296,6 +296,10 @@ npm run test:e2e:prod
 - `test:e2e:prod` runs production audit packs (`public` + `auth` by default) and writes
   artifacts to `apps/web/test-results/production/<run-id>` plus `issues-map.json`
   from real failing tests and runtime API probes
+- Runtime probes in `test:e2e:prod` assert unauthenticated generation endpoints return `401`
+  (`/api/generations`, `/api/generations/history`, `/api/generations/[id]`)
+- Lead-readiness checkout smoke in production audit accepts `403 Billing is not enabled`
+  when billing is disabled and expects `200 + url` when billing is enabled
 - Campaign assets for `siza_br_en_leadtest_v1` are in `apps/web/marketing/google-ads/siza_br_en_leadtest_v1`
   - `campaign-config.json`
   - `keywords.csv`

@@ -76,6 +76,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `GET /api/admin/validation`
 
 ### Changed
+- **Production audit script lint compliance** — `apps/web/scripts/e2e-production-audit.sh`
+  now follows strict Shell Lint/Sonar rules (`[[ ]]`, stderr error output, explicit
+  function returns, stable status capture, and `shfmt -i 2` formatting)
+- **Generation route error handling deduplication** — Added shared generation API
+  error mapping helper used by `/api/generations`, `/api/generations/history`,
+  and `/api/generations/[id]` catch paths to keep UnauthorizedError => `401`
+  behavior consistent without repeated handler logic
+- **Generation unauth test deduplication** — Replaced three near-identical
+  unauthenticated generation GET route tests with one parameterized auth-contract
+  suite covering list, history, and by-id endpoints
 - **Generation API auth contract** — `verifySession` failures now return `401`
   (instead of `500`) for `/api/generations`, `/api/generations/history`, and
   `/api/generations/[id]`, while preserving existing `403`/`404`/`500` semantics

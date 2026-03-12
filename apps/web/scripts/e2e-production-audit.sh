@@ -10,75 +10,77 @@ REPORT_ROOT="${WEB_DIR}/playwright-report/production/${RUN_ID}"
 RUNTIME_PROBES_FILE="${ARTIFACT_ROOT}/runtime-probes.json"
 SCOPE="${PROD_E2E_SCOPE:-all}"
 
-cleanup() {
-  rm -f "${TMP_ENV_FILE}"
-}
-trap cleanup EXIT
+trap 'rm -f "${TMP_ENV_FILE}"' EXIT
 
 require_env() {
   local name="$1"
-  if [ -z "${!name:-}" ]; then
-    echo "[ERROR] Missing required env: ${name}"
+  if [[ -z "${!name:-}" ]]; then
+    echo "[ERROR] Missing required env: ${name}" >&2
     exit 1
   fi
+  return 0
 }
 
 ensure_non_local_supabase() {
   local url="${NEXT_PUBLIC_SUPABASE_URL:-}"
   if [[ "${url}" == *"localhost"* || "${url}" == *"127.0.0.1"* ]]; then
-    echo "[ERROR] NEXT_PUBLIC_SUPABASE_URL must be non-local for production audit."
+    echo "[ERROR] NEXT_PUBLIC_SUPABASE_URL must be non-local for production audit." >&2
     exit 1
   fi
+  return 0
 }
 
 ensure_generation_backend() {
-  if [ -n "${MCP_GATEWAY_URL:-}" ] || [ -n "${GEMINI_API_KEY:-}" ] || [ -n "${OPENAI_API_KEY:-}" ] || [ -n "${ANTHROPIC_API_KEY:-}" ]; then
-    return
+  if [[ -n "${MCP_GATEWAY_URL:-}" ]] || [[ -n "${GEMINI_API_KEY:-}" ]] ||
+    [[ -n "${OPENAI_API_KEY:-}" ]] || [[ -n "${ANTHROPIC_API_KEY:-}" ]]; then
+    return 0
   fi
-  echo "[ERROR] Missing generation backend (set MCP_GATEWAY_URL or one AI provider key)."
+  echo "[ERROR] Missing generation backend (set MCP_GATEWAY_URL or one AI provider key)." >&2
   exit 1
 }
 
 resolve_service_role_key() {
-  if [ -n "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
-    return
+  if [[ -n "${SUPABASE_SERVICE_ROLE_KEY:-}" ]]; then
+    return 0
   fi
 
   local url="${NEXT_PUBLIC_SUPABASE_URL:-}"
-  if [ -z "${url}" ]; then
-    return
+  if [[ -z "${url}" ]]; then
+    return 0
   fi
 
   local project_ref
   project_ref="$(echo "${url}" | sed -E 's#https?://([^.]+).*#\1#')"
-  if [ -z "${project_ref}" ]; then
-    return
+  if [[ -z "${project_ref}" ]]; then
+    return 0
   fi
 
   local resolved
   resolved="$(
-    supabase projects api-keys --project-ref "${project_ref}" --output json 2>/dev/null \
-      | jq -r '.[] | select(.name=="service_role") | .api_key // empty' \
-      | head -n 1
+    supabase projects api-keys --project-ref "${project_ref}" --output json 2>/dev/null |
+      jq -r '.[] | select(.name=="service_role") | .api_key // empty' |
+      head -n 1
   )"
 
-  if [ -n "${resolved}" ]; then
+  if [[ -n "${resolved}" ]]; then
     export SUPABASE_SERVICE_ROLE_KEY="${resolved}"
   fi
+  return 0
 }
 
 resolve_vercel_env_dir() {
   local common_git_dir
   common_git_dir="$(git -C "${REPO_DIR}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
-  if [ -n "${common_git_dir}" ]; then
+  if [[ -n "${common_git_dir}" ]]; then
     local canonical_repo_dir
     canonical_repo_dir="$(cd "${common_git_dir}/.." && pwd)"
-    if [ -f "${canonical_repo_dir}/.vercel/project.json" ]; then
+    if [[ -f "${canonical_repo_dir}/.vercel/project.json" ]]; then
       echo "${canonical_repo_dir}"
-      return
+      return 0
     fi
   fi
   echo "${REPO_DIR}"
+  return 0
 }
 
 collect_issues_map() {
@@ -183,6 +185,7 @@ fs.writeFileSync(`${root}/issues-map.json`, JSON.stringify(payload, null, 2));
 NODE
 
   echo "[OK] Consolidated issue map: ${output_file}"
+  return 0
 }
 
 run_runtime_probes() {
@@ -251,6 +254,7 @@ fs.writeFileSync(outputFile, JSON.stringify({ generated_at: new Date().toISOStri
 NODE
 
   echo "[OK] Runtime probes saved: ${RUNTIME_PROBES_FILE}"
+  return 0
 }
 
 run_pack() {
@@ -268,12 +272,12 @@ run_pack() {
   export PLAYWRIGHT_PROD_REPORT_FILE="${report_file}"
 
   local playwright_bin="${WEB_DIR}/node_modules/.bin/playwright"
-  if [ ! -x "${playwright_bin}" ]; then
+  if [[ ! -x "${playwright_bin}" ]]; then
     playwright_bin="${REPO_DIR}/node_modules/.bin/playwright"
   fi
 
-  if [ ! -x "${playwright_bin}" ]; then
-    echo "[ERROR] Playwright binary not found."
+  if [[ ! -x "${playwright_bin}" ]]; then
+    echo "[ERROR] Playwright binary not found." >&2
     exit 1
   fi
 
@@ -284,11 +288,28 @@ run_pack() {
   return "${status}"
 }
 
+run_pack_capture_status() {
+  local pack_name="$1"
+  shift
+  local pack_status=0
+
+  set +e
+  run_pack "${pack_name}" "$@"
+  pack_status=$?
+  set -e
+
+  if [[ "${pack_status}" -ne 0 ]]; then
+    STATUS="${pack_status}"
+  fi
+  return 0
+}
+
 VERCEL_ENV_DIR="$(resolve_vercel_env_dir)"
 echo "[INFO] Pulling production env from Vercel (siza-web) via ${VERCEL_ENV_DIR}"
 (cd "${VERCEL_ENV_DIR}" && npx vercel env pull "${TMP_ENV_FILE}" --environment=production --yes)
 
 set -a
+# shellcheck source=/dev/null
 source "${TMP_ENV_FILE}"
 set +a
 
@@ -318,23 +339,23 @@ AUTH_SPECS=(
 )
 
 case "${SCOPE}" in
-  all)
-    STATUS=0
-    run_pack "public" "${PUBLIC_SPECS[@]}" || STATUS=$?
-    run_pack "auth" "${AUTH_SPECS[@]}" || STATUS=$?
-    ;;
-  public)
-    STATUS=0
-    run_pack "public" "${PUBLIC_SPECS[@]}" || STATUS=$?
-    ;;
-  auth)
-    STATUS=0
-    run_pack "auth" "${AUTH_SPECS[@]}" || STATUS=$?
-    ;;
-  *)
-    echo "[ERROR] Invalid PROD_E2E_SCOPE: ${SCOPE} (use all|public|auth)"
-    exit 1
-    ;;
+all)
+  STATUS=0
+  run_pack_capture_status "public" "${PUBLIC_SPECS[@]}"
+  run_pack_capture_status "auth" "${AUTH_SPECS[@]}"
+  ;;
+public)
+  STATUS=0
+  run_pack_capture_status "public" "${PUBLIC_SPECS[@]}"
+  ;;
+auth)
+  STATUS=0
+  run_pack_capture_status "auth" "${AUTH_SPECS[@]}"
+  ;;
+*)
+  echo "[ERROR] Invalid PROD_E2E_SCOPE: ${SCOPE} (use all|public|auth)" >&2
+  exit 1
+  ;;
 esac
 
 run_runtime_probes
