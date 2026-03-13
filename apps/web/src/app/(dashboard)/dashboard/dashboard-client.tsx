@@ -31,6 +31,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useMemo, useState } from 'react';
 import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 interface StatCardProps {
   label: string;
@@ -126,17 +127,38 @@ function RecentProjectCard({
 
 function QuickAction({
   href,
+  onClick,
   icon: Icon,
   label,
   description,
   accent,
 }: {
   href: string;
+  onClick?: () => Promise<void> | void;
   icon: React.ElementType;
   label: string;
   description: string;
   accent?: string;
 }) {
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        className="group flex w-full items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 text-left transition-all duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
+      >
+        <div className="rounded-lg bg-violet-500/10 p-2 group-hover:bg-violet-500/20 transition-colors">
+          <Icon className={`h-4 w-4 ${accent || 'text-violet-400'}`} />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-text-primary">{label}</p>
+          <p className="text-xs text-text-secondary">{description}</p>
+        </div>
+      </button>
+    );
+  }
+
   return (
     <Link
       href={href}
@@ -522,17 +544,45 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
       ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=quick_action_generate`
       : '/projects/new?source=dashboard&entry=quick_action_generate';
 
-  const handleCreateStarterProject = async () => {
+  const trackStarterProjectEvent = (
+    action: string,
+    entry: string,
+    params: Record<string, string | boolean | null> = {}
+  ) => {
+    trackEvent({
+      action,
+      category: 'Activation',
+      label: entry,
+      params: {
+        source: 'dashboard',
+        entry,
+        step: 'project',
+        hasProjectBefore: activationProgress.project,
+        ...params,
+      },
+    });
+  };
+
+  const handleCreateStarterProject = async (entry: string) => {
+    setIsStarterPromptDismissed(false);
+    trackStarterProjectEvent('activation_starter_project_confirmed', entry, { fallback: false });
     try {
       const project = await createProject.mutateAsync({
         name: 'My First Project',
         framework: 'react',
       });
-      router.push(
-        `/generate?projectId=${project.id}&source=dashboard&entry=guided_starter_project&step=project`
-      );
+      trackStarterProjectEvent('activation_starter_project_created', entry, {
+        projectId: project.id,
+        fallback: false,
+      });
+      trackStarterProjectEvent('activation_route_to_generate', entry, {
+        projectId: project.id,
+        fallback: false,
+      });
+      router.push(`/generate?projectId=${project.id}&source=dashboard&entry=${entry}&step=project`);
     } catch {
-      router.push('/projects/new?source=dashboard&entry=guided_starter_project&step=project');
+      trackStarterProjectEvent('activation_starter_project_fallback', entry, { fallback: true });
+      router.push(`/projects/new?source=dashboard&entry=${entry}&step=project`);
     }
   };
 
@@ -586,26 +636,32 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
               </Link>
             </Button>
           )}
-          <Button
-            asChild
-            className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
-          >
-            <Link href={dashboardPrimaryHref}>
-              {activationProgress.project ? (
+          {activationProgress.project ? (
+            <Button
+              asChild
+              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
+            >
+              <Link href={dashboardPrimaryHref}>
                 <SparklesIcon className="mr-2 h-4 w-4" />
-              ) : (
-                <PlusIcon className="mr-2 h-4 w-4" />
-              )}
+                {dashboardPrimaryLabel}
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
+              onClick={async () => handleCreateStarterProject('header_primary')}
+            >
+              <PlusIcon className="mr-2 h-4 w-4" />
               {dashboardPrimaryLabel}
-            </Link>
-          </Button>
+            </Button>
+          )}
         </div>
       </div>
 
       {showStarterProjectPrompt ? (
         <GuidedStarterProjectPrompt
           isCreatingProject={createProject.isPending}
-          onConfirm={handleCreateStarterProject}
+          onConfirm={() => handleCreateStarterProject('guided_starter_project')}
           onNotNow={() => setIsStarterPromptDismissed(true)}
         />
       ) : null}
@@ -617,9 +673,7 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
           onCreateProject={
             activationProgress.project
               ? null
-              : async () => {
-                  setIsStarterPromptDismissed(false);
-                }
+              : async () => handleCreateStarterProject('checklist_next_step')
           }
           isCreatingProject={createProject.isPending}
         />
@@ -719,16 +773,23 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
                 Describe what you need and Siza generates production-ready code.
               </p>
               <div className="mt-4 flex items-center justify-center gap-3">
-                <Button asChild className="bg-violet-600 hover:bg-violet-500" size="sm">
-                  <Link href={emptyStatePrimaryHref}>
-                    {activationProgress.project ? (
+                {activationProgress.project ? (
+                  <Button asChild className="bg-violet-600 hover:bg-violet-500" size="sm">
+                    <Link href={emptyStatePrimaryHref}>
                       <SparklesIcon className="mr-2 h-4 w-4" />
-                    ) : (
-                      <PlusIcon className="mr-2 h-4 w-4" />
-                    )}
+                      {emptyStatePrimaryLabel}
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    className="bg-violet-600 hover:bg-violet-500"
+                    size="sm"
+                    onClick={async () => handleCreateStarterProject('empty_state_primary')}
+                  >
+                    <PlusIcon className="mr-2 h-4 w-4" />
                     {emptyStatePrimaryLabel}
-                  </Link>
-                </Button>
+                  </Button>
+                )}
                 <Button
                   asChild
                   variant="outline"
@@ -767,6 +828,11 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
             <div className="space-y-2">
               <QuickAction
                 href={quickActionGenerateHref}
+                onClick={
+                  activationProgress.project
+                    ? undefined
+                    : async () => handleCreateStarterProject('quick_action_generate')
+                }
                 icon={SparklesIcon}
                 label="Generate Component"
                 description="AI-powered code generation"
