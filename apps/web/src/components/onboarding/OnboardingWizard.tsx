@@ -67,7 +67,7 @@ export function OnboardingWizard() {
     if (step === 'generate' && stepData.project?.id) {
       return `/generate?projectId=${stepData.project.id}&source=onboarding&step=${step}`;
     }
-    return `/projects/new?source=onboarding&step=${step}`;
+    return `/dashboard?source=onboarding&entry=skip_${step}&intent=create_project`;
   };
 
   const handleSkip = async (step: OnboardingStepKey) => {

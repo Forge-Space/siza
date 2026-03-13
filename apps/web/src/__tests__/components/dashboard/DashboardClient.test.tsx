@@ -7,12 +7,16 @@ import { useAIKeys } from '@/stores/ai-keys';
 import { useCatalog } from '@/hooks/use-catalog';
 import { useGoldenPaths } from '@/hooks/use-golden-paths';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 jest.mock('@/hooks/use-projects');
 jest.mock('@/hooks/use-subscription');
 jest.mock('@/stores/ai-keys');
 jest.mock('@/hooks/use-catalog');
 jest.mock('@/hooks/use-golden-paths');
+jest.mock('@/components/analytics/AnalyticsProvider', () => ({
+  trackEvent: jest.fn(),
+}));
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -61,6 +65,7 @@ const mockUseSubscription = useSubscription as jest.MockedFunction<typeof useSub
 const mockUseAIKeys = useAIKeys as jest.MockedFunction<typeof useAIKeys>;
 const mockUseCatalog = useCatalog as jest.MockedFunction<typeof useCatalog>;
 const mockUseGoldenPaths = useGoldenPaths as jest.MockedFunction<typeof useGoldenPaths>;
+const mockTrackEvent = trackEvent as jest.MockedFunction<typeof trackEvent>;
 const mockCreateProject = jest.fn();
 
 const createMockQueryClient = () =>
@@ -618,24 +623,14 @@ describe('DashboardClient', () => {
       expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Create project' })).toBeInTheDocument();
       expect(screen.getByText('Complete your first generation')).toBeInTheDocument();
-      const createProjectLinks = screen.getAllByRole('link', { name: 'Create Project' });
-      expect(createProjectLinks.length).toBeGreaterThan(0);
-      expect(createProjectLinks[0]).toHaveAttribute(
-        'href',
-        '/projects/new?source=dashboard&entry=header_primary'
-      );
-      expect(createProjectLinks[1]).toHaveAttribute(
-        'href',
-        '/projects/new?source=dashboard&entry=empty_state_primary'
-      );
+      const createProjectButtons = screen.getAllByRole('button', { name: 'Create Project' });
+      expect(createProjectButtons.length).toBe(2);
       const generateComponentLinks = screen.getAllByRole('link', { name: 'Generate Component' });
       generateComponentLinks.forEach((link) => {
         expect(link).toHaveAttribute('href');
         expect(link.getAttribute('href')).toContain('/projects/new?source=dashboard');
       });
-      expect(
-        screen.getByRole('link', { name: 'Generate Component AI-powered code generation' })
-      ).toHaveAttribute('href', '/projects/new?source=dashboard&entry=quick_action_generate');
+      expect(screen.getByRole('button', { name: 'Generate Component' })).toBeInTheDocument();
     });
 
     it('creates starter project from guided prompt confirm action', async () => {
@@ -651,6 +646,82 @@ describe('DashboardClient', () => {
         });
         expect(mockPush).toHaveBeenCalledWith(
           '/generate?projectId=starter-1&source=dashboard&entry=guided_starter_project&step=project'
+        );
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            action: 'activation_starter_project_confirmed',
+            category: 'Activation',
+            label: 'guided_starter_project',
+          })
+        );
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            action: 'activation_starter_project_created',
+            category: 'Activation',
+            label: 'guided_starter_project',
+            params: expect.objectContaining({
+              projectId: 'starter-1',
+            }),
+          })
+        );
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            action: 'activation_route_to_generate',
+            category: 'Activation',
+            label: 'guided_starter_project',
+          })
+        );
+      });
+    });
+
+    it('creates starter project from header primary action', async () => {
+      const user = userEvent.setup();
+      renderNoProjectDashboard();
+
+      await user.click(screen.getAllByRole('button', { name: 'Create Project' })[0]);
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          '/generate?projectId=starter-1&source=dashboard&entry=header_primary&step=project'
+        );
+      });
+    });
+
+    it('creates starter project from empty-state primary action', async () => {
+      const user = userEvent.setup();
+      renderNoProjectDashboard();
+
+      await user.click(screen.getAllByRole('button', { name: 'Create Project' })[1]);
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          '/generate?projectId=starter-1&source=dashboard&entry=empty_state_primary&step=project'
+        );
+      });
+    });
+
+    it('creates starter project from quick-action generate button', async () => {
+      const user = userEvent.setup();
+      renderNoProjectDashboard();
+
+      await user.click(screen.getByRole('button', { name: 'Generate Component' }));
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          '/generate?projectId=starter-1&source=dashboard&entry=quick_action_generate&step=project'
+        );
+      });
+    });
+
+    it('creates starter project from checklist next-step action', async () => {
+      const user = userEvent.setup();
+      renderNoProjectDashboard();
+
+      await user.click(screen.getByRole('button', { name: 'Create project' }));
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          '/generate?projectId=starter-1&source=dashboard&entry=checklist_next_step&step=project'
         );
       });
     });
@@ -677,6 +748,16 @@ describe('DashboardClient', () => {
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith(
           '/projects/new?source=dashboard&entry=guided_starter_project&step=project'
+        );
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            action: 'activation_starter_project_fallback',
+            category: 'Activation',
+            label: 'guided_starter_project',
+            params: expect.objectContaining({
+              fallback: true,
+            }),
+          })
         );
       });
     });

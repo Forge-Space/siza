@@ -18,27 +18,67 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
   const createProject = useCreateProject();
   const [completing, setCompleting] = useState(false);
   const generationDestination = project
-    ? `/generate?projectId=${project.id}&source=onboarding&step=done`
-    : '/projects/new?source=onboarding&step=done';
-  const createProjectFallback = '/projects/new?source=onboarding&step=done';
+    ? `/generate?projectId=${project.id}&source=onboarding&entry=done_primary&step=project`
+    : '/projects/new?source=onboarding&entry=done_primary&step=project';
+  const createProjectFallback = '/projects/new?source=onboarding&entry=done_primary&step=project';
+
+  const trackActivationEvent = (
+    action: string,
+    entry: string,
+    params: Record<string, string | boolean | null> = {}
+  ) => {
+    trackEvent({
+      action,
+      category: 'Activation',
+      label: entry,
+      params: {
+        source: 'onboarding',
+        entry,
+        step: 'project',
+        hasProjectBefore: !!project,
+        ...params,
+      },
+    });
+  };
 
   const resolveDestination = async () => {
-    if (project) return generationDestination;
+    if (project) {
+      return { destination: generationDestination, projectId: project.id as string | null };
+    }
+    trackActivationEvent('activation_starter_project_confirmed', 'done_primary', {
+      fallback: false,
+    });
     try {
       const createdProject = await createProject.mutateAsync({
         name: 'My First Project',
         framework: 'react',
       });
-      return `/generate?projectId=${createdProject.id}&source=onboarding&step=done`;
+      trackActivationEvent('activation_starter_project_created', 'done_primary', {
+        projectId: createdProject.id,
+        fallback: false,
+      });
+      return {
+        destination: `/generate?projectId=${createdProject.id}&source=onboarding&entry=done_primary&step=project`,
+        projectId: createdProject.id,
+      };
     } catch {
-      return createProjectFallback;
+      trackActivationEvent('activation_starter_project_fallback', 'done_primary', {
+        fallback: true,
+      });
+      return { destination: createProjectFallback, projectId: null };
     }
   };
 
   const handleComplete = async () => {
     setCompleting(true);
-    const destination = await resolveDestination();
+    const { destination, projectId } = await resolveDestination();
     onCtaClick?.(destination);
+    if (projectId) {
+      trackActivationEvent('activation_route_to_generate', 'done_primary', {
+        projectId,
+        fallback: false,
+      });
+    }
     onComplete?.();
     trackEvent({
       action: 'onboarding_cta_clicked',
@@ -65,9 +105,18 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
         { label: 'Browse templates', href: '/templates' },
       ]
     : [
-        { label: 'Create your first project', href: '/projects/new?source=onboarding&step=done' },
-        { label: 'Browse projects', href: '/projects' },
-        { label: 'Browse templates', href: '/templates' },
+        {
+          label: 'Create your first project',
+          href: '/dashboard?source=onboarding&entry=done_create_project&intent=create_project',
+        },
+        {
+          label: 'Go to dashboard',
+          href: '/dashboard?source=onboarding&entry=done_dashboard&intent=create_project',
+        },
+        {
+          label: 'Generate your first component',
+          href: '/dashboard?source=onboarding&entry=done_generate&intent=create_project',
+        },
       ];
 
   return (
@@ -98,7 +147,7 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
                   label: 'done',
                   params: { step: 'done', cta: href },
                 });
-                await fetch('/api/onboarding/complete', { method: 'POST' });
+                await fetch('/api/onboarding/complete', { method: 'POST' }).catch(() => null);
                 router.push(href);
               }}
               className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition-colors"

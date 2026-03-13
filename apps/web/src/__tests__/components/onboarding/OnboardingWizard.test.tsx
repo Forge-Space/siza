@@ -143,7 +143,7 @@ describe('OnboardingWizard', () => {
     });
   });
 
-  it('tracks skip telemetry and routes project-missing users to project creation', async () => {
+  it('tracks skip telemetry and routes project-missing users to dashboard conversion flow', async () => {
     const user = userEvent.setup();
     render(<OnboardingWizard />);
 
@@ -164,7 +164,9 @@ describe('OnboardingWizard', () => {
         })
       );
       expect(globalThis.fetch).toHaveBeenCalledWith('/api/onboarding/complete', { method: 'POST' });
-      expect(mockPush).toHaveBeenCalledWith('/projects/new?source=onboarding&step=welcome');
+      expect(mockPush).toHaveBeenCalledWith(
+        '/dashboard?source=onboarding&entry=skip_welcome&intent=create_project'
+      );
     });
   });
 
