@@ -70,7 +70,10 @@ export function SignInClient() {
             <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
             <span className="text-2xl font-display font-bold">Siza</span>
           </Link>
-          <h2 className="mt-6 text-2xl font-semibold text-foreground">Sign in to Siza</h2>
+          <p className="mt-6 text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground">
+            Siza workspace access
+          </p>
+          <h1 className="mt-3 text-2xl font-semibold text-foreground">Sign in to Siza</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Welcome back to the premium AI coding platform
           </p>

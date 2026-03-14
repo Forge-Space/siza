@@ -13,7 +13,8 @@ interface HeaderProps {
 
 export function AuthCardShell({ children, className = '' }: BaseSectionProps) {
   return (
-    <div
+    <main
+      id="main-content"
       className={`relative flex min-h-screen items-center justify-center overflow-hidden bg-surface-0 px-4 py-10 ${className}`}
     >
       <div className="pointer-events-none absolute left-1/2 top-[-20%] h-[44rem] w-[44rem] -translate-x-1/2 rounded-full bg-violet-600/30 blur-[120px] opacity-50" />
@@ -21,7 +22,7 @@ export function AuthCardShell({ children, className = '' }: BaseSectionProps) {
       <div className="relative z-10 w-full max-w-[440px] rounded-xl border border-border bg-surface p-8 shadow-2xl sm:p-10">
         {children}
       </div>
-    </div>
+    </main>
   );
 }
 

@@ -143,7 +143,10 @@ export function SignUpClient() {
               <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
               <span className="text-2xl font-display font-bold">Siza</span>
             </Link>
-            <h2 className="mt-6 text-2xl font-semibold text-foreground">Check your email</h2>
+            <p className="mt-6 text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground">
+              Account confirmation
+            </p>
+            <h1 className="mt-3 text-2xl font-semibold text-foreground">Check your email</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               We&apos;ve sent you a confirmation link to <strong>{email}</strong>
             </p>
@@ -186,7 +189,10 @@ export function SignUpClient() {
             <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
             <span className="text-2xl font-display font-bold">Siza</span>
           </Link>
-          <h2 className="mt-6 text-2xl font-semibold text-foreground">Create your account</h2>
+          <p className="mt-6 text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground">
+            Start your workspace
+          </p>
+          <h1 className="mt-3 text-2xl font-semibold text-foreground">Create your account</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Start generating beautiful UI components with AI
           </p>
