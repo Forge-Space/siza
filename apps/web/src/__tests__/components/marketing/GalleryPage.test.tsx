@@ -66,4 +66,23 @@ describe('GalleryPage', () => {
       '/generate'
     );
   });
+
+  it('hides auth-dependent empty-state actions while auth is loading', async () => {
+    mockUseSupabaseUser.mockReturnValue({ user: null, loading: true });
+
+    render(<GalleryPage />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: /no featured generations yet/i })
+      ).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole('link', { name: /browse templates/i })).toHaveAttribute(
+      'href',
+      '/templates'
+    );
+    expect(screen.queryByRole('link', { name: /start free/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /generate now/i })).not.toBeInTheDocument();
+  });
 });

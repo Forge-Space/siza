@@ -48,7 +48,7 @@ async function fetchGalleryData(page: number, fw: string) {
 }
 
 export function GalleryClient() {
-  const { user } = useSupabaseUser();
+  const { user, loading: authLoading } = useSupabaseUser();
   const [generations, setGenerations] = useState<Generation[]>([]);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -61,7 +61,8 @@ export function GalleryClient() {
   const [emptyMessage, setEmptyMessage] = useState('No featured generations yet');
   const [error, setError] = useState<string | null>(null);
   const currentPage = useRef(1);
-  const isSignedIn = Boolean(user);
+  const showAuthAction = !authLoading;
+  const isSignedIn = showAuthAction && Boolean(user);
 
   useEffect(() => {
     let cancelled = false;
@@ -198,12 +199,14 @@ export function GalleryClient() {
             >
               Browse Templates
             </Link>
-            <Link
-              href={isSignedIn ? '/generate' : '/signup'}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
-            >
-              {isSignedIn ? 'Generate Now' : 'Start Free'}
-            </Link>
+            {showAuthAction ? (
+              <Link
+                href={isSignedIn ? '/generate' : '/signup'}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+              >
+                {isSignedIn ? 'Generate Now' : 'Start Free'}
+              </Link>
+            ) : null}
           </div>
         </div>
       ) : (
