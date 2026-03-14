@@ -80,6 +80,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `activation_route_to_generate`
 
 ### Changed
+- **Public auth semantics and gallery guidance** — Auth routes now render a real
+  page-level `h1` inside the auth shell `main` landmark, and gallery empty states
+  now direct signed-out users to `/signup` and signed-in users to `/generate`
 - **Production audit script lint compliance** — `apps/web/scripts/e2e-production-audit.sh`
   now follows strict Shell Lint/Sonar rules (`[[ ]]`, stderr error output, explicit
   function returns, stable status capture, and `shfmt -i 2` formatting)

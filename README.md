@@ -115,6 +115,9 @@ SIZA_AGENT_LOCAL_FALLBACK=false
   `lead_signup_started`, `lead_signup_success`, `lead_signup_oauth_start`, `lead_signup_error`
 - Unit coverage validates signup attribution metadata and lead event emission in
   `SignUpPage` auth tests
+- Public auth routes now expose a page-level `h1` inside a proper `main` landmark, and
+  the gallery empty state always offers onward actions (`/templates` plus `/signup` or
+  `/generate` depending on session state)
 
 ### MCP-first routing policy
 

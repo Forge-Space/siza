@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { Search, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSupabaseUser } from '@/hooks/use-supabase-user';
 import { GalleryCard } from './gallery-card';
 
 interface Generation {
@@ -46,6 +48,7 @@ async function fetchGalleryData(page: number, fw: string) {
 }
 
 export function GalleryClient() {
+  const { user, loading: authLoading } = useSupabaseUser();
   const [generations, setGenerations] = useState<Generation[]>([]);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -58,6 +61,8 @@ export function GalleryClient() {
   const [emptyMessage, setEmptyMessage] = useState('No featured generations yet');
   const [error, setError] = useState<string | null>(null);
   const currentPage = useRef(1);
+  const showAuthAction = !authLoading;
+  const isSignedIn = showAuthAction && Boolean(user);
 
   useEffect(() => {
     let cancelled = false;
@@ -186,7 +191,23 @@ export function GalleryClient() {
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <Search className="mb-4 h-12 w-12 text-muted-foreground/50" />
           <h2 className="mb-2 text-lg font-medium text-foreground">No featured generations yet</h2>
-          <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+          <p className="max-w-md text-sm text-muted-foreground">{emptyMessage}</p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/templates"
+              className="rounded-md border border-surface-3 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-1"
+            >
+              Browse Templates
+            </Link>
+            {showAuthAction ? (
+              <Link
+                href={isSignedIn ? '/generate' : '/signup'}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+              >
+                {isSignedIn ? 'Generate Now' : 'Start Free'}
+              </Link>
+            ) : null}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

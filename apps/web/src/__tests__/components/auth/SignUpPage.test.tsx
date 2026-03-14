@@ -64,6 +64,10 @@ describe('SignUpPage', () => {
 
   it('should render sign up form', () => {
     render(<SignUpPage />);
+    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: /create your account/i })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
@@ -112,7 +116,9 @@ describe('SignUpPage', () => {
     await user.type(screen.getByLabelText(/password/i), 'password123');
     await user.click(screen.getByRole('button', { name: /create account/i }));
     await waitFor(() => {
-      expect(screen.getByText(/check your email/i)).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 1, name: /check your email/i })
+      ).toBeInTheDocument();
     });
     expect(mockTrackEvent).toHaveBeenCalledWith(
       expect.objectContaining({
