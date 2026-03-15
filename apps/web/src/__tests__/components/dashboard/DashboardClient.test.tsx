@@ -1,5 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { DashboardClient } from '@/app/(dashboard)/dashboard/dashboard-client';
 import { useProjects, useCreateProject } from '@/hooks/use-projects';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -7,7 +6,6 @@ import { useAIKeys } from '@/stores/ai-keys';
 import { useCatalog } from '@/hooks/use-catalog';
 import { useGoldenPaths } from '@/hooks/use-golden-paths';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 jest.mock('@/hooks/use-projects');
 jest.mock('@/hooks/use-subscription');
@@ -65,7 +63,6 @@ const mockUseSubscription = useSubscription as jest.MockedFunction<typeof useSub
 const mockUseAIKeys = useAIKeys as jest.MockedFunction<typeof useAIKeys>;
 const mockUseCatalog = useCatalog as jest.MockedFunction<typeof useCatalog>;
 const mockUseGoldenPaths = useGoldenPaths as jest.MockedFunction<typeof useGoldenPaths>;
-const mockTrackEvent = trackEvent as jest.MockedFunction<typeof trackEvent>;
 const mockCreateProject = jest.fn();
 
 const createMockQueryClient = () =>
@@ -199,7 +196,7 @@ describe('DashboardClient', () => {
   describe('Page Heading', () => {
     it('renders dashboard heading', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -227,7 +224,7 @@ describe('DashboardClient', () => {
   describe('Plan Badge', () => {
     it('shows Free badge for free plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -252,7 +249,7 @@ describe('DashboardClient', () => {
 
     it('shows Pro badge for pro plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -277,7 +274,7 @@ describe('DashboardClient', () => {
 
     it('shows Team badge for enterprise plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -330,7 +327,7 @@ describe('DashboardClient', () => {
 
     it('shows generation count stat card', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -357,7 +354,7 @@ describe('DashboardClient', () => {
 
     it('shows unlimited for pro plan generations', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -386,7 +383,7 @@ describe('DashboardClient', () => {
   describe('Usage Bar', () => {
     it('shows green usage bar when usage is low', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -417,7 +414,7 @@ describe('DashboardClient', () => {
 
     it('handles null usage gracefully', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -439,7 +436,7 @@ describe('DashboardClient', () => {
   describe('Upgrade CTA', () => {
     it('shows upgrade to pro CTA when plan is free', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -467,7 +464,7 @@ describe('DashboardClient', () => {
 
     it('does not show upgrade CTA when plan is pro', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -492,7 +489,7 @@ describe('DashboardClient', () => {
 
     it('shows upgrade quick action for free plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -518,7 +515,7 @@ describe('DashboardClient', () => {
 
     it('does not show upgrade quick action for pro plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -593,16 +590,31 @@ describe('DashboardClient', () => {
 
       renderWithQueryClient(<DashboardClient />);
 
-      expect(screen.getByText('Ready to build something?')).toBeInTheDocument();
-      expect(
-        screen.getByText('Describe what you need and Siza generates production-ready code.')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Forge Space')).toBeInTheDocument();
+      expect(screen.getByText('Generate your first UI component with AI')).toBeInTheDocument();
     });
   });
 
   describe('Quick Actions', () => {
     it('shows all quick action links', () => {
-      mockFreeNoProjectState();
+      mockUseProjects.mockReturnValue({
+        data: mockProjects,
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 2,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
       renderWithQueryClient(<DashboardClient />);
 
       expect(screen.getByText('Quick Actions')).toBeInTheDocument();
@@ -613,155 +625,44 @@ describe('DashboardClient', () => {
     });
   });
 
-  describe('Core Flow Progress', () => {
-    it('shows guided prompt and checklist for onboarding-complete users without a project', () => {
+  describe('Simplified Welcome View (zero projects)', () => {
+    it('shows simplified welcome view with Start Generating and Create a Project CTAs', () => {
       renderNoProjectDashboard();
 
-      expect(screen.getByText('Start your first project')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Create Starter Project' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Not now' })).toBeInTheDocument();
-      expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Create project' })).toBeInTheDocument();
-      expect(screen.getByText('Complete your first generation')).toBeInTheDocument();
-      const createProjectButtons = screen.getAllByRole('button', { name: 'Create Project' });
-      expect(createProjectButtons.length).toBe(2);
-      const generateComponentLinks = screen.getAllByRole('link', { name: 'Generate Component' });
-      generateComponentLinks.forEach((link) => {
-        expect(link).toHaveAttribute('href');
-        expect(link.getAttribute('href')).toContain('/projects/new?source=dashboard');
-      });
-      expect(screen.getByRole('button', { name: 'Generate Component' })).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Forge Space')).toBeInTheDocument();
+      expect(screen.getByText('Generate your first UI component with AI')).toBeInTheDocument();
+      expect(screen.getByText('Start Generating')).toBeInTheDocument();
+      expect(screen.getByText('Create a Project')).toBeInTheDocument();
+      expect(screen.getByText('How it works')).toBeInTheDocument();
+      expect(screen.getByText('Describe')).toBeInTheDocument();
+      expect(screen.getByText('Generate')).toBeInTheDocument();
+      expect(screen.getByText('Ship')).toBeInTheDocument();
     });
 
-    it('creates starter project from guided prompt confirm action', async () => {
-      const user = userEvent.setup();
+    it('links Start Generating to /generate', () => {
       renderNoProjectDashboard();
 
-      await user.click(screen.getByRole('button', { name: 'Create Starter Project' }));
-
-      await waitFor(() => {
-        expect(mockCreateProject).toHaveBeenCalledWith({
-          name: 'My First Project',
-          framework: 'react',
-        });
-        expect(mockPush).toHaveBeenCalledWith(
-          '/generate?projectId=starter-1&source=dashboard&entry=guided_starter_project&step=project'
-        );
-        expect(mockTrackEvent).toHaveBeenCalledWith(
-          expect.objectContaining({
-            action: 'activation_starter_project_confirmed',
-            category: 'Activation',
-            label: 'guided_starter_project',
-          })
-        );
-        expect(mockTrackEvent).toHaveBeenCalledWith(
-          expect.objectContaining({
-            action: 'activation_starter_project_created',
-            category: 'Activation',
-            label: 'guided_starter_project',
-            params: expect.objectContaining({
-              projectId: 'starter-1',
-            }),
-          })
-        );
-        expect(mockTrackEvent).toHaveBeenCalledWith(
-          expect.objectContaining({
-            action: 'activation_route_to_generate',
-            category: 'Activation',
-            label: 'guided_starter_project',
-          })
-        );
-      });
+      const startLink = screen.getByText('Start Generating').closest('a');
+      expect(startLink).toHaveAttribute('href', '/generate');
     });
 
-    it('creates starter project from header primary action', async () => {
-      const user = userEvent.setup();
+    it('links Create a Project to /projects/new', () => {
       renderNoProjectDashboard();
 
-      await user.click(screen.getAllByRole('button', { name: 'Create Project' })[0]);
-
-      await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith(
-          '/generate?projectId=starter-1&source=dashboard&entry=header_primary&step=project'
-        );
-      });
+      const createLink = screen.getByText('Create a Project').closest('a');
+      expect(createLink).toHaveAttribute('href', '/projects/new');
     });
 
-    it('creates starter project from empty-state primary action', async () => {
-      const user = userEvent.setup();
+    it('does not show the full governance dashboard elements', () => {
       renderNoProjectDashboard();
 
-      await user.click(screen.getAllByRole('button', { name: 'Create Project' })[1]);
-
-      await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith(
-          '/generate?projectId=starter-1&source=dashboard&entry=empty_state_primary&step=project'
-        );
-      });
+      expect(screen.queryByText('Core Flow Progress')).not.toBeInTheDocument();
+      expect(screen.queryByText('Quick Actions')).not.toBeInTheDocument();
+      expect(screen.queryByText('Platform Governance')).not.toBeInTheDocument();
     });
+  });
 
-    it('creates starter project from quick-action generate button', async () => {
-      const user = userEvent.setup();
-      renderNoProjectDashboard();
-
-      await user.click(screen.getByRole('button', { name: 'Generate Component' }));
-
-      await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith(
-          '/generate?projectId=starter-1&source=dashboard&entry=quick_action_generate&step=project'
-        );
-      });
-    });
-
-    it('creates starter project from checklist next-step action', async () => {
-      const user = userEvent.setup();
-      renderNoProjectDashboard();
-
-      await user.click(screen.getByRole('button', { name: 'Create project' }));
-
-      await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith(
-          '/generate?projectId=starter-1&source=dashboard&entry=checklist_next_step&step=project'
-        );
-      });
-    });
-
-    it('hides guided starter prompt after Not now without creating a project', async () => {
-      const user = userEvent.setup();
-      renderNoProjectDashboard();
-
-      await user.click(screen.getByRole('button', { name: 'Not now' }));
-
-      expect(screen.queryByText('Start your first project')).not.toBeInTheDocument();
-      expect(mockCreateProject).not.toHaveBeenCalled();
-      expect(mockPush).not.toHaveBeenCalled();
-      expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
-    });
-
-    it('routes to manual project creation when starter project creation fails', async () => {
-      const user = userEvent.setup();
-      mockCreateProject.mockRejectedValueOnce(new Error('creation failed'));
-      renderNoProjectDashboard();
-
-      await user.click(screen.getByRole('button', { name: 'Create Starter Project' }));
-
-      await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith(
-          '/projects/new?source=dashboard&entry=guided_starter_project&step=project'
-        );
-        expect(mockTrackEvent).toHaveBeenCalledWith(
-          expect.objectContaining({
-            action: 'activation_starter_project_fallback',
-            category: 'Activation',
-            label: 'guided_starter_project',
-            params: expect.objectContaining({
-              fallback: true,
-            }),
-          })
-        );
-      });
-    });
-
+  describe('Core Flow Progress (with projects)', () => {
     it('uses project-aware generate link for generation next step', () => {
       mockUseProjects.mockReturnValue({
         data: mockProjects,
@@ -812,7 +713,7 @@ describe('DashboardClient', () => {
 
     it('hides checklist when user is qualified', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
