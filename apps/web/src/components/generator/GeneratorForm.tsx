@@ -37,7 +37,7 @@ const generatorSchema = z.object({
 type GeneratorFormData = z.infer<typeof generatorSchema>;
 
 interface GeneratorFormProps {
-  projectId: string;
+  projectId: string | null;
   framework: string;
   onGenerate: (code: string, settings: any) => void;
   onGenerating: () => void;
@@ -95,7 +95,7 @@ export default function GeneratorForm({
   initialDescription,
   formRef,
 }: GeneratorFormProps) {
-  const generation = useGeneration(projectId);
+  const generation = useGeneration(projectId ?? undefined);
   const encryptionKey = useAIKeyStore((s) => s.encryptionKey);
   const loadApiKeys = useAIKeyStore((s) => s.loadApiKeys);
   const apiKeys = useAIKeys();
@@ -141,7 +141,7 @@ export default function GeneratorForm({
   const designContextEnabled = isFeatureEnabled('ENABLE_DESIGN_CONTEXT');
   const autocompleteEnabled = isFeatureEnabled('ENABLE_PROMPT_AUTOCOMPLETE');
   const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
-  const activeTheme = useThemeStore((s) => s.getActiveTheme)(projectId);
+  const activeTheme = useThemeStore((s) => s.getActiveTheme)(projectId ?? '');
   const [promptValue, setPromptValue] = useState(initialDescription || '');
   const [image, setImage] = useState<ImageState | null>(null);
   const designAnalysisEnabled = isFeatureEnabled('ENABLE_DESIGN_ANALYSIS');
@@ -217,7 +217,7 @@ export default function GeneratorForm({
         typescript: data.typescript,
         componentName: data.componentName,
         prompt: data.prompt,
-        projectId,
+        projectId: projectId ?? undefined,
         provider: selectedProvider as AIProvider,
         model: selectedModel,
         ...(image && { imageBase64: image.base64, imageMimeType: image.mimeType }),
@@ -438,7 +438,7 @@ export default function GeneratorForm({
 
           {designContextEnabled && (
             <DesignContext
-              projectId={projectId}
+              projectId={projectId ?? ''}
               values={designContext}
               onChange={setDesignContext}
             />

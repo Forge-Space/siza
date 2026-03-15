@@ -29,7 +29,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
 import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
@@ -475,6 +475,10 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
   const [isStarterPromptDismissed, setIsStarterPromptDismissed] = useState(false);
 
   const isLoading = projectsLoading || usageLoading;
+
+  useEffect(() => {
+    trackEvent({ action: 'dashboard_viewed', category: 'Navigation' });
+  }, []);
 
   const stats = useMemo(() => {
     if (!projects) return null;
