@@ -26,6 +26,8 @@
     "deps:check": "ncu",
     "deps:update": "ncu -u && npm install",
     "deps:unused": "knip",
+    "routes:check": "tsx scripts/check-route-coverage.ts",
+    "routes:scaffold": "tsx scripts/scaffold-route-test.ts",
     "clean": "turbo run clean && rm -rf node_modules",
     "prepare": "husky"
   },
