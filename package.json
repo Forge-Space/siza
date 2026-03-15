@@ -26,6 +26,8 @@
     "deps:check": "ncu",
     "deps:update": "ncu -u && npm install",
     "deps:unused": "knip",
+    "routes:check": "tsx scripts/check-route-coverage.ts",
+    "routes:scaffold": "tsx scripts/scaffold-route-test.ts",
     "clean": "turbo run clean && rm -rf node_modules",
     "prepare": "husky"
   },
@@ -64,7 +66,9 @@
     "tar": "^7.5.11",
     "onnxruntime-node": {
       "tar": "^7.5.11"
-    }
+    },
+    "undici": "^7.24.3",
+    "yauzl": "^3.2.1"
   },
   "engines": {
     "node": ">=22",
