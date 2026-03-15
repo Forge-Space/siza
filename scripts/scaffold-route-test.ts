@@ -58,7 +58,8 @@ if (methods.length === 0) {
   process.exit(1);
 }
 
-const hasAuthBarrel = source.includes("from '@/lib/api'") && !source.includes("from '@/lib/api/auth'");
+const hasAuthBarrel =
+  source.includes("from '@/lib/api'") && !source.includes("from '@/lib/api/auth'");
 const hasAuthDirect = source.includes("from '@/lib/api/auth'") || source.includes('verifySession');
 const hasRateLimit = source.includes('checkRateLimit');
 const hasSupabase = source.includes('createClient');
@@ -69,8 +70,10 @@ const paramMatch = /params:\s*Promise<\{[^}]*(\w+):\s*string/.exec(source);
 const paramName = paramMatch ? paramMatch[1] : 'id';
 
 const testName =
-  routeRelative.replace(/\[(\w+)\]/g, '$1').replace(/\//g, '-').toLowerCase() +
-  '-route.test.ts';
+  routeRelative
+    .replace(/\[(\w+)\]/g, '$1')
+    .replace(/\//g, '-')
+    .toLowerCase() + '-route.test.ts';
 const testFile = resolve(TEST_DIR, testName);
 
 if (existsSync(testFile)) {
@@ -144,14 +147,20 @@ jest.spyOn(NextResponse, 'redirect').mockImplementation((url: string | URL) => {
 // Variable declarations
 if (hasAuthBarrel) {
   parts.push(`import { verifySession } from '@/lib/api';`);
-  parts.push(`const mockVerifySession = verifySession as jest.MockedFunction<typeof verifySession>;`);
+  parts.push(
+    `const mockVerifySession = verifySession as jest.MockedFunction<typeof verifySession>;`
+  );
 } else if (hasAuthDirect) {
   parts.push(`import { verifySession } from '@/lib/api/auth';`);
-  parts.push(`const mockVerifySession = verifySession as jest.MockedFunction<typeof verifySession>;`);
+  parts.push(
+    `const mockVerifySession = verifySession as jest.MockedFunction<typeof verifySession>;`
+  );
 }
 if (hasRateLimit) {
   parts.push(`import { checkRateLimit } from '@/lib/api/rate-limit';`);
-  parts.push(`const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;`);
+  parts.push(
+    `const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;`
+  );
 }
 parts.push('');
 
@@ -159,9 +168,13 @@ parts.push('');
 const setupLines: string[] = ['jest.clearAllMocks();'];
 if (hasRedirect) setupLines.push('redirectUrls.length = 0;');
 if (hasAuthBarrel || hasAuthDirect)
-  setupLines.push(`mockVerifySession.mockResolvedValue({ user: { id: 'u1', email: 'user@test.com' } } as never);`);
+  setupLines.push(
+    `mockVerifySession.mockResolvedValue({ user: { id: 'u1', email: 'user@test.com' } } as never);`
+  );
 if (hasRateLimit)
-  setupLines.push(`mockCheckRateLimit.mockResolvedValue({ allowed: true, remaining: 59, resetAt: Date.now() + 60000 } as never);`);
+  setupLines.push(
+    `mockCheckRateLimit.mockResolvedValue({ allowed: true, remaining: 59, resetAt: Date.now() + 60000 } as never);`
+  );
 if (hasSupabase)
   setupLines.push(`mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null });`);
 
@@ -241,4 +254,6 @@ mkdirSync(TEST_DIR, { recursive: true });
 writeFileSync(testFile, parts.join('\n'), 'utf-8');
 
 console.log(`CREATED: ${relative(ROOT, testFile)}`);
-console.log(`Methods: ${methodList} | Auth: ${hasAuthBarrel || hasAuthDirect} | RateLimit: ${hasRateLimit} | Dynamic: ${hasDynamic}`);
+console.log(
+  `Methods: ${methodList} | Auth: ${hasAuthBarrel || hasAuthDirect} | RateLimit: ${hasRateLimit} | Dynamic: ${hasDynamic}`
+);
