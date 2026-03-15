@@ -1,7 +1,7 @@
 ---
 name: api-route-testing
 description: Write unit tests for Next.js App Router API route handlers in Siza — mock patterns, auth, rate-limit, Supabase chaining
-version: 1.3.0
+version: 1.6.0
 tags: [testing, api, routes, jest, nextjs]
 ---
 
@@ -251,6 +251,51 @@ mockVerifySession.mockRejectedValue(new UnauthorizedError('Unauthorized'));
 mockVerifySession.mockRejectedValue(new Error('not authenticated'));
 ```
 
+## Redirect Routes (NextResponse.redirect)
+
+`NextResponse.redirect` loses its `Location` header in Jest. Use `jest.spyOn` to capture the URL:
+
+```typescript
+import { NextResponse } from 'next/server';
+
+const redirectUrls: string[] = [];
+const originalRedirect = NextResponse.redirect.bind(NextResponse);
+jest.spyOn(NextResponse, 'redirect').mockImplementation((url: string | URL) => {
+  redirectUrls.push(String(url));
+  return originalRedirect(url);
+});
+
+beforeEach(() => {
+  redirectUrls.length = 0;
+});
+
+it('redirects to success page', async () => {
+  const res = await GET(makeRequest({ installation_id: '123', setup_action: 'install' }));
+  expect(res.status).toBe(307);
+  expect(redirectUrls[0]).toContain('github=connected');
+});
+```
+
+**Do NOT** use `jest.mock('next/server', ...)` — that breaks `NextRequest` throughout the test file.
+
+## Bearer Token Auth (internal routes)
+
+Routes using `authorizeInternalValidationRequest` require a `Bearer` token:
+
+```typescript
+function makeRequest(method: string, token?: string) {
+  return new Request('http://localhost/api/internal/...', {
+    method,
+    headers: token ? { authorization: `Bearer ${token}` } : {},
+  });
+}
+
+// Set env token
+process.env.METRICS_SNAPSHOT_TOKEN = 'secret';
+
+// Test cases: 503 (missing env), 401 (no header), 403 (wrong token), 200 (correct token)
+```
+
 ## Running Tests
 
 ```bash
@@ -266,34 +311,21 @@ cd apps/web && npx jest --forceExit --silent
 
 ## Route Coverage Map (as of 2026-03-15)
 
-67 route files total. **23 actively tested** in `__tests__/lib/api/` (default jest run). **1419 tests total**.
+67 route files total. **49 actively tested** — **1601 total tests** (PR #499).
+
+See `api-route-testing` skill v1.5.0 table for full list. New additions (v1.6.0):
 
 | Route | Test file | Tests |
 |-------|-----------|-------|
-| `GET /api/gallery` | `gallery-route.test.ts` ✓ | 5 |
-| `GET /api/search` | `search-route.test.ts` ✓ | 6 |
-| `GET /api/usage/current` | `usage-current-route.test.ts` ✓ | 6 |
-| `POST /api/onboarding/complete` | `onboarding-complete-route.test.ts` ✓ | 3 |
-| `POST /api/tour/complete` | `tour-complete-route.test.ts` ✓ | 3 |
-| `GET /api/scorecards` | `scorecards-route.test.ts` ✓ | 7 |
-| `GET /api/suggestions` | `suggestions-route.test.ts` ✓ | 7 |
-| `GET /api/generations/history` | `generations-history-route.test.ts` ✓ | 5 |
-| `PATCH /api/generations/[id]/feature` | `generation-feature-route.test.ts` ✓ | 6 |
-| `GET /api/metrics` | `metrics-route.test.ts` ✓ | 6 |
-| `GET+POST /api/teams` | `teams-route.test.ts` ✓ | 8 |
-| `GET /api/plugins` | `plugins-route.test.ts` ✓ | 4 |
-| `GET+POST /api/golden-paths` | `golden-paths-route.test.ts` ✓ | 6 |
-| `GET+POST /api/templates` | `templates-route.test.ts` ✓ | 7 |
-| `POST /api/generate/analyze` | `generate-analyze-route.test.ts` ✓ | 7 |
-| `POST /api/generate/validate` | `generate-validate-route.test.ts` ✓ | 8 |
-| `GET+POST /api/projects` | `projects-route.test.ts` ✓ | 9 |
-| `GET+POST /api/components` | `components-route.test.ts` ✓ | 10 |
-| `GET+POST /api/generations` | `generations-route.test.ts` ✓ | 10 |
-| `GET+PATCH+DELETE /api/projects/[id]` | `projects-id-route.test.ts` ✓ | 12 |
-| `GET+PATCH+DELETE /api/generations/[id]` | `generations-id-route.test.ts` ✓ | 15 |
-| `GET+POST+PATCH+DELETE /api/teams/[slug]` | `teams-slug-route.test.ts` ✓ | 16 |
-| `GET+PATCH+DELETE /api/components/[id]` | `components-id-route.test.ts` ✓ | 8 |
-| `GET /api/catalog` | `integration/catalog-route.test.ts` (excluded from default run) | — |
-| `GET /api/catalog/[id]` | `integration/catalog-id-route.test.ts` (excluded) | — |
+| `POST /api/analyze-image` | `analyze-image-route.test.ts` ✓ | 9 |
+| `GET /api/audit` | `audit-route.test.ts` ✓ | 7 |
+| `GET /api/github/repos` | `github-routes.test.ts` ✓ | 3 |
+| `GET /api/github/prs` | `github-routes.test.ts` ✓ | 3 |
+| `GET /api/github/callback` | `github-routes.test.ts` ✓ | 4 |
+| `POST /api/github/webhook` | `github-routes.test.ts` ✓ | 7 |
+| `GET /api/internal/validation/report` | `internal-validation-routes.test.ts` ✓ | 6 |
+| `POST /api/internal/validation/snapshot` | `internal-validation-routes.test.ts` ✓ | 6 |
+| `GET /api/catalog/stats` | `catalog-extra-routes.test.ts` ✓ | 2 |
+| `GET+POST /api/catalog/discover` | `catalog-extra-routes.test.ts` ✓ | 7 |
 
-**Next targets (44 remaining):** `generate` (350L complex SSE streaming), `wireframe` (338L), `golden-paths/scaffold` (172L), `catalog/ci` (165L), `catalog/[id]` (120L), `github/webhook` (116L), `plugins/[slug]` (107L)
+**Remaining (18):** `generate` (SSE streaming), `catalog/ci`, `catalog/docs`, `catalog/graph`, `catalog/import`, `catalog/[id]/relationships`, `github/install`, `github/push`, `github/repos/link`, `github/repos/unlink`, `stripe/webhook`, `permissions`, `health`
