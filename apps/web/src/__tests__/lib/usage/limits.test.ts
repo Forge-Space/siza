@@ -95,11 +95,7 @@ describe('checkProjectQuota', () => {
       const call = queryCall;
 
       if (call === 1) {
-        // projects count query
-        const mockHead = jest.fn().mockResolvedValue({ count: 3, error: null });
-        const mockEqHead = jest.fn().mockReturnValue({ count: 3, error: null, then: undefined });
-        // The actual chain: from('projects').select('id', {count:'exact',head:true}).eq('user_id', userId)
-        // returns { count: N } directly
+        // projects count query: from('projects').select('id',{count,head}).eq('user_id').→{count}
         const selectHead = jest.fn().mockReturnValue({
           eq: jest.fn().mockResolvedValue({ count: 3, error: null }),
         });

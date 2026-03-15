@@ -193,9 +193,10 @@ describe('Supabase Storage', () => {
     });
   });
 
-  // Cast helper — storage mock has narrow type, but real Supabase storage has more methods
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const bucket = (methods: Record<string, jest.Mock>): any => methods;
+  // Cast helper — storage mock has narrow type; cast lets us test extended storage methods
+  function bucket(methods: Record<string, jest.Mock>) {
+    return methods as ReturnType<typeof mockStorage.from>;
+  }
 
   describe('getPublicUrl', () => {
     it('returns public URL for a file', () => {
