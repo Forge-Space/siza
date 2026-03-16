@@ -101,7 +101,7 @@ describe('FigmaExportDialog', () => {
 
   it('renders dialog with title', () => {
     render(<FigmaExportDialog wireframe={mockWireframe} onClose={mockOnClose} />);
-    expect(screen.getByText('Export to Figma')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Export to Figma/i })).toBeInTheDocument();
   });
 
   it('shows wireframe details', () => {
@@ -128,8 +128,8 @@ describe('FigmaExportDialog', () => {
     render(<FigmaExportDialog wireframe={mockWireframe} onClose={mockOnClose} />);
     const input = screen.getByDisplayValue('Siza Wireframe');
     fireEvent.change(input, { target: { value: '' } });
-    const exportBtn = screen.getByText('Export to Figma');
-    expect(exportBtn.closest('button')).toBeDisabled();
+    const exportBtn = screen.getByRole('button', { name: /Export to Figma/i });
+    expect(exportBtn).toBeDisabled();
   });
 
   it('calls fetch and shows success result', async () => {
@@ -140,7 +140,7 @@ describe('FigmaExportDialog', () => {
     });
 
     render(<FigmaExportDialog wireframe={mockWireframe} onClose={mockOnClose} />);
-    fireEvent.click(screen.getByText('Export to Figma'));
+    fireEvent.click(screen.getByRole('button', { name: /Export to Figma/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Export Successful')).toBeInTheDocument();
@@ -157,7 +157,7 @@ describe('FigmaExportDialog', () => {
     });
 
     render(<FigmaExportDialog wireframe={mockWireframe} onClose={mockOnClose} />);
-    fireEvent.click(screen.getByText('Export to Figma'));
+    fireEvent.click(screen.getByRole('button', { name: /Export to Figma/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument();
@@ -173,11 +173,11 @@ describe('FigmaExportDialog', () => {
     });
 
     render(<FigmaExportDialog wireframe={mockWireframe} onClose={mockOnClose} />);
-    fireEvent.click(screen.getByText('Export to Figma'));
+    fireEvent.click(screen.getByRole('button', { name: /Export to Figma/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Export Successful')).toBeInTheDocument();
     });
-    expect(screen.queryByText('Export to Figma')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Export to Figma/i })).not.toBeInTheDocument();
   });
 });
