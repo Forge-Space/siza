@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.48.0] — 2026-03-15
+
+### Added
+- **StatsBar component** — global stats strip with real-time project, component, and user metrics (PR #521)
+
 ## [0.47.1] — 2026-03-15
 
 ### Added
