@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Generator component unit tests** — 74 tests across 9 suites covering GeneratorForm, ThemeGenerator, DesignContext, LivePreview, and CodeEditor; fixed DesignContext color-mode radio button assertions
+- **Onboarding step unit tests** — 22 tests across WelcomeStep, ProjectStep, and GenerateStep covering render, skip/next callbacks, form validation, mutation pending/error states, and generation progress flow
+- **AnalyticsDashboard unit tests** — 3 tests covering loading state, live metrics rendering, and time range switching
+- **StatsBar unit tests** — 9 tests covering formatDownloads thresholds (<1k, 1k-9k as 1.5k, ≥10k as 10k), npm vs product-repo label switching, and static stat items
+- **ecosystem-data unit tests** — 3 tests covering GitHub API → snapshot mapping, fallback on release fetch failure, and full fallback on repo list failure
+
+## [0.48.0] — 2026-03-15
+
+### Added
+- **StatsBar component** — global stats strip with real-time project, component, and user metrics (PR #521)
+
 ## [0.47.1] — 2026-03-15
 
 ### Added
