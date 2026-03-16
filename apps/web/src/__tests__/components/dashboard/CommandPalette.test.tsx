@@ -12,7 +12,7 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/stores/ui-store');
 
 // Mock cmdk entirely to avoid ResizeObserver (not available in jsdom)
- 
+
 function makeCmdkMocks() {
   function CmdRoot({ children, className }: { children: React.ReactNode; className?: string }) {
     return (
@@ -131,7 +131,6 @@ const mockUseUIStore = jest.mocked(useUIStore);
 const mockSetOpen = jest.fn();
 
 function setupStore(open: boolean) {
-   
   mockUseUIStore.mockImplementation((selector: any) =>
     selector({ commandPaletteOpen: open, setCommandPaletteOpen: mockSetOpen })
   );
