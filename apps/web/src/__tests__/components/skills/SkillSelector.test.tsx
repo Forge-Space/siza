@@ -29,7 +29,11 @@ jest.mock('@/components/skills/SkillCard', () => ({
 
 jest.mock('@/components/skills/SkillParameterForm', () => ({
   SkillParameterForm: ({ onChange }: { onChange: (params: Record<string, string>) => void }) => (
-    <div data-testid="skill-param-form" onClick={() => onChange({ paramA: 'value' })} />
+    <button
+      type="button"
+      data-testid="skill-param-form"
+      onClick={() => onChange({ paramA: 'value' })}
+    />
   ),
 }));
 
