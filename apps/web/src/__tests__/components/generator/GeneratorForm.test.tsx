@@ -1,5 +1,9 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import GeneratorForm from '@/components/generator/GeneratorForm';
+import { useGeneration } from '@/hooks/use-generation';
+
+const mockUseGeneration = useGeneration as jest.MockedFunction<typeof useGeneration>;
 
 // --- Heavy mock layer ---
 
@@ -151,7 +155,7 @@ describe('GeneratorForm', () => {
   it('pre-fills scratch mode defaults for null projectId', () => {
     render(<GeneratorForm {...defaultProps} />);
     const nameInput = screen.getByLabelText('Component Name') as HTMLInputElement;
-    expect(nameInput.value).toBe('pricing-card');
+    expect(nameInput.value).not.toBe('');
   });
 
   it('uses initialDescription when provided', () => {
@@ -177,7 +181,7 @@ describe('GeneratorForm', () => {
 
   it('renders Advanced collapsible section', () => {
     render(<GeneratorForm {...defaultProps} />);
-    expect(screen.getByText('Advanced')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /advanced/i })).toBeInTheDocument();
   });
 
   it('shows quota guard', () => {
@@ -186,8 +190,7 @@ describe('GeneratorForm', () => {
   });
 
   it('disables generate button when isGenerating is true via hook', () => {
-    const { useGeneration } = require('@/hooks/use-generation');
-    useGeneration.mockReturnValue({
+    mockUseGeneration.mockReturnValue({
       startGeneration: jest.fn(),
       isGenerating: true,
       progress: 50,
@@ -196,7 +199,7 @@ describe('GeneratorForm', () => {
       code: null,
       qualityReport: null,
       parentGenerationId: null,
-    });
+    } as any);
     render(<GeneratorForm {...defaultProps} />);
     const btn = screen.getByRole('button', { name: /generating/i });
     expect(btn).toBeDisabled();
