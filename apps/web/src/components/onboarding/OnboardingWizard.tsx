@@ -18,12 +18,11 @@ interface StepData {
 const stepKeys = ['welcome', 'project', 'generate', 'done'] as const;
 type OnboardingStepKey = (typeof stepKeys)[number];
 
-const stepNudges: Record<OnboardingStepKey, string> = {
-  welcome:
-    'To qualify for core flow, complete onboarding, create one project, and finish one generation.',
-  project: 'Creating your first project unlocks the next qualification step.',
-  generate: 'Complete one generation now to qualify faster.',
-  done: 'You can continue from the dashboard and keep your qualification progress.',
+const stepContext: Record<OnboardingStepKey, string> = {
+  welcome: 'Three steps to your first component. Takes about a minute.',
+  project: 'Give your project a name and pick a framework.',
+  generate: 'Watch generation run — you can customise anything afterwards.',
+  done: 'Setup complete. Your workspace is ready.',
 };
 
 function trackOnboardingEvent(
@@ -93,7 +92,13 @@ export function OnboardingWizard() {
 
       <StepIndicator currentStep={currentStep} />
 
-      <p className="text-center text-sm text-violet-200/80">{stepNudges[currentStepKey]}</p>
+      <p
+        aria-live="polite"
+        aria-atomic="true"
+        className="text-center text-sm text-white/60"
+      >
+        {stepContext[currentStepKey]}
+      </p>
 
       {currentStep === 0 && (
         <WelcomeStep

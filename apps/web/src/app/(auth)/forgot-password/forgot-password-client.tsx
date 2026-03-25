@@ -41,21 +41,21 @@ export function ForgotPasswordClient() {
               <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
               <span className="text-2xl font-display font-bold">Siza</span>
             </Link>
-            <h2 className="mt-6 text-2xl font-semibold text-foreground">Check your email</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              We&apos;ve sent a password reset link to <strong>{email}</strong>
+            <h1 className="mt-6 text-xl font-semibold text-foreground">Check your email</h1>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              A reset link was sent to <strong className="text-foreground">{email}</strong>.
             </p>
           </div>
 
-          <div>
+          <div className="space-y-4">
             <p className="text-center text-sm text-muted-foreground">
-              Click the link in the email to reset your password. The link expires in 1 hour.
+              The link expires in 1 hour. Check your spam folder if you don&apos;t see it.
             </p>
             <Link
               href="/signin"
-              className="mt-6 block w-full rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-primary-hover"
+              className="block w-full rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-hover transition-colors min-h-[44px] leading-[28px]"
             >
-              Back to Sign In
+              Back to sign in
             </Link>
           </div>
         </div>
@@ -71,31 +71,42 @@ export function ForgotPasswordClient() {
             <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
             <span className="text-2xl font-display font-bold">Siza</span>
           </Link>
-          <h2 className="mt-6 text-2xl font-semibold text-foreground">Forgot password?</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enter your email and we&apos;ll send you a reset link
+          <h1 className="mt-6 text-xl font-semibold text-foreground">Reset your password</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Enter your email address and we&apos;ll send you a reset link.
           </p>
         </div>
 
         <div>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+            noValidate
+            aria-label="Password reset form"
+          >
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive"
+              >
                 {error}
               </div>
             )}
 
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-sm font-medium text-foreground">
                 Email
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary min-h-[44px]"
                 placeholder="you@example.com"
               />
             </div>
@@ -103,15 +114,15 @@ export function ForgotPasswordClient() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50 transition-colors min-h-[44px]"
             >
-              {loading ? 'Sending...' : 'Send reset link'}
+              {loading ? 'Sending…' : 'Send reset link'}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Remember your password?{' '}
-            <Link href="/signin" className="font-medium text-primary hover:underline">
+            Remembered it?{' '}
+            <Link href="/signin" className="font-medium text-primary hover:underline transition-colors">
               Sign in
             </Link>
           </p>

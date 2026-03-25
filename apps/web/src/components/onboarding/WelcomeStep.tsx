@@ -1,6 +1,6 @@
 'use client';
 
-import { Sparkles, Code2, Zap } from 'lucide-react';
+import { Layers, Code2, MessageSquare } from 'lucide-react';
 import { Button } from '@siza/ui';
 import { Card, CardContent } from '@siza/ui';
 import { trackEvent } from '@/components/analytics/AnalyticsProvider';
@@ -10,21 +10,21 @@ interface WelcomeStepProps {
   onSkip: () => void;
 }
 
-const features = [
+const capabilities = [
   {
-    icon: Sparkles,
-    title: 'AI Generation',
-    description: 'Describe components with words and get production-ready code',
+    icon: Layers,
+    title: 'Component generation',
+    description: 'Describe a component in plain text and receive production-ready code.',
   },
   {
     icon: Code2,
-    title: 'Live Preview',
-    description: 'See your generated components rendered instantly',
+    title: 'Live preview',
+    description: 'Render output immediately and copy it into your project.',
   },
   {
-    icon: Zap,
-    title: 'Iterate Fast',
-    description: 'Refine results with conversation-style prompts',
+    icon: MessageSquare,
+    title: 'Conversational iteration',
+    description: 'Refine the result with follow-up prompts until it matches your intent.',
   },
 ];
 
@@ -32,19 +32,19 @@ export function WelcomeStep({ onNext, onSkip }: WelcomeStepProps) {
   return (
     <div className="space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-white">Welcome to Siza</h1>
-        <p className="text-white/60">Let&apos;s set up your first project in under a minute</p>
+        <h1 className="text-2xl font-semibold text-white">Welcome to Siza</h1>
+        <p className="text-sm text-white/60">Set up your workspace in three steps.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {features.map(({ icon: Icon, title, description }) => (
+        {capabilities.map(({ icon: Icon, title, description }) => (
           <Card key={title} className="border-white/5 bg-white/[0.02]">
             <CardContent className="pt-6 text-center space-y-3">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
-                <Icon className="h-5 w-5 text-violet-400" />
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-white/5">
+                <Icon className="h-5 w-5 text-white/50" aria-hidden="true" />
               </div>
-              <h3 className="font-medium text-white">{title}</h3>
-              <p className="text-sm text-white/50">{description}</p>
+              <h3 className="text-sm font-medium text-white">{title}</h3>
+              <p className="text-xs text-white/40 leading-relaxed">{description}</p>
             </CardContent>
           </Card>
         ))}
@@ -62,9 +62,9 @@ export function WelcomeStep({ onNext, onSkip }: WelcomeStepProps) {
             });
             onSkip();
           }}
-          className="text-white/40"
+          className="text-white/40 hover:text-white/60"
         >
-          Skip tutorial
+          Skip setup
         </Button>
         <Button
           onClick={() => {
@@ -80,8 +80,8 @@ export function WelcomeStep({ onNext, onSkip }: WelcomeStepProps) {
           Get started
         </Button>
       </div>
-      <p className="text-center text-xs text-white/50">
-        You can skip now and finish the remaining qualification steps later from the dashboard.
+      <p className="text-center text-xs text-white/30">
+        You can complete this later from your dashboard.
       </p>
     </div>
   );

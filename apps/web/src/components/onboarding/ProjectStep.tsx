@@ -76,18 +76,28 @@ export function ProjectStep({ onNext, onSkip }: ProjectStepProps) {
   return (
     <div className="space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-white">Create your first project</h1>
-        <p className="text-white/60">Projects organize your generated components</p>
+        <h1 className="text-2xl font-semibold text-white">Create your first project</h1>
+        <p className="text-sm text-white/60">Projects group your generated components.</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" aria-label="Create project">
+        <div className="space-y-1.5">
           <Label htmlFor="name">Project name</Label>
-          <Input id="name" {...register('name')} placeholder="My First Project" />
-          {errors.name && <p className="text-sm text-red-400">{errors.name.message}</p>}
+          <Input
+            id="name"
+            {...register('name')}
+            placeholder="My First Project"
+            aria-describedby={errors.name ? 'name-error' : undefined}
+            aria-invalid={!!errors.name}
+          />
+          {errors.name && (
+            <p id="name-error" role="alert" className="text-sm text-red-400">
+              {errors.name.message}
+            </p>
+          )}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <Label htmlFor="framework">Framework</Label>
           <Select
             value={framework}
@@ -97,7 +107,7 @@ export function ProjectStep({ onNext, onSkip }: ProjectStepProps) {
               setValue('framework', fw);
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger id="framework">
               <SelectValue placeholder="Select framework" />
             </SelectTrigger>
             <SelectContent>
@@ -110,7 +120,11 @@ export function ProjectStep({ onNext, onSkip }: ProjectStepProps) {
           </Select>
         </div>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && (
+          <p role="alert" aria-live="assertive" className="text-sm text-red-400">
+            {error}
+          </p>
+        )}
 
         <div className="flex justify-center gap-3">
           <Button
@@ -125,17 +139,14 @@ export function ProjectStep({ onNext, onSkip }: ProjectStepProps) {
               });
               onSkip();
             }}
-            className="text-white/40"
+            className="text-white/40 hover:text-white/60"
           >
-            Skip
+            Skip for now
           </Button>
           <Button type="submit" disabled={createProject.isPending}>
-            {createProject.isPending ? 'Creating...' : 'Create project'}
+            {createProject.isPending ? 'Creating…' : 'Create project'}
           </Button>
         </div>
-        <p className="text-center text-xs text-white/50">
-          This step is required to move toward core-flow qualification.
-        </p>
       </form>
     </div>
   );

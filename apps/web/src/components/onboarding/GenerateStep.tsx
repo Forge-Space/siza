@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@siza/ui';
 import { Card, CardContent } from '@siza/ui';
 import { useGeneration } from '@/hooks/use-generation';
@@ -45,18 +45,22 @@ export function GenerateStep({ project, onNext, onSkip }: GenerateStepProps) {
     return (
       <div className="space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-white">Your first component</h1>
-          <p className="text-white/60">
-            Generated a PricingCard for {project?.name ?? 'your project'}
+          <h1 className="text-2xl font-semibold text-white">Component generated</h1>
+          <p className="text-sm text-white/60">
+            Generated <code className="text-violet-400">PricingCard</code> for{' '}
+            {project?.name ?? 'your project'}.
           </p>
         </div>
 
         <Card className="border-white/5 bg-white/[0.02] overflow-hidden">
           <CardContent className="p-0">
-            <pre className="max-h-60 overflow-auto p-4 text-xs text-white/70">
+            <pre
+              className="max-h-60 overflow-auto p-4 text-xs text-white/60 leading-relaxed"
+              aria-label="Generated component code preview"
+            >
               <code>
                 {code.slice(0, 800)}
-                {code.length > 800 ? '\n...' : ''}
+                {code.length > 800 ? '\n…' : ''}
               </code>
             </pre>
           </CardContent>
@@ -84,27 +88,24 @@ export function GenerateStep({ project, onNext, onSkip }: GenerateStepProps) {
   return (
     <div className="space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-white">Generate your first component</h1>
-        <p className="text-white/60">One click to see AI generation in action</p>
+        <h1 className="text-2xl font-semibold text-white">Try a generation</h1>
+        <p className="text-sm text-white/60">Run the sample below to see generation in action.</p>
       </div>
 
       <Card className="border-white/5 bg-white/[0.02]">
         <CardContent className="pt-6 space-y-3">
-          <div className="flex items-center gap-2 text-sm text-violet-400">
-            <Sparkles className="h-4 w-4" />
-            <span>Sample prompt</span>
-          </div>
+          <p className="text-xs font-medium uppercase tracking-widest text-white/30">Sample prompt</p>
           <p className="text-sm text-white/70 leading-relaxed">{SAMPLE_PROMPT}</p>
         </CardContent>
       </Card>
 
       {isGenerating && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-center gap-2 text-sm text-white/60">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Generating... {Math.round(progress)}%</span>
+        <div className="space-y-2" aria-live="polite" aria-label="Generation in progress">
+          <div className="flex items-center justify-center gap-2 text-sm text-white/50">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <span>Generating… {Math.round(progress)}%</span>
           </div>
-          <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+          <div className="h-1 rounded-full bg-white/5 overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
             <div
               className="h-full rounded-full bg-violet-500 transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -113,7 +114,11 @@ export function GenerateStep({ project, onNext, onSkip }: GenerateStepProps) {
         </div>
       )}
 
-      {error && <p className="text-center text-sm text-red-400">{error}</p>}
+      {error && (
+        <p role="alert" className="text-center text-sm text-red-400">
+          {error}
+        </p>
+      )}
 
       <div className="flex justify-center gap-3">
         <Button
@@ -127,18 +132,15 @@ export function GenerateStep({ project, onNext, onSkip }: GenerateStepProps) {
             });
             onSkip();
           }}
-          className="text-white/40"
+          className="text-white/40 hover:text-white/60"
           disabled={isGenerating}
         >
-          Skip
+          Skip for now
         </Button>
         <Button onClick={handleGenerate} disabled={isGenerating}>
-          {isGenerating ? 'Generating...' : 'Generate'}
+          {isGenerating ? 'Generating…' : 'Run sample'}
         </Button>
       </div>
-      <p className="text-center text-xs text-white/50">
-        Completing one generation is the final requirement for qualification.
-      </p>
     </div>
   );
 }

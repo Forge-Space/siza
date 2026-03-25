@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { Button } from '@siza/ui';
 import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 import { useCreateProject } from '@/hooks/use-projects';
@@ -100,7 +100,7 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
 
   const links = project
     ? [
-        { label: 'Generate your first component', href: generationDestination },
+        { label: 'Open the generator', href: generationDestination },
         { label: 'View your project', href: `/projects/${project.id}` },
         { label: 'Browse templates', href: '/templates' },
       ]
@@ -114,7 +114,7 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
           href: '/dashboard?source=onboarding&entry=done_dashboard&intent=create_project',
         },
         {
-          label: 'Generate your first component',
+          label: 'Start generating',
           href: '/dashboard?source=onboarding&entry=done_generate&intent=create_project',
         },
       ];
@@ -123,18 +123,20 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
     <div className="space-y-8 text-center">
       <div className="space-y-4">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
-          <CheckCircle className="h-8 w-8 text-emerald-400" />
+          <CheckCircle2 className="h-8 w-8 text-emerald-400" aria-hidden="true" />
         </div>
-        <h1 className="text-3xl font-bold text-white">You&apos;re all set!</h1>
-        <p className="text-white/60">
+        <h1 className="text-2xl font-semibold text-white">
+          {project ? 'Workspace ready' : 'Setup complete'}
+        </h1>
+        <p className="text-sm text-white/60 max-w-sm mx-auto">
           {project
-            ? `You created "${project.name}". Generate once more to strengthen your core-flow progress.`
-            : 'Create your first project to keep your qualification progress moving.'}
+            ? `"${project.name}" is set up. Head to the generator to build your first component.`
+            : 'Your account is active. Create a project to start generating components.'}
         </p>
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium text-white/40">What&apos;s next?</p>
+        <p className="text-xs font-medium uppercase tracking-widest text-white/30">Quick links</p>
         <div className="flex flex-col items-center gap-2">
           {links.map(({ label, href }) => (
             <button
@@ -150,10 +152,10 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
                 await fetch('/api/onboarding/complete', { method: 'POST' }).catch(() => null);
                 router.push(href);
               }}
-              className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition-colors"
+              className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 transition-colors min-h-[44px]"
             >
               {label}
-              <ArrowRight className="h-3 w-3" />
+              <ArrowRight className="h-3 w-3" aria-hidden="true" />
             </button>
           ))}
         </div>
@@ -161,10 +163,10 @@ export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
 
       <Button onClick={handleComplete} disabled={completing} size="lg">
         {completing
-          ? 'Finishing...'
+          ? 'Opening…'
           : project
-            ? 'Continue to Generate'
-            : 'Create Project and Generate'}
+            ? 'Open generator'
+            : 'Create project and start'}
       </Button>
     </div>
   );

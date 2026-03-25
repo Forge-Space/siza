@@ -28,12 +28,12 @@ export function ResetPasswordClient() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Password must be at least 6 characters.');
       return;
     }
 
@@ -55,7 +55,7 @@ export function ResetPasswordClient() {
   if (hasSession === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-sm text-muted-foreground">Loading...</div>
+        <div className="text-sm text-muted-foreground">Verifying…</div>
       </div>
     );
   }
@@ -69,15 +69,15 @@ export function ResetPasswordClient() {
               <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
               <span className="text-2xl font-display font-bold">Siza</span>
             </Link>
-            <h2 className="mt-6 text-2xl font-semibold text-foreground">Invalid or expired link</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              This password reset link is no longer valid.
+            <h1 className="mt-6 text-xl font-semibold text-foreground">Link expired or invalid</h1>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              This reset link is no longer active. Request a new one.
             </p>
           </div>
           <div className="text-center">
             <Link
               href="/forgot-password"
-              className="inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+              className="inline-block rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors min-h-[44px] leading-[28px]"
             >
               Request a new link
             </Link>
@@ -96,9 +96,9 @@ export function ResetPasswordClient() {
               <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
               <span className="text-2xl font-display font-bold">Siza</span>
             </Link>
-            <h2 className="mt-6 text-2xl font-semibold text-foreground">Password updated</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Your password has been reset. Redirecting to sign in...
+            <h1 className="mt-6 text-xl font-semibold text-foreground">Password updated</h1>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Your password has been changed. Redirecting you to sign in…
             </p>
           </div>
         </div>
@@ -114,47 +114,63 @@ export function ResetPasswordClient() {
             <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
             <span className="text-2xl font-display font-bold">Siza</span>
           </Link>
-          <h2 className="mt-6 text-2xl font-semibold text-foreground">Set new password</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Enter your new password below</p>
+          <h1 className="mt-6 text-xl font-semibold text-foreground">Set a new password</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">Choose a strong password for your account.</p>
         </div>
 
         <div>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+            noValidate
+            aria-label="Set new password form"
+          >
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive"
+              >
                 {error}
               </div>
             )}
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-sm font-medium text-foreground">
                 New password
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
+                aria-describedby="password-hint"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary min-h-[44px]"
                 placeholder="••••••••"
               />
-              <p className="text-xs text-muted-foreground">Must be at least 6 characters</p>
+              <p id="password-hint" className="text-xs text-muted-foreground">
+                Minimum 6 characters.
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm password
+            <div className="space-y-1.5">
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+                Confirm new password
               </label>
               <input
                 id="confirmPassword"
+                name="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary min-h-[44px]"
                 placeholder="••••••••"
               />
             </div>
@@ -162,9 +178,9 @@ export function ResetPasswordClient() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50 transition-colors min-h-[44px]"
             >
-              {loading ? 'Updating...' : 'Update password'}
+              {loading ? 'Updating…' : 'Update password'}
             </button>
           </form>
         </div>
