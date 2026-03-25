@@ -105,16 +105,23 @@ export function decryptApiKey(encryptedKey: string, encryptionKey: string): stri
   }
 }
 
+const API_KEY_PREFIXES = {
+  openai: 'sk-',
+  anthropic: 'sk-ant-',
+} as const;
+
+const API_KEY_MIN_LENGTH = 20;
+
 export function validateApiKey(apiKey: string, provider: AIProvider): boolean {
   const trimmedKey = apiKey.trim();
   if (provider === 'siza') return false;
   switch (provider) {
     case 'openai':
-      return trimmedKey.startsWith('sk-') && trimmedKey.length >= 20;
+      return trimmedKey.startsWith(API_KEY_PREFIXES.openai) && trimmedKey.length >= API_KEY_MIN_LENGTH;
     case 'anthropic':
-      return trimmedKey.startsWith('sk-ant-') && trimmedKey.length >= 20;
+      return trimmedKey.startsWith(API_KEY_PREFIXES.anthropic) && trimmedKey.length >= API_KEY_MIN_LENGTH;
     case 'google':
-      return trimmedKey.length >= 20 && !trimmedKey.includes(' ');
+      return trimmedKey.length >= API_KEY_MIN_LENGTH && !trimmedKey.includes(' ');
     default:
       return false;
   }
