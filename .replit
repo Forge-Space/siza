@@ -37,3 +37,7 @@ externalPort = 80
 build = ["sh", "-c", "npm --workspace @siza/web run build"]
 run = ["sh", "-c", "npm --workspace @siza/web run start"]
 deploymentTarget = "cloudrun"
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 120000
