@@ -1,7 +1,4 @@
-if (process.env.NODE_ENV === 'development') {
-  const { initOpenNextCloudflareForDev } = require('@opennextjs/cloudflare');
-  initOpenNextCloudflareForDev();
-}
+// Cloudflare-specific dev init disabled for Replit compatibility (was: initOpenNextCloudflareForDev)
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
