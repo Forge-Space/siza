@@ -9,9 +9,9 @@ import '@testing-library/jest-dom';
 export const TEST_CONFIG = {
   timeout: 10000,
   API_KEYS: {
-    OPENAI: process.env.TEST_OPENAI_API_KEY || 'sk-test-key-for-testing-only',
-    ANTHROPIC: process.env.TEST_ANTHROPIC_API_KEY || 'sk-ant-test-key-for-testing-only',
-    GOOGLE: process.env.TEST_GOOGLE_API_KEY || 'AIza-test-key-for-testing-only',
+    OPENAI: process.env.TEST_OPENAI_API_KEY || 'test-openai-api-key',
+    ANTHROPIC: process.env.TEST_ANTHROPIC_API_KEY || 'test-anthropic-api-key',
+    GOOGLE: process.env.TEST_GOOGLE_API_KEY || 'test-google-api-key',
   },
   PASSWORDS: {
     VALID: process.env.TEST_VALID_PASSWORD || 'test-password-123',
