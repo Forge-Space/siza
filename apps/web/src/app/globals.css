@@ -1,48 +1,91 @@
-/* Forge Space Design Tokens (from @forgespace/brand-guide) */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Forge Space / Siza Design Tokens
+   Dark-only. Do NOT add transition-all anywhere in global styles.
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  --forge-bg: #121214;
-  --forge-bg-elevated: #18181b;
-  --forge-surface: #1a1a1e;
-  --forge-surface-alt: #1e1e22;
-  --forge-border: #27272a;
-  --forge-border-hover: #3f3f46;
-  --forge-primary: #8b5cf6;
-  --forge-primary-rgb: 139, 92, 246;
-  --forge-primary-hover: #a78bfa;
+  /* ── Deep surface scale ── */
+  --forge-bg:              #0e0e11;
+  --forge-bg-elevated:     #141417;
+  --forge-surface:         #18181c;
+  --forge-surface-alt:     #1c1c20;
+  --forge-surface-raised:  #212126;
+  --forge-panel:           #19191d;
+  --forge-panel-header:    #1c1c20;
+
+  /* ── Borders (matte, no glow) ── */
+  --forge-border:          #26262c;
+  --forge-border-subtle:   rgba(38, 38, 44, 0.6);
+  --forge-border-hover:    #38383f;
+  --forge-border-focus:    #8b5cf6;
+  --forge-divider:         rgba(38, 38, 44, 0.8);
+
+  /* ── Brand / Primary ── */
+  --forge-primary:         #8b5cf6;
+  --forge-primary-rgb:     139, 92, 246;
+  --forge-primary-hover:   #a78bfa;
   --forge-primary-pressed: #6d28d9;
-  --forge-text: #fafafa;
-  --forge-text-muted: #a1a1aa;
-  --forge-text-subtle: #a1a1aa;
-  --forge-accent: rgba(139, 92, 246, 0.12);
-  --forge-accent-foreground: #8b5cf6;
-  --forge-destructive: #ef4444;
-  --forge-success: #22c55e;
-  --forge-warning: #eab308;
-  --forge-input: #18181b;
-  --forge-ring: #8b5cf6;
-  --forge-space-1: 4px;
-  --forge-space-2: 8px;
-  --forge-space-3: 12px;
-  --forge-space-4: 16px;
-  --forge-space-5: 20px;
-  --forge-space-6: 24px;
-  --forge-space-8: 32px;
+  --forge-primary-subtle:  rgba(139, 92, 246, 0.1);
+  --forge-primary-muted:   rgba(139, 92, 246, 0.06);
+
+  /* ── Text ── */
+  --forge-text:            #f4f4f5;
+  --forge-text-secondary:  #a1a1aa;
+  --forge-text-muted:      #71717a;
+  --forge-text-placeholder:#52525b;
+  --forge-text-brand:      #a78bfa;
+
+  /* ── Status colours ── */
+  --forge-success:         #22c55e;
+  --forge-success-subtle:  rgba(34, 197, 94, 0.1);
+  --forge-warning:         #f59e0b;
+  --forge-warning-subtle:  rgba(245, 158, 11, 0.1);
+  --forge-error:           #ef4444;
+  --forge-error-subtle:    rgba(239, 68, 68, 0.1);
+  --forge-info:            #3b82f6;
+  --forge-info-subtle:     rgba(59, 130, 246, 0.1);
+
+  /* ── Matte shadows (no glow spreads) ── */
+  --forge-shadow-xs:       0 1px 2px rgba(0,0,0,0.35);
+  --forge-shadow-sm:       0 2px 4px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.03);
+  --forge-shadow-md:       0 4px 12px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+  --forge-shadow-lg:       0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+  --forge-shadow-panel:    0 0 0 1px var(--forge-border), 0 2px 8px rgba(0,0,0,0.3);
+
+  /* ── Focus ring (crisp, no halo spread) ── */
+  --forge-focus-ring:      0 0 0 2px var(--forge-bg), 0 0 0 4px var(--forge-primary);
+
+  /* ── Motion ── */
+  --forge-duration-instant: 80ms;
+  --forge-duration-fast:   140ms;
+  --forge-duration-standard:220ms;
+  --forge-duration-entrance:360ms;
+  --forge-ease:            cubic-bezier(0.16, 1, 0.3, 1);
+  --forge-ease-out:        cubic-bezier(0, 0, 0.2, 1);
+  --forge-ease-in:         cubic-bezier(0.4, 0, 1, 1);
+
+  /* ── Spacing ── */
+  --forge-space-1:  4px;
+  --forge-space-2:  8px;
+  --forge-space-3:  12px;
+  --forge-space-4:  16px;
+  --forge-space-5:  20px;
+  --forge-space-6:  24px;
+  --forge-space-8:  32px;
   --forge-space-10: 40px;
   --forge-space-12: 48px;
   --forge-space-16: 64px;
-  --forge-radius-sm: 8px;
-  --forge-radius-md: 10px;
-  --forge-radius-lg: 12px;
-  --forge-radius-xl: 16px;
-  --forge-glow-primary: 0 0 30px rgba(139, 92, 246, 0.3);
-  --forge-glow-primary-sm: 0 0 20px rgba(139, 92, 246, 0.25);
-  --forge-focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.15), 0 0 20px rgba(139, 92, 246, 0.1);
-  --forge-duration-fast: 150ms;
-  --forge-duration-standard: 200ms;
-  --forge-duration-entrance: 400ms;
-  --forge-ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --forge-gradient-hero: linear-gradient(315deg, #6d28d9 0%, #8b5cf6 50%, #a78bfa 100%);
-  --forge-gradient-button: linear-gradient(315deg, #6d28d9 0%, #8b5cf6 100%);
+
+  /* ── Radii ── */
+  --forge-radius-xs: 4px;
+  --forge-radius-sm: 6px;
+  --forge-radius-md: 8px;
+  --forge-radius-lg: 10px;
+  --forge-radius-xl: 12px;
+  --forge-radius-2xl:16px;
+
+  /* ── Gradients ── */
+  --forge-gradient-brand:  linear-gradient(135deg, #6d28d9 0%, #8b5cf6 60%, #a78bfa 100%);
+  --forge-gradient-subtle: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(109,40,217,0.04) 100%);
 }
 
 @tailwind base;
@@ -51,60 +94,67 @@
 
 @layer base {
   :root {
+    /* ── Typefaces ── */
     --forge-font-display: var(--font-plus-jakarta), system-ui, sans-serif;
-    --forge-font-body: var(--font-dm-sans), system-ui, sans-serif;
-    --forge-font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+    --forge-font-body:    var(--font-dm-sans), system-ui, sans-serif;
+    --forge-font-mono:    var(--font-ibm-plex-mono), ui-monospace, monospace;
 
-    /* ── Legacy aliases (compatibility) ── */
-    --surface-0: var(--forge-bg);
-    --surface-1: var(--forge-surface);
-    --surface-2: var(--forge-border);
-    --surface-3: var(--forge-border-hover);
-    --surface-4: #52525b;
-    --brand: var(--forge-primary);
-    --brand-light: var(--forge-primary-hover);
-    --brand-dark: var(--forge-primary-pressed);
-    --brand-muted: #4c1d95;
-    --text-primary: var(--forge-text);
-    --text-secondary: var(--forge-text-muted);
-    --text-muted: var(--forge-text-subtle);
-    --text-brand: var(--forge-accent-foreground);
+    /* ── Legacy surface aliases (kept for compatibility) ── */
+    --surface-0:    var(--forge-bg);
+    --surface-1:    var(--forge-surface);
+    --surface-2:    var(--forge-border);
+    --surface-3:    var(--forge-border-hover);
+    --surface-4:    #52525b;
 
-    /* ── Semantic colors ── */
-    --success: #22c35d;
-    --warning: #f59f0a;
-    --error: #ef4343;
-    --info: #368fe7;
+    /* ── Legacy brand aliases ── */
+    --brand:        var(--forge-primary);
+    --brand-light:  var(--forge-primary-hover);
+    --brand-dark:   var(--forge-primary-pressed);
+    --brand-muted:  #4c1d95;
 
-    /* ── Design tokens ── */
-    --transition-fast: 150ms ease;
-    --transition-default: 200ms ease;
-    --transition-smooth: 300ms cubic-bezier(0.16, 1, 0.3, 1);
-    --radius-card: var(--forge-radius-lg);
-    --border-subtle: rgba(63, 63, 70, 0.6);
-    --border-hover: rgba(var(--forge-primary-rgb), 0.4);
+    /* ── Legacy text aliases ── */
+    --text-primary:   var(--forge-text);
+    --text-secondary: var(--forge-text-secondary);
+    --text-muted:     var(--forge-text-muted);
+    --text-brand:     var(--forge-text-brand);
 
-    /* ── shadcn variable mapping (HSL without commas) ── */
-    --background: 240 9% 7%;
-    --foreground: 0 0% 98%;
-    --card: 240 7% 11%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 7% 11%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 263 91% 66%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 260 25% 18%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 260 25% 18%;
-    --muted-foreground: 0 0% 64%;
-    --accent: 260 20% 25%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84% 60%;
+    /* ── Legacy semantic status ── */
+    --success: var(--forge-success);
+    --warning: var(--forge-warning);
+    --error:   var(--forge-error);
+    --info:    var(--forge-info);
+
+    /* ── Legacy transition shorthands ── */
+    --transition-fast:    var(--forge-duration-fast) var(--forge-ease-out);
+    --transition-default: var(--forge-duration-standard) var(--forge-ease-out);
+    --transition-smooth:  var(--forge-duration-entrance) var(--forge-ease);
+
+    /* ── Legacy misc ── */
+    --radius-card:   var(--forge-radius-xl);
+    --border-subtle: var(--forge-border-subtle);
+    --border-hover:  rgba(var(--forge-primary-rgb), 0.35);
+
+    /* ── shadcn/ui HSL token mapping ── */
+    --background:          240 9% 7%;
+    --foreground:          0 0% 96%;
+    --card:                240 7% 10%;
+    --card-foreground:     0 0% 96%;
+    --popover:             240 7% 10%;
+    --popover-foreground:  0 0% 96%;
+    --primary:             263 91% 66%;
+    --primary-foreground:  0 0% 98%;
+    --secondary:           260 22% 16%;
+    --secondary-foreground:0 0% 96%;
+    --muted:               260 22% 16%;
+    --muted-foreground:    0 0% 64%;
+    --accent:              260 18% 22%;
+    --accent-foreground:   0 0% 96%;
+    --destructive:         0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 20%;
-    --input: 240 6% 20%;
-    --ring: 263 91% 66%;
-    --radius: 0.625rem;
+    --border:              240 6% 18%;
+    --input:               240 6% 18%;
+    --ring:                263 91% 66%;
+    --radius:              0.5rem;
 
     /* ── Chart colors ── */
     --chart-1: 263 91% 66%;
@@ -114,97 +164,140 @@
     --chart-5: 340 75% 55%;
 
     /* ── Font families ── */
-    --font-sans: var(--forge-font-body);
+    --font-sans:    var(--forge-font-body);
     --font-display: var(--forge-font-display);
-    --font-mono: var(--forge-font-mono);
+    --font-mono:    var(--forge-font-mono);
 
-    /* ── Easing ── */
-    --ease-siza: var(--forge-ease);
+    /* ── Easing aliases ── */
+    --ease-siza:   var(--forge-ease);
     --ease-spring: cubic-bezier(0.2, 1.6, 0.4, 1);
     --ease-bounce: cubic-bezier(0.2, 1.4, 0.4, 1);
   }
 }
 
-/* ── Shadows ── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Base layer reset & rhythm
+   ═══════════════════════════════════════════════════════════════════════════ */
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--forge-font-body);
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ── Focus: crisp ring, no halo ── */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--forge-focus-ring);
+    border-radius: var(--forge-radius-sm);
+  }
+
+  ::selection {
+    background-color: rgba(var(--forge-primary-rgb), 0.25);
+    color: #f4f4f5;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Utility classes
+   ═══════════════════════════════════════════════════════════════════════════ */
 @layer utilities {
+  /* ── Matte shadows (no glow) ── */
   .shadow-card {
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(63, 63, 70, 0.3);
+    box-shadow: var(--forge-shadow-sm);
   }
   .shadow-card-hover {
     box-shadow:
-      0 8px 24px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(139, 92, 246, 0.25);
+      0 4px 16px rgba(0,0,0,0.45),
+      0 0 0 1px var(--forge-border-hover);
   }
-  .shadow-glow-brand {
-    box-shadow:
-      0 0 20px rgba(139, 92, 246, 0.15),
-      0 0 0 1px rgba(139, 92, 246, 0.3);
-  }
-  .shadow-glow-focus {
-    box-shadow:
-      0 0 0 2px var(--surface-0),
-      0 0 0 4px var(--brand);
+  .shadow-panel {
+    box-shadow: var(--forge-shadow-panel);
   }
 
+  /* ── Focus glow (accessibility) ── */
+  .shadow-glow-focus {
+    box-shadow: var(--forge-focus-ring);
+  }
+
+  /* ── Workspace shell card ── */
   .siza-shell-card {
-    @apply rounded-xl border border-border bg-surface shadow-card transition-all duration-200;
+    border-radius: var(--forge-radius-xl);
+    border: 1px solid var(--forge-border);
+    background-color: var(--forge-surface);
+    box-shadow: var(--forge-shadow-sm);
+    transition:
+      border-color var(--forge-duration-fast) var(--forge-ease-out),
+      box-shadow   var(--forge-duration-fast) var(--forge-ease-out);
   }
 
   .siza-shell-card:hover {
-    border-color: rgba(124, 58, 237, 0.2);
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(124, 58, 237, 0.12);
+    border-color: var(--forge-border-hover);
+    box-shadow: var(--forge-shadow-md);
   }
 
+  /* ── Panel / rail rules ── */
+  .siza-panel {
+    background-color: var(--forge-panel);
+    border-right: 1px solid var(--forge-divider);
+  }
+
+  .siza-panel-header {
+    background-color: var(--forge-panel-header);
+    border-bottom: 1px solid var(--forge-divider);
+    padding: var(--forge-space-3) var(--forge-space-4);
+  }
+
+  .siza-rail {
+    background-color: var(--forge-bg);
+    border-right: 1px solid var(--forge-divider);
+  }
+
+  .siza-divider {
+    height: 1px;
+    background-color: var(--forge-divider);
+  }
+
+  /* ── Page header ── */
   .siza-page-header {
     @apply mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between;
   }
 
+  /* ── Prose ── */
   .siza-prose h2 {
-    @apply text-lg font-semibold text-foreground;
+    @apply text-base font-semibold text-foreground;
   }
-
   .siza-prose p,
   .siza-prose li {
     @apply text-sm leading-relaxed text-muted-foreground;
   }
 
-  .ambient-noise {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-  }
-
-  @keyframes ambient-shift {
-    0%,
-    100% {
-      transform: scale(1) translate(0, 0);
-    }
-    33% {
-      transform: scale(1.05) translate(2%, -1%);
-    }
-    66% {
-      transform: scale(0.97) translate(-1%, 2%);
-    }
-  }
-
+  /* ── Scrollbar ── */
   .siza-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(82, 82, 91, 0.75) transparent;
+    scrollbar-color: var(--forge-border-hover) transparent;
   }
-
   .siza-scrollbar::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
   }
-
   .siza-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(82, 82, 91, 0.75);
+    background: var(--forge-border-hover);
     border-radius: var(--forge-radius-sm);
   }
+  .siza-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
+  /* ── Shimmer text ── */
   .shimmer-text {
     background: linear-gradient(
       90deg,
@@ -218,61 +311,39 @@
     color: transparent;
     animation: shimmer 5s linear infinite;
   }
+
+  /* ── Ambient noise texture ── */
+  .ambient-noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
 }
 
-/* ── Motion ── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Keyframe animations
+   ═══════════════════════════════════════════════════════════════════════════ */
 @keyframes siza-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes siza-scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes pulse-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 12px rgba(var(--forge-primary-rgb), 0.2);
-  }
-  50% {
-    box-shadow: 0 0 24px rgba(var(--forge-primary-rgb), 0.4);
-  }
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: 200% center;
-  }
-  100% {
-    background-position: -200% center;
-  }
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
 }
 
 @keyframes mesh-rotate {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
+
 @keyframes particle-drift {
-  0%,
-  100% {
+  0%, 100% {
     transform: translate(0, 0);
     opacity: var(--particle-opacity, 0.2);
   }
@@ -281,57 +352,37 @@
     opacity: min(calc(var(--particle-opacity, 0.2) * 1.5), 1);
   }
 }
+
 @keyframes cursor-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }
 
+@keyframes ambient-shift {
+  0%,  100% { transform: scale(1)    translate(0,   0); }
+  33%        { transform: scale(1.04) translate(2%,  -1%); }
+  66%        { transform: scale(0.97) translate(-1%, 2%); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Reduced-motion override  (must stay at file level, not inside @layer)
+   ═══════════════════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  *, *::before, *::after {
+    animation-duration:       0.01ms !important;
+    animation-iteration-count:1      !important;
+    transition-duration:      0.01ms !important;
+    scroll-behavior:          auto   !important;
   }
 }
 
-/* ── Focus & Accessibility ── */
-@layer base {
-  :focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 2px var(--surface-0),
-      0 0 0 4px var(--forge-primary);
-    border-radius: var(--forge-radius-sm);
-  }
-
-  ::selection {
-    background-color: rgba(var(--forge-primary-rgb), 0.3);
-    color: #fafafa;
-  }
-}
-
-/* ── Code editor (design system) ── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Code editor
+   ═══════════════════════════════════════════════════════════════════════════ */
 .siza-code-editor .monaco-editor {
-  --monaco-editor-bg: var(--surface-0);
+  --monaco-editor-bg: var(--forge-bg);
 }
 .siza-code-editor .monaco-editor .margin,
 .siza-code-editor .monaco-editor .monaco-editor-background {
-  background-color: var(--surface-0) !important;
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+  background-color: var(--forge-bg) !important;
 }

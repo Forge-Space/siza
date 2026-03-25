@@ -118,3 +118,19 @@ export { GenerationProgress } from './components/generator/GenerationProgress';
 
 // Layout components (shared)
 export { NavigationSidebar } from './components/layout/NavigationSidebar';
+
+// Primitives (workspace shell, panels, status, spec, empty state, forms)
+export { WorkspaceShell } from './components/primitives/WorkspaceShell';
+export type { WorkspaceShellProps } from './components/primitives/WorkspaceShell';
+export { PanelHeader } from './components/primitives/PanelHeader';
+export type { PanelHeaderProps } from './components/primitives/PanelHeader';
+export { SectionHeader } from './components/primitives/SectionHeader';
+export type { SectionHeaderProps } from './components/primitives/SectionHeader';
+export { StatusRow } from './components/primitives/StatusRow';
+export type { StatusRowProps, StatusVariant } from './components/primitives/StatusRow';
+export { SpecRow } from './components/primitives/SpecRow';
+export type { SpecRowProps } from './components/primitives/SpecRow';
+export { EmptyState } from './components/primitives/EmptyState';
+export type { EmptyStateProps } from './components/primitives/EmptyState';
+export { FormField, FormSection } from './components/primitives/FormField';
+export type { FormFieldProps, FormSectionProps } from './components/primitives/FormField';
