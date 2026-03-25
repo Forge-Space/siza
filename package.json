@@ -78,6 +78,7 @@
   "packageManager": "npm@10.9.2",
   "dependencies": {
     "@react-email/components": "^1.0.9",
-    "@supabase/supabase-js": "^2.99.2"
+    "@supabase/supabase-js": "^2.99.2",
+    "autoprefixer": "^10.4.27"
   }
 }

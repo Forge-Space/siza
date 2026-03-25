@@ -34,6 +34,6 @@ localPort = 5000
 externalPort = 80
 
 [deployment]
-build = ["sh", "-c", "npm run build"]
-run = ["sh", "-c", "npm run start"]
+build = ["sh", "-c", "npm --workspace @siza/web run build"]
+run = ["sh", "-c", "npm --workspace @siza/web run start"]
 deploymentTarget = "cloudrun"
