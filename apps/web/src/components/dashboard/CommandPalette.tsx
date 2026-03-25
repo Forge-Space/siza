@@ -146,7 +146,12 @@ export function CommandPalette() {
   }, {});
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div
+      className="fixed inset-0 z-50"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Command palette"
+    >
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in-0 duration-150"
         onClick={() => setOpen(false)}
@@ -173,6 +178,13 @@ export function CommandPalette() {
               onValueChange={setQuery}
             />
             {/* eslint-enable jsx-a11y/no-autofocus */}
+          </div>
+          <div
+            aria-live="polite"
+            aria-atomic="true"
+            className="sr-only"
+          >
+            {searching ? 'Searching…' : hasResults ? `${results.length} results found` : ''}
           </div>
           <Command.List className="max-h-[300px] overflow-y-auto p-2">
             <Command.Empty className="py-6 text-center text-sm text-text-muted-foreground">

@@ -35,7 +35,7 @@ export default function TopBar({ user, isAdmin }: TopBarProps) {
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
-                className="md:hidden -ml-1 inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground hover:bg-surface hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
+                className="md:hidden -ml-1 inline-flex items-center justify-center rounded-md min-h-[44px] min-w-[44px] text-muted-foreground hover:bg-surface hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
                 onClick={() => setMobileMenuOpen(true)}
                 aria-label={mobileMenuOpen ? 'Close main menu' : 'Open main menu'}
                 aria-expanded={mobileMenuOpen}
@@ -101,7 +101,7 @@ export default function TopBar({ user, isAdmin }: TopBarProps) {
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="relative inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-surface hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
+                    className="relative inline-flex items-center justify-center rounded-md min-h-[44px] min-w-[44px] text-muted-foreground hover:bg-surface hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
                     aria-label="Notifications"
                   >
                     <BellIcon className="h-4 w-4" aria-hidden="true" />

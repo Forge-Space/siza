@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -60,6 +60,7 @@ function CollapsibleSection({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const panelId = useId();
 
   return (
     <div className="border border-surface-3 rounded-lg overflow-hidden">
@@ -67,6 +68,7 @@ function CollapsibleSection({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
+        aria-controls={panelId}
         className="flex items-center justify-between w-full px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand/60"
       >
         <span className="flex items-center gap-2">
@@ -83,7 +85,7 @@ function CollapsibleSection({
           aria-hidden="true"
         />
       </button>
-      {open && <div className="px-3 pb-3 pt-2 space-y-3">{children}</div>}
+      {open && <div id={panelId} className="px-3 pb-3 pt-2 space-y-3">{children}</div>}
     </div>
   );
 }

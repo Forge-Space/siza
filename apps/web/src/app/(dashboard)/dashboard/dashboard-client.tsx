@@ -47,7 +47,7 @@ function StatCard({ label, value, subtitle, icon: Icon, href, accent, accentBg }
   return (
     <Link
       href={href}
-      className="group relative rounded-xl border border-surface-3 bg-surface-1 p-5 transition-colors duration-200 hover:border-violet-500/30 hover:shadow-[0_0_24px_rgba(124,58,237,0.08)] overflow-hidden"
+      className="group relative rounded-xl border border-surface-3 bg-surface-1 p-5 transition-[border-color,box-shadow] duration-200 hover:border-violet-500/30 hover:shadow-[0_0_24px_rgba(124,58,237,0.08)] overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="relative flex items-center justify-between">
@@ -100,7 +100,7 @@ function RecentProjectCard({
   return (
     <Link
       href={`/projects/${id}`}
-      className="group flex items-center gap-4 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-colors duration-200 hover:border-violet-500/30 hover:bg-surface-1/80"
+      className="group flex items-center gap-4 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-[border-color,background-color] duration-200 hover:border-violet-500/30 hover:bg-surface-1/80"
     >
       <div className="flex-shrink-0 rounded-lg bg-violet-500/10 p-2.5">
         <FolderIcon className="h-5 w-5 text-violet-400" />
@@ -146,7 +146,7 @@ function QuickAction({
         type="button"
         onClick={onClick}
         aria-label={label}
-        className="group flex w-full items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 text-left transition-colors duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
+        className="group flex w-full items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 text-left transition-[border-color,box-shadow] duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
       >
         <div className="rounded-lg bg-violet-500/10 p-2 group-hover:bg-violet-500/20 transition-colors">
           <Icon className={`h-4 w-4 ${accent || 'text-violet-400'}`} />
@@ -163,7 +163,7 @@ function QuickAction({
     <Link
       href={href}
       aria-label={label}
-      className="group flex items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-colors duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
+      className="group flex items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-[border-color,box-shadow] duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
     >
       <div className="rounded-lg bg-violet-500/10 p-2 group-hover:bg-violet-500/20 transition-colors">
         <Icon className={`h-4 w-4 ${accent || 'text-violet-400'}`} />
@@ -224,7 +224,7 @@ function GoldenPathCard({ path }: { path: GoldenPathRow }) {
   return (
     <Link
       href="/golden-paths"
-      className="group flex items-center gap-4 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-colors duration-200 hover:border-violet-500/30 hover:bg-surface-1/80"
+      className="group flex items-center gap-4 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-[border-color,background-color] duration-200 hover:border-violet-500/30 hover:bg-surface-1/80"
     >
       <div className="flex-shrink-0 rounded-lg bg-violet-500/10 p-2.5">
         <StackIcon className="h-5 w-5 text-violet-400" />
@@ -627,7 +627,7 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
           <Button
             asChild
             size="lg"
-            className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_24px_rgba(124,58,237,0.2)] hover:shadow-[0_0_32px_rgba(124,58,237,0.3)] transition-colors text-base px-8 py-3"
+            className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_24px_rgba(124,58,237,0.2)] hover:shadow-[0_0_32px_rgba(124,58,237,0.3)] transition-[background-color,box-shadow] text-base px-8 py-3"
           >
             <Link href="/generate">
               <SparklesIcon className="mr-2 h-5 w-5" />
@@ -716,7 +716,7 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
           {activationProgress.project ? (
             <Button
               asChild
-              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-colors"
+              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-[background-color,box-shadow]"
             >
               <Link href={dashboardPrimaryHref}>
                 <SparklesIcon className="mr-2 h-4 w-4" />
@@ -725,7 +725,7 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
             </Button>
           ) : (
             <Button
-              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-colors"
+              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-[background-color,box-shadow]"
               onClick={async () => handleCreateStarterProject('header_primary')}
             >
               <PlusIcon className="mr-2 h-4 w-4" />

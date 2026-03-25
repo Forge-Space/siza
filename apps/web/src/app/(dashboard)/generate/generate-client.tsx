@@ -9,7 +9,7 @@ import RefinementInput from '@/components/generator/RefinementInput';
 import GenerationHistory from '@/components/generator/GenerationHistory';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@siza/ui';
+import { Skeleton, EmptyState } from '@siza/ui';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -26,7 +26,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Info,
-  FolderPlusIcon,
 } from 'lucide-react';
 import FeedbackPanel from '@/components/generator/FeedbackPanel';
 import { QualityBadge } from '@/components/generator/QualityBadge';
@@ -256,6 +255,7 @@ export default function TemplateComponent() {
           <span>
             Working in scratch mode — output is not saved.{' '}
             <button
+              type="button"
               onClick={() => setCreateDialogOpen(true)}
               className="underline hover:text-amber-100 transition-colors"
               aria-label="Create a project to save your work"
@@ -271,8 +271,9 @@ export default function TemplateComponent() {
       <div className="flex items-center justify-between px-4 sm:px-5 h-12 border-b border-surface-3 bg-surface-0 flex-shrink-0">
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => setConfigCollapsed(!configCollapsed)}
-            className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
+            className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label={configCollapsed ? 'Show prompt panel' : 'Hide prompt panel'}
             aria-expanded={!configCollapsed}
           >
@@ -312,8 +313,8 @@ export default function TemplateComponent() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-text-secondary hover:text-text-primary"
                 aria-label="View generation history"
+                className="text-text-secondary hover:text-text-primary"
               >
                 <HistoryIcon className="w-4 h-4" aria-hidden="true" />
               </Button>
@@ -330,16 +331,11 @@ export default function TemplateComponent() {
                     onForkGeneration={handleForkFromHistory}
                   />
                 ) : (
-                  <div className="p-6 text-center">
-                    <FolderPlusIcon
-                      className="w-8 h-8 text-text-muted mx-auto mb-3"
-                      aria-hidden="true"
-                    />
-                    <p className="text-sm font-medium text-text-primary mb-1">No history yet</p>
-                    <p className="text-xs text-text-secondary">
-                      Create a project to start saving your generation history.
-                    </p>
-                  </div>
+                  <EmptyState
+                    title="No history yet"
+                    description="Create a project to view generation history."
+                    size="sm"
+                  />
                 )}
               </div>
             </SheetContent>
