@@ -1,0 +1,133 @@
+Improve Siza’s UI/UX and visual system so it feels cleaner, more professional, more modern, and more solid while staying fully aligned with the existing brand guide and design system.
+
+Important constraints:
+- Preserve dark-only mode
+- Preserve the existing Forge/Siza palette and semantic token model
+- Backgrounds must stay in the Forge Deep / Forge Surface family, never pure black
+- Forge Violet is the primary accent for CTA, focus, active, selected, and key links only
+- Teal and Spark are secondary accents used sparingly for semantic/supportive emphasis
+- Keep the visual balance around 80% dark neutrals and 20% accent
+- No gradient text
+- No glassmorphism
+- No glow-heavy generic AI SaaS styling
+- No card soup
+- No fake trust metrics or fake testimonial energy
+- No hype-heavy copy
+- No `transition-all`
+- Use shared primitives and reusable patterns instead of one-off styling
+- The result should feel architectural, technical, calm, premium, and intuitive
+
+Design direction:
+- Siza should feel like a serious architectural/developer workspace, not a trendy AI app
+- Use structure first: hierarchy should come from layout, typography, spacing, borders, rails, panels, and section headers
+- Prefer matte surfaces, restrained shadows, crisp dividers, and consistent workspace shells
+- Keep motion subtle and purposeful, using opacity/transform only
+- Use precise, confident, technical copy instead of generic startup phrasing
+
+Execute the following implementation tickets:
+
+1. Design tokens and shell cleanup
+- Update `apps/web/src/app/globals.css` with stronger semantic tokens for surfaces, borders, focus, motion, and status
+- Add workspace shell rules for matte panels, rails, dividers, and restrained shadows
+- Remove glow-heavy defaults and ban `transition-all`
+
+2. App frame and metadata alignment
+- Update `apps/web/src/app/layout.tsx`
+- Replace generic metadata/tagline copy with Siza-aligned language
+- Refine global body/background/text rhythm and keep the skip link polished and visible
+
+3. Shared UI primitives expansion
+- Improve shared primitives exposed through `packages/ui/src/index.ts`
+- Add or standardize reusable patterns like `WorkspaceShell`, `PanelHeader`, `SectionHeader`, `StatusRow`, `SpecRow`, `EmptyState`, and stronger form field primitives
+- Prefer reusable semantic patterns over custom one-off screen styling
+
+4. Dashboard shell and top bar redesign
+- Refactor `apps/web/src/components/dashboard/DashboardShell.tsx` and `apps/web/src/components/dashboard/TopBar.tsx`
+- Make the shell feel infrastructural and consistent across dashboard pages
+- Replace the custom notifications dropdown with an accessible shared primitive
+- Tighten spacing, breadcrumb hierarchy, search trigger styling, and focus states
+
+5. Dashboard information hierarchy rewrite
+- Redesign `apps/web/src/app/(dashboard)/dashboard/dashboard-client.tsx`
+- Reduce card density and reorganize into:
+  - primary next action
+  - active/recent work
+  - supporting insights
+- Remove brand drift like `Forge Space` references
+- Rewrite generic CTA text into precise task-based actions
+
+6. Generate workspace redesign
+- Refactor `apps/web/src/app/(dashboard)/generate/generate-client.tsx`
+- Make prompt, provider, and output the dominant structure
+- Move advanced options into progressive disclosure
+- Replace custom tab UI with accessible shared tabs
+- Clarify save, push, history, and scratch-mode states
+
+7. Generator form simplification
+- Redesign `apps/web/src/components/generator/GeneratorForm.tsx`
+- Replace raw controls with shared field primitives
+- Reorganize sections into core input, generation context, and advanced controls
+- Improve labels, helper text, and loading copy
+
+8. Auth experience rewrite
+- Update `apps/web/src/app/(auth)/signin/signin-client.tsx` plus signup, forgot-password, and reset-password pages
+- Remove generic startup-style copy and make tone quieter and more technical
+- Add proper semantics like `name`, `autoComplete`, and accessible error/live states
+
+9. Auth shell and migration primitives cleanup
+- Rewrite `apps/web/src/components/migration/migration-primitives.tsx`
+- Remove fake-sounding proof, generic AI platform language, and marketing fluff
+- Redesign `AuthSplitShell` to feel like product context, not an ad panel
+
+10. Onboarding polish
+- Refine `apps/web/src/components/onboarding/OnboardingWizard.tsx`
+- Keep the flow logic, but improve pacing, progress language, and reward feeling
+- Make onboarding feel confidence-building instead of merely tracked
+
+11. Pricing page restructuring
+- Redesign `apps/web/src/app/(marketing)/pricing/pricing-client.tsx` and `apps/web/src/components/billing/PricingCard.tsx`
+- Reframe pricing into a clearer comparison/specification layout
+- Improve plan framing, toggle clarity, feature grouping, and loading copy
+- Reduce template-like visual treatment
+
+12. Marketing navigation and story alignment
+- Update `apps/web/src/app/(marketing)/MarketingNav.tsx` and `apps/web/src/app/page.tsx`
+- Make navigation calmer and more mature
+- Keep homepage structure, but tighten narrative flow from product proof to ecosystem to CTA
+
+13. Hero and product proof refinement
+- Update `apps/web/src/components/landing/HeroSection.tsx`, `apps/web/src/components/landing/CapabilitiesSection.tsx`, and `apps/web/src/components/landing/EcosystemSection.tsx`
+- Reduce generic AI phrasing and overactive motion
+- Use ecosystem and capabilities sections as the model for more specific, systems-oriented storytelling
+
+14. Preview and CTA section rewrite
+- Redesign `apps/web/src/components/landing/DashboardPreview.tsx` and `apps/web/src/components/landing/CTASection.tsx`
+- Make the preview represent Siza’s actual governed workflow
+- Remove gradient text, fake testimonial energy, and vague trust language from the CTA section
+- Replace hype with workflow proof, ecosystem proof, or product proof
+
+15. Command palette and mobile nav polish
+- Refine `apps/web/src/components/dashboard/CommandPalette.tsx` and `apps/web/src/components/dashboard/MobileNav.tsx`
+- Keep existing accessibility strengths, but align copy, motion, spacing, and active states with the new system
+- Remove `transition-all` and improve product-specific microcopy
+
+16. Final accessibility and consistency pass
+- Audit focus states, icon-only labels, tabs, menus, popovers, dialogs, error announcements, and touch targets across touched screens
+- Standardize empty states, loading states, success states, and error states
+- Ensure the redesign is more consistent and more accessible, not just more polished
+
+Recommended implementation order:
+- Phase 1: tickets 1-3
+- Phase 2: tickets 4-7
+- Phase 3: tickets 8-11
+- Phase 4: tickets 12-15
+- Phase 5: ticket 16
+
+Success criteria:
+- The app feels unmistakably like Siza
+- The UI feels more mature, more coherent, and more professional
+- The interface feels cleaner without becoming bland
+- Product screens feel like a serious developer/design-system workspace
+- Marketing feels evidence-based and distinctive instead of generic
+- Shared patterns are stronger after the redesign
+- Accessibility and consistency improve across the product
