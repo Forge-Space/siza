@@ -6,6 +6,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  allowedDevOrigins: ['*.replit.dev', '*.repl.co'],
   reactStrictMode: true,
   env: {
     APP_VERSION: require('./package.json').version,
