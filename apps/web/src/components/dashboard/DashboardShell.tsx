@@ -12,7 +12,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <>
       <CommandPalette />
       <KeyboardShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
-      {children}
+      <div className="min-h-full">{children}</div>
     </>
   );
 }

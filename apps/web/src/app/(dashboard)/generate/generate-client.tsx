@@ -10,6 +10,7 @@ import GenerationHistory from '@/components/generator/GenerationHistory';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@siza/ui';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   ArrowLeft,
@@ -25,6 +26,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Info,
+  FolderPlusIcon,
 } from 'lucide-react';
 import FeedbackPanel from '@/components/generator/FeedbackPanel';
 import { QualityBadge } from '@/components/generator/QualityBadge';
@@ -206,10 +208,10 @@ export default function TemplateComponent() {
       if (!res.ok) {
         if (res.status === 404) {
           setPushState('no-repo');
-          setPushError('No GitHub repo linked.');
+          setPushError('No GitHub repository linked to this project.');
         } else {
           setPushState('error');
-          setPushError(data.error || 'Failed to push');
+          setPushError(data.error || 'Push failed. Please try again.');
         }
         return;
       }
@@ -218,7 +220,7 @@ export default function TemplateComponent() {
       setPushState('success');
     } catch {
       setPushState('error');
-      setPushError('Network error');
+      setPushError('Network error. Check your connection and try again.');
     }
   };
 
@@ -245,27 +247,23 @@ export default function TemplateComponent() {
     });
   }, [projectId]);
 
-  const tabCls = (tab: OutputTab) =>
-    `flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-      activeTab === tab
-        ? 'border-violet-500 text-violet-300'
-        : 'border-transparent text-text-secondary hover:text-text-primary'
-    }`;
-
   return (
     <div className="h-full flex flex-col rounded-xl border border-surface-3 bg-surface-0 overflow-hidden">
       {/* Scratch Mode Banner */}
       {!projectId && (
         <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-200">
-          <Info className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>Generating in scratch mode.</span>
-          <button
-            onClick={() => setCreateDialogOpen(true)}
-            className="underline hover:text-amber-100 transition-colors"
-          >
-            Create a project
-          </button>
-          <span>to save your work.</span>
+          <Info className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+          <span>
+            Working in scratch mode — output is not saved.{' '}
+            <button
+              onClick={() => setCreateDialogOpen(true)}
+              className="underline hover:text-amber-100 transition-colors"
+              aria-label="Create a project to save your work"
+            >
+              Create a project
+            </button>{' '}
+            to persist your generations.
+          </span>
         </div>
       )}
 
@@ -275,17 +273,18 @@ export default function TemplateComponent() {
           <button
             onClick={() => setConfigCollapsed(!configCollapsed)}
             className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
-            aria-label={configCollapsed ? 'Show config panel' : 'Hide config panel'}
+            aria-label={configCollapsed ? 'Show prompt panel' : 'Hide prompt panel'}
+            aria-expanded={!configCollapsed}
           >
             {configCollapsed ? (
-              <PanelLeftOpen className="w-4 h-4" />
+              <PanelLeftOpen className="w-4 h-4" aria-hidden="true" />
             ) : (
-              <PanelLeftClose className="w-4 h-4" />
+              <PanelLeftClose className="w-4 h-4" aria-hidden="true" />
             )}
           </button>
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-violet-400" />
-            <span className="text-sm font-medium text-text-primary">Generate</span>
+            <Sparkles className="w-4 h-4 text-violet-400" aria-hidden="true" />
+            <span className="text-sm font-semibold text-text-primary">Generate</span>
           </div>
           {isTemplateMode && (
             <Badge
@@ -304,8 +303,8 @@ export default function TemplateComponent() {
               onClick={() => router.push('/templates')}
               className="text-xs"
             >
-              <ArrowLeft className="w-3 h-3 mr-1" />
-              Templates
+              <ArrowLeft className="w-3 h-3 mr-1" aria-hidden="true" />
+              Back to Templates
             </Button>
           )}
           <Sheet>
@@ -314,8 +313,9 @@ export default function TemplateComponent() {
                 variant="ghost"
                 size="sm"
                 className="text-text-secondary hover:text-text-primary"
+                aria-label="View generation history"
               >
-                <HistoryIcon className="w-4 h-4" />
+                <HistoryIcon className="w-4 h-4" aria-hidden="true" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[380px] sm:w-[420px] p-0">
@@ -330,8 +330,15 @@ export default function TemplateComponent() {
                     onForkGeneration={handleForkFromHistory}
                   />
                 ) : (
-                  <div className="p-6 text-center text-sm text-text-secondary">
-                    Create a project to view generation history.
+                  <div className="p-6 text-center">
+                    <FolderPlusIcon
+                      className="w-8 h-8 text-text-muted mx-auto mb-3"
+                      aria-hidden="true"
+                    />
+                    <p className="text-sm font-medium text-text-primary mb-1">No history yet</p>
+                    <p className="text-xs text-text-secondary">
+                      Create a project to start saving your generation history.
+                    </p>
                   </div>
                 )}
               </div>
@@ -342,11 +349,14 @@ export default function TemplateComponent() {
 
       {/* Workspace Body */}
       <div className="flex-1 min-h-0 flex flex-col md:flex-row">
-        {/* Left: Config Panel */}
+        {/* Left: Prompt + Config Panel */}
         <div
-          className={`flex-shrink-0 border-b md:border-b-0 md:border-r border-surface-3 bg-surface-0 overflow-y-auto transition-[width] duration-200 ease-siza ${
-            configCollapsed ? 'w-0 overflow-hidden' : 'w-full md:w-[360px] lg:w-[400px]'
-          }`}
+          className={`flex-shrink-0 border-b md:border-b-0 md:border-r border-surface-3 bg-surface-0 overflow-y-auto ${
+            configCollapsed
+              ? 'w-0 overflow-hidden opacity-0 pointer-events-none'
+              : 'w-full md:w-[360px] lg:w-[400px] opacity-100'
+          } transition-opacity duration-200`}
+          aria-hidden={configCollapsed || undefined}
         >
           <GeneratorForm
             projectId={projectId}
@@ -361,127 +371,149 @@ export default function TemplateComponent() {
 
         {/* Right: Output Panel */}
         <div className="flex-1 flex flex-col min-h-0 min-w-0">
-          {/* Output Tab Bar */}
-          <div className="flex items-center justify-between border-b border-surface-3 bg-surface-0 flex-shrink-0 px-3">
-            <div className="flex items-center">
-              <button onClick={() => setActiveTab('preview')} className={tabCls('preview')}>
-                <Eye className="w-3.5 h-3.5" />
-                Preview
-              </button>
-              <button onClick={() => setActiveTab('code')} className={tabCls('code')}>
-                <Code className="w-3.5 h-3.5" />
-                Code
-              </button>
-              {qualityReport && (
-                <div className="ml-3">
-                  <QualityBadge report={qualityReport} />
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-1.5">
-              {generatedCode && (
-                <>
-                  <Button
-                    onClick={() => setSaveDialogOpen(true)}
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs text-text-secondary hover:text-text-primary"
-                    title="Save as template (⌘S)"
-                  >
-                    <Save className="w-3.5 h-3.5 mr-1" />
-                    Save
-                  </Button>
-                  {githubEnabled && pushState === 'idle' && (
+          {/* Output Tabs */}
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as OutputTab)}
+            className="flex flex-col flex-1 min-h-0"
+          >
+            {/* Tab bar */}
+            <div className="flex items-center justify-between border-b border-surface-3 bg-surface-0 flex-shrink-0 px-3">
+              <TabsList className="h-auto bg-transparent p-0 gap-0 rounded-none">
+                <TabsTrigger
+                  value="preview"
+                  className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-violet-500 data-[state=active]:text-violet-300 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:text-text-secondary hover:text-text-primary bg-transparent shadow-none transition-colors"
+                >
+                  <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                  Preview
+                </TabsTrigger>
+                <TabsTrigger
+                  value="code"
+                  className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-violet-500 data-[state=active]:text-violet-300 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:text-text-secondary hover:text-text-primary bg-transparent shadow-none transition-colors"
+                >
+                  <Code className="w-3.5 h-3.5" aria-hidden="true" />
+                  Code
+                </TabsTrigger>
+                {qualityReport && (
+                  <div className="ml-2 flex items-center">
+                    <QualityBadge report={qualityReport} />
+                  </div>
+                )}
+              </TabsList>
+
+              {/* Output Actions */}
+              <div className="flex items-center gap-1.5">
+                {generatedCode && (
+                  <>
                     <Button
-                      onClick={handlePushToGitHub}
+                      onClick={() => setSaveDialogOpen(true)}
                       variant="ghost"
                       size="sm"
                       className="text-xs text-text-secondary hover:text-text-primary"
+                      title="Save as template (⌘S)"
                     >
-                      <Github className="w-3.5 h-3.5 mr-1" />
-                      Push
+                      <Save className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
+                      Save template
                     </Button>
-                  )}
-                  {githubEnabled && pushState === 'pushing' && (
-                    <Button disabled variant="ghost" size="sm" className="text-xs">
-                      <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
-                      Pushing...
-                    </Button>
-                  )}
-                  {githubEnabled && pushState === 'success' && prUrl && (
-                    <a
-                      href={prUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                      View PR
-                    </a>
-                  )}
-                  {githubEnabled && (pushState === 'error' || pushState === 'no-repo') && (
-                    <span className="inline-flex items-center gap-1 text-xs text-amber-400">
-                      <AlertTriangle className="w-3.5 h-3.5" />
-                      {pushError}
-                    </span>
-                  )}
-                </>
+                    {githubEnabled && pushState === 'idle' && (
+                      <Button
+                        onClick={handlePushToGitHub}
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-text-secondary hover:text-text-primary"
+                        disabled={!projectId}
+                        title={!projectId ? 'Create a project to push to GitHub' : 'Push to GitHub'}
+                      >
+                        <Github className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
+                        Push to GitHub
+                      </Button>
+                    )}
+                    {githubEnabled && pushState === 'pushing' && (
+                      <Button disabled variant="ghost" size="sm" className="text-xs">
+                        <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" aria-hidden="true" />
+                        Pushing…
+                      </Button>
+                    )}
+                    {githubEnabled && pushState === 'success' && prUrl && (
+                      <a
+                        href={prUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                      >
+                        <Check className="w-3.5 h-3.5" aria-hidden="true" />
+                        View pull request
+                      </a>
+                    )}
+                    {githubEnabled && (pushState === 'error' || pushState === 'no-repo') && (
+                      <span
+                        className="inline-flex items-center gap-1 text-xs text-amber-400"
+                        role="alert"
+                      >
+                        <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
+                        {pushError}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Tab content — render both and show/hide to preserve editor/preview state */}
+            <div className="flex-1 min-h-0 relative">
+              {!generatedCode && !isGenerating ? (
+                <div className="flex flex-col items-center justify-center h-full text-center px-8">
+                  <div
+                    className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-4"
+                    aria-hidden="true"
+                  >
+                    <Sparkles className="w-8 h-8 text-violet-400" />
+                  </div>
+                  <h3 className="text-base font-semibold text-text-primary mb-2">
+                    Output appears here
+                  </h3>
+                  <p className="text-sm text-text-secondary max-w-xs">
+                    Fill in the prompt panel on the left and click Generate.
+                  </p>
+                </div>
+              ) : (
+                <div className="h-full">
+                  <div className={activeTab === 'preview' ? 'h-full' : 'hidden'}>
+                    <LivePreview code={generatedCode} framework={framework} />
+                  </div>
+                  <div className={activeTab === 'code' ? 'h-full' : 'hidden'}>
+                    <CodeEditor
+                      code={generatedCode}
+                      onChange={handleCodeChange}
+                      language={
+                        framework === 'react' || framework === 'angular' ? 'typescript' : framework
+                      }
+                    />
+                  </div>
+                </div>
               )}
             </div>
-          </div>
 
-          {/* Tab Content */}
-          <div className="flex-1 min-h-0 relative">
-            {!generatedCode && !isGenerating ? (
-              <div className="flex flex-col items-center justify-center h-full text-center px-8">
-                <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-4">
-                  <Sparkles className="w-8 h-8 text-violet-400" />
-                </div>
-                <h3 className="text-lg font-semibold font-display text-text-primary mb-2">
-                  Ready to Generate
-                </h3>
-                <p className="text-sm text-text-secondary max-w-sm">
-                  Describe your component in the config panel and hit Generate. Your code and
-                  preview will appear here.
-                </p>
-              </div>
-            ) : (
-              <div className="h-full">
-                <div className={activeTab === 'preview' ? 'h-full' : 'hidden'}>
-                  <LivePreview code={generatedCode} framework={framework} />
-                </div>
-                <div className={activeTab === 'code' ? 'h-full' : 'hidden'}>
-                  <CodeEditor
-                    code={generatedCode}
-                    onChange={handleCodeChange}
-                    language={
-                      framework === 'react' || framework === 'angular' ? 'typescript' : framework
-                    }
-                  />
+            {/* Bottom Bar: Refinement + Feedback */}
+            {generatedCode && !isGenerating && (
+              <div className="border-t border-surface-3 bg-surface-0 flex-shrink-0">
+                {conversationEnabled && generationId && (
+                  <div className="px-4 pt-3">
+                    <RefinementInput
+                      onRefine={handleRefine}
+                      onNewGeneration={handleNewGeneration}
+                      isGenerating={generation.isGenerating}
+                      conversationTurn={generation.conversationTurn}
+                      maxTurns={generation.maxConversationTurns}
+                    />
+                  </div>
+                )}
+                <div className="flex items-center justify-between px-4 py-2">
+                  <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Bottom Bar: Refinement + Feedback */}
-          {generatedCode && !isGenerating && (
-            <div className="border-t border-surface-3 bg-surface-0 flex-shrink-0">
-              {conversationEnabled && generationId && (
-                <div className="px-4 pt-3">
-                  <RefinementInput
-                    onRefine={handleRefine}
-                    onNewGeneration={handleNewGeneration}
-                    isGenerating={generation.isGenerating}
-                    conversationTurn={generation.conversationTurn}
-                    maxTurns={generation.maxConversationTurns}
-                  />
-                </div>
-              )}
-              <div className="flex items-center justify-between px-4 py-2">
-                <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
-              </div>
-            </div>
-          )}
+          </Tabs>
         </div>
       </div>
 

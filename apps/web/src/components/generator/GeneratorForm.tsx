@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { SparklesIcon, WandIcon, ChevronDownIcon, SettingsIcon, CpuIcon } from 'lucide-react';
+import { SparklesIcon, WandIcon, ChevronDownIcon, SlidersHorizontalIcon, CpuIcon } from 'lucide-react';
 import { useGeneration } from '@/hooks/use-generation';
 import { useAIKeyStore, useAIKeys } from '@/stores/ai-keys';
 import { decryptApiKey, type AIProvider } from '@/lib/encryption';
@@ -66,10 +66,11 @@ function CollapsibleSection({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center justify-between w-full px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-1 transition-colors"
+        aria-expanded={open}
+        className="flex items-center justify-between w-full px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand/60"
       >
         <span className="flex items-center gap-2">
-          <Icon className="h-4 w-4" />
+          <Icon className="h-4 w-4" aria-hidden="true" />
           {title}
           {badge && (
             <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-brand/15 text-brand-light">
@@ -79,9 +80,10 @@ function CollapsibleSection({
         </span>
         <ChevronDownIcon
           className={`h-4 w-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          aria-hidden="true"
         />
       </button>
-      {open && <div className="px-3 pb-3 space-y-3">{children}</div>}
+      {open && <div className="px-3 pb-3 pt-2 space-y-3">{children}</div>}
     </div>
   );
 }
@@ -304,69 +306,86 @@ export default function GeneratorForm({
       <form
         ref={formRef}
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col flex-1 overflow-y-auto p-4 space-y-3"
+        className="flex flex-col flex-1 overflow-y-auto p-4 space-y-4"
       >
         <QuotaGuard error={generation.error} usage={usage} isQuotaExceeded={isQuotaExceeded} />
 
-        <div>
-          <label
-            htmlFor="componentName"
-            className="block text-xs font-medium text-text-secondary mb-1"
-          >
-            Component Name
-          </label>
-          <input
-            {...register('componentName')}
-            type="text"
-            id="componentName"
-            aria-describedby={errors.componentName ? 'componentName-error' : undefined}
-            aria-invalid={!!errors.componentName}
-            className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-            placeholder="MyButton"
-          />
-          {errors.componentName && (
-            <p id="componentName-error" role="alert" className="mt-1 text-xs text-error">
-              {errors.componentName.message}
-            </p>
-          )}
+        {/* — Core input — */}
+        <div className="space-y-3">
+          <div>
+            <label
+              htmlFor="prompt"
+              className="block text-xs font-medium text-text-secondary mb-1"
+            >
+              What do you want to build?
+            </label>
+            {autocompleteEnabled ? (
+              <PromptAutocomplete
+                id="prompt"
+                value={promptValue}
+                onChange={(val) => {
+                  setPromptValue(val);
+                  setValue('prompt', val, { shouldValidate: true });
+                }}
+                framework={framework}
+                rows={5}
+                className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                placeholder="A pricing card with three plan tiers, feature lists, and a highlighted recommended plan…"
+              />
+            ) : (
+              <textarea
+                {...register('prompt')}
+                id="prompt"
+                rows={5}
+                aria-describedby={
+                  errors.prompt ? 'prompt-error' : 'prompt-hint'
+                }
+                aria-invalid={!!errors.prompt}
+                className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                placeholder="A pricing card with three plan tiers, feature lists, and a highlighted recommended plan…"
+              />
+            )}
+            {errors.prompt ? (
+              <p id="prompt-error" role="alert" className="mt-1 text-xs text-error">
+                {errors.prompt.message}
+              </p>
+            ) : (
+              <p id="prompt-hint" className="mt-1 text-xs text-text-muted">
+                Be specific: include variants, states, and interactions you need.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="componentName"
+              className="block text-xs font-medium text-text-secondary mb-1"
+            >
+              Component name
+            </label>
+            <input
+              {...register('componentName')}
+              type="text"
+              id="componentName"
+              aria-describedby={errors.componentName ? 'componentName-error' : 'componentName-hint'}
+              aria-invalid={!!errors.componentName}
+              className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+              placeholder="PricingCard"
+            />
+            {errors.componentName ? (
+              <p id="componentName-error" role="alert" className="mt-1 text-xs text-error">
+                {errors.componentName.message}
+              </p>
+            ) : (
+              <p id="componentName-hint" className="mt-1 text-xs text-text-muted">
+                Used as the exported function name (PascalCase recommended).
+              </p>
+            )}
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="prompt" className="block text-xs font-medium text-text-secondary mb-1">
-            Describe Your Component
-          </label>
-          {autocompleteEnabled ? (
-            <PromptAutocomplete
-              id="prompt"
-              value={promptValue}
-              onChange={(val) => {
-                setPromptValue(val);
-                setValue('prompt', val, { shouldValidate: true });
-              }}
-              framework={framework}
-              rows={4}
-              className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-              placeholder="A modern button with primary/secondary variants, hover effects, and loading state..."
-            />
-          ) : (
-            <textarea
-              {...register('prompt')}
-              id="prompt"
-              rows={4}
-              aria-describedby={errors.prompt ? 'prompt-error' : undefined}
-              aria-invalid={!!errors.prompt}
-              className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-              placeholder="A modern button with primary/secondary variants, hover effects, and loading state..."
-            />
-          )}
-          {errors.prompt && (
-            <p id="prompt-error" role="alert" className="mt-1 text-xs text-error">
-              {errors.prompt.message}
-            </p>
-          )}
-        </div>
-
-        <CollapsibleSection title="AI Provider" icon={CpuIcon} badge={providerLabel}>
+        {/* — AI Provider — */}
+        <CollapsibleSection title="AI provider" icon={CpuIcon} badge={providerLabel}>
           {sizaAiEnabled && (
             <SizaAICard
               selected={selectedProvider === 'siza'}
@@ -384,17 +403,18 @@ export default function GeneratorForm({
           />
         </CollapsibleSection>
 
+        {/* — Advanced controls — */}
         <CollapsibleSection
-          title="Advanced"
-          icon={SettingsIcon}
-          badge={advancedCount > 0 ? `${advancedCount}` : undefined}
+          title="Advanced options"
+          icon={SlidersHorizontalIcon}
+          badge={advancedCount > 0 ? `${advancedCount} active` : undefined}
         >
           <div>
             <label
               htmlFor="componentLibrary"
               className="block text-xs font-medium text-text-secondary mb-1"
             >
-              Component Library
+              Component library
             </label>
             <select
               {...register('componentLibrary')}
@@ -405,13 +425,13 @@ export default function GeneratorForm({
               <option value="shadcn">shadcn/ui</option>
               <option value="mui">Material-UI</option>
               <option value="chakra">Chakra UI</option>
-              <option value="none">None</option>
+              <option value="none">None (vanilla)</option>
             </select>
           </div>
 
           <div>
             <label htmlFor="style" className="block text-xs font-medium text-text-secondary mb-1">
-              Design Style
+              Design style
             </label>
             <select
               {...register('style')}
@@ -424,13 +444,13 @@ export default function GeneratorForm({
             </select>
           </div>
 
-          <label className="flex items-center">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               {...register('typescript')}
               type="checkbox"
               className="rounded border-surface-3 text-brand focus:ring-brand"
             />
-            <span className="ml-2 text-sm text-text-primary">Use TypeScript</span>
+            <span className="text-sm text-text-primary">Use TypeScript</span>
           </label>
 
           <ImageUpload image={image} onImageChange={setImage} />
@@ -469,12 +489,12 @@ export default function GeneratorForm({
         >
           {generation.isGenerating ? (
             <>
-              <WandIcon className="animate-spin h-4 w-4 mr-2" />
-              Generating...
+              <WandIcon className="animate-spin h-4 w-4 mr-2" aria-hidden="true" />
+              Generating…
             </>
           ) : (
             <>
-              <SparklesIcon className="h-4 w-4 mr-2" />
+              <SparklesIcon className="h-4 w-4 mr-2" aria-hidden="true" />
               Generate
               {selectedSkillIds.length > 0 && <SkillBadge count={selectedSkillIds.length} />}
             </>
