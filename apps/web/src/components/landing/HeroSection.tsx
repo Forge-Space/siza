@@ -7,19 +7,19 @@ import { CONTAINER } from './constants';
 const DEMO_STEPS = [
   {
     label: 'prompt',
-    lines: ['$ siza generate --component ProductCard', '  > Analyzing context...'],
+    lines: ['$ siza generate --component ProductCard', '  > Analyzing codebase context...'],
   },
   {
     label: 'generating',
     lines: [
-      '  > Generating component...',
+      '  > Applying design tokens...',
       '',
       'import { Badge } from "@/components/ui/badge";',
       'import { Card, CardContent } from "@/components/ui/card";',
       '',
       'export function ProductCard({ product }: Props) {',
       '  return (',
-      '    <Card className="group hover:shadow-lg transition-all">',
+      '    <Card className="group border border-border">',
       '      <CardContent className="p-4">',
       '        <Badge variant="secondary">{product.category}</Badge>',
       '        <h3 className="mt-2 font-semibold">{product.name}</h3>',
@@ -34,9 +34,9 @@ const DEMO_STEPS = [
     label: 'done',
     lines: [
       '',
-      '  ✓ Component generated (847ms)',
+      '  ✓ Component generated (623ms)',
       '  ✓ TypeScript types inferred',
-      '  ✓ Tests scaffolded',
+      '  ✓ Quality gates passed',
     ],
   },
 ];
@@ -61,14 +61,12 @@ function AnimatedCodeDemo() {
         setCharIdx((c) => c + 1);
       }, 18);
     } else {
-      // line complete
       const newDisplayed = [...displayed, currentLine];
       timeoutRef.current = setTimeout(
         () => {
           setDisplayed(newDisplayed);
           if (isLastLine) {
             if (isLastStep) {
-              // reset after pause
               timeoutRef.current = setTimeout(() => {
                 setStepIdx(0);
                 setLineIdx(0);
@@ -150,7 +148,6 @@ function AnimatedCodeDemo() {
 export function HeroSection() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Sharp 1px dot grid — no blur */}
       <div
         className="absolute inset-0 opacity-[0.18]"
         style={{
@@ -158,45 +155,44 @@ export function HeroSection() {
           backgroundSize: '32px 32px',
         }}
       />
-      {/* Single static radial glow, no animation */}
       <div
         className="absolute w-[600px] h-[400px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse, rgba(139,92,246,0.12), transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(139,92,246,0.10), transparent 70%)',
         }}
       />
 
       <div className={`${CONTAINER} relative z-10 text-center`}>
-        <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-mono text-violet-300">
-          <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
-          1,200+ developers generating
+        <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/25 bg-violet-500/8 px-4 py-1.5 text-xs font-mono text-violet-300">
+          <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+          Open source · BYOK · Self-hostable
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.02em] leading-[1.05] mt-6">
-          Generate production-grade
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.02em] leading-[1.05] mt-6 text-[#FAFAFA]">
+          Ship governed UI code
           <br />
-          <span className="text-violet-400">UI code</span> with AI
+          <span className="text-violet-400">without the generic slop</span>
         </h1>
 
         <p className="text-lg text-[#A1A1AA] max-w-2xl mx-auto mt-6">
-          Siza generates quality React, Next.js, and Vue components&nbsp;— not generic AI slop.
-          Bring your own API key, choose your model, and ship faster.
+          Siza generates React and Next.js components that fit your design system, pass quality
+          gates, and include TypeScript types and tests. Bring your own API key; no lock-in.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
           <a
             href="/signup"
-            className="inline-flex items-center gap-2 bg-violet-600 text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-violet-500 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 bg-violet-600 text-white rounded-lg px-6 py-3 text-sm font-medium transition-colors duration-150 hover:bg-violet-500"
           >
-            Start Generating Free
+            Start for free
             <ArrowRight className="w-4 h-4" />
           </a>
           <a
             href="/docs"
-            className="inline-flex items-center gap-2 border border-[#27272A] rounded-lg px-6 py-3 text-sm font-medium text-[#FAFAFA] hover:bg-violet-500/5 hover:border-violet-500/40 hover:-translate-y-0.5 transition-all duration-200"
+            className="inline-flex items-center gap-2 border border-[#27272A] rounded-lg px-6 py-3 text-sm font-medium text-[#FAFAFA] hover:bg-violet-500/5 hover:border-violet-500/30 transition-colors duration-150"
           >
             <BookOpen className="w-4 h-4" />
-            Read the Docs
+            Read the docs
           </a>
         </div>
 

@@ -72,7 +72,7 @@ export default function MobileNav({ open, onClose, isAdmin }: MobileNavProps) {
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-200"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 opacity-100 transition-opacity duration-200"
         onClick={handleBackdropClick}
         onKeyDown={handleBackdropKeyDown}
         tabIndex={0}
@@ -81,56 +81,58 @@ export default function MobileNav({ open, onClose, isAdmin }: MobileNavProps) {
       />
       <div
         ref={panelRef}
-        className="fixed inset-y-0 left-0 flex flex-col w-64 bg-surface-1 border-r border-surface-3 z-50 transition-transform duration-300 ease-siza"
+        className="fixed inset-y-0 left-0 flex flex-col w-64 bg-surface-1 border-r border-surface-3 z-50"
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation"
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-surface-3">
-          <h1 className="text-xl font-display font-bold text-brand">Siza</h1>
+        <div className="flex items-center justify-between h-16 px-4 border-b border-surface-3 shrink-0">
+          <h1 className="text-base font-display font-bold text-text-primary">Siza</h1>
           <button
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="p-2 rounded-md text-text-muted-foreground hover:text-text-primary hover:bg-surface-2 transition-colors"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-text-muted-foreground hover:text-text-primary hover:bg-surface-2 transition-colors duration-100"
             aria-label="Close navigation"
           >
             <XIcon className="h-5 w-5" />
           </button>
         </div>
-        <nav className="flex-1 px-2 py-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-2 py-4">
           <Link
             href="/generate"
             onClick={onClose}
-            className="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg bg-brand text-white hover:bg-brand-light transition-colors mb-4"
+            className="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg bg-brand/10 text-brand-light border border-brand/20 hover:bg-brand/15 transition-colors duration-100 mb-4 min-h-[44px]"
           >
-            <PlusIcon className="mr-3 h-5 w-5" />
-            Generate Component
+            <PlusIcon className="h-4 w-4 shrink-0" />
+            New Generation
           </Link>
-          {navigationItems.map((item) => {
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={onClose}
-                className={`group relative flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? 'bg-brand/15 text-brand-light before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand-light'
-                    : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
-                }`}
-              >
-                <item.icon
-                  className={`mr-3 h-5 w-5 ${
+          <div className="space-y-0.5">
+            {navigationItems.map((item) => {
+              const isActive = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={onClose}
+                  className={`group relative flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md min-h-[44px] transition-colors duration-100 ${
                     isActive
-                      ? 'text-brand-light'
-                      : 'text-text-muted-foreground group-hover:text-text-secondary'
+                      ? 'bg-brand/10 text-brand-light before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:rounded-full before:bg-brand-light'
+                      : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
                   }`}
-                />
-                {item.name}
-              </Link>
-            );
-          })}
+                >
+                  <item.icon
+                    className={`h-4 w-4 shrink-0 ${
+                      isActive
+                        ? 'text-brand-light'
+                        : 'text-text-muted-foreground group-hover:text-text-secondary'
+                    }`}
+                  />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
       </div>
     </>

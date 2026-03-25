@@ -71,7 +71,7 @@ const GROUP_HEADING_CLASS =
   '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider';
 
 const ITEM_CLASS =
-  'relative flex cursor-pointer select-none items-center rounded-lg px-2 py-2 text-sm text-text-secondary outline-none data-[selected=true]:bg-brand/10 data-[selected=true]:text-brand-light hover:bg-surface-2 transition-colors';
+  'relative flex cursor-pointer select-none items-center gap-3 rounded-md px-2 py-2 text-sm text-text-secondary outline-none data-[selected=true]:bg-brand/10 data-[selected=true]:text-brand-light hover:bg-surface-2 transition-colors duration-100';
 
 export function CommandPalette() {
   const open = useUIStore((s) => s.commandPaletteOpen);
@@ -148,26 +148,26 @@ export function CommandPalette() {
   return (
     <div className="fixed inset-0 z-50">
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in-0 duration-150"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in-0 duration-150"
         onClick={() => setOpen(false)}
         aria-hidden="true"
       />
       <div className="fixed inset-x-0 top-[20vh] mx-auto max-w-lg px-4">
         <Command
-          className="rounded-xl border border-surface-3 bg-surface-1 shadow-2xl overflow-hidden"
+          className="rounded-xl border border-surface-3 bg-surface-1 shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150"
           loop
           shouldFilter={showStatic}
         >
-          <div className="flex items-center border-b border-surface-3 px-3">
+          <div className="flex items-center gap-2 border-b border-surface-3 px-3 h-12">
             {searching ? (
-              <LoaderIcon className="mr-2 h-4 w-4 shrink-0 text-text-muted-foreground animate-spin" />
+              <LoaderIcon className="h-4 w-4 shrink-0 text-text-muted-foreground animate-spin" />
             ) : (
-              <SearchIcon className="mr-2 h-4 w-4 shrink-0 text-text-muted-foreground" />
+              <SearchIcon className="h-4 w-4 shrink-0 text-text-muted-foreground" />
             )}
             {/* eslint-disable jsx-a11y/no-autofocus */}
             <Command.Input
               placeholder="Search projects, catalog, templates..."
-              className="flex h-12 w-full bg-transparent py-3 text-sm text-text-primary outline-none placeholder:text-text-muted-foreground"
+              className="flex h-full w-full bg-transparent text-sm text-text-primary outline-none placeholder:text-text-muted-foreground"
               autoFocus
               value={query}
               onValueChange={setQuery}
@@ -180,7 +180,7 @@ export function CommandPalette() {
             </Command.Empty>
 
             {hasResults &&
-              Object.entries(resultsByType).map(([type, items]) => {
+              Object.entries(resultsByType).map(([type, typeItems]) => {
                 const Icon = TYPE_ICONS[type] || FileTextIcon;
                 return (
                   <Command.Group
@@ -188,18 +188,18 @@ export function CommandPalette() {
                     heading={TYPE_LABELS[type] || type}
                     className={GROUP_HEADING_CLASS}
                   >
-                    {items.map((r) => (
+                    {typeItems.map((r) => (
                       <Command.Item
                         key={r.id}
                         value={`${r.title} ${r.subtitle || ''}`}
                         onSelect={() => handleSelect(r.href)}
                         className={ITEM_CLASS}
                       >
-                        <Icon className="mr-3 h-4 w-4 text-text-muted-foreground" />
-                        <div className="flex flex-col">
-                          <span>{r.title}</span>
+                        <Icon className="h-4 w-4 shrink-0 text-text-muted-foreground" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="truncate">{r.title}</span>
                           {r.subtitle && (
-                            <span className="text-[11px] text-text-muted">{r.subtitle}</span>
+                            <span className="text-[11px] text-text-muted truncate">{r.subtitle}</span>
                           )}
                         </div>
                       </Command.Item>
@@ -218,10 +218,10 @@ export function CommandPalette() {
                       onSelect={() => handleSelect(item.href)}
                       className={ITEM_CLASS}
                     >
-                      <item.icon className="mr-3 h-4 w-4 text-text-muted-foreground" />
-                      <span>{item.label}</span>
+                      <item.icon className="h-4 w-4 shrink-0 text-text-muted-foreground" />
+                      <span className="flex-1">{item.label}</span>
                       {item.shortcut && (
-                        <span className="ml-auto text-xs text-text-muted-foreground opacity-60">
+                        <span className="text-xs text-text-muted-foreground opacity-50 font-mono">
                           {item.shortcut}
                         </span>
                       )}
@@ -237,10 +237,10 @@ export function CommandPalette() {
                       onSelect={() => handleSelect(item.href)}
                       className={ITEM_CLASS}
                     >
-                      <item.icon className="mr-3 h-4 w-4 text-text-muted-foreground" />
-                      <span>{item.label}</span>
+                      <item.icon className="h-4 w-4 shrink-0 text-text-muted-foreground" />
+                      <span className="flex-1">{item.label}</span>
                       {item.shortcut && (
-                        <span className="ml-auto text-xs text-text-muted-foreground opacity-60">
+                        <span className="text-xs text-text-muted-foreground opacity-50 font-mono">
                           {item.shortcut}
                         </span>
                       )}
@@ -251,8 +251,8 @@ export function CommandPalette() {
             )}
           </Command.List>
           <div className="border-t border-surface-3 px-3 py-2 flex items-center justify-between text-[11px] text-text-muted">
-            <span>↑↓ Navigate · ↵ Select · Esc Close</span>
-            <span className="text-text-muted-foreground">⌘K</span>
+            <span>↑↓ navigate · ↵ select · Esc close</span>
+            <span className="font-mono text-text-muted-foreground opacity-60">⌘K</span>
           </div>
         </Command>
       </div>

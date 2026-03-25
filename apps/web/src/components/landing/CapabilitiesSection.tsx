@@ -4,45 +4,44 @@ import { CONTAINER, SECTION_PADDING } from './constants';
 const capabilities = [
   {
     icon: Layers,
-    title: 'Architecture-First',
+    title: 'Architecture-aware scaffolds',
     description:
-      'Service layers, middleware, proper separation of concerns. Every scaffold follows patterns that scale.',
+      'Service layers, middleware, and proper separation of concerns. Every scaffold follows patterns that hold up at scale.',
   },
   {
     icon: ShieldCheck,
-    title: 'Security by Default',
+    title: 'Security by default',
     description:
-      'BYOK encryption, RLS policies, input validation, and SOC 2-ready patterns baked into every project.',
+      'BYOK encryption, RLS policies, input validation, and SOC 2-ready patterns baked into every generated project.',
   },
   {
     icon: CheckSquare,
-    title: 'Quality Gates',
+    title: 'Five-layer quality gates',
     description:
-      'Anti-generic detection, accessibility audit, diversity tracking. Five validation layers before code ships.',
+      'Anti-generic detection, accessibility audit, and diversity tracking run before code ships. You see the scorecard every time.',
   },
   {
     icon: Boxes,
-    title: 'Full-Stack Scaffolds',
+    title: 'Full-stack templates',
     description:
-      'SaaS, API, monorepo templates with auth, billing, database, and tests included. Not just components.',
+      'SaaS, API, and monorepo starters with auth, billing, database, and tests included. Not just component shells.',
   },
   {
     icon: Brain,
-    title: 'Context-Aware Generation',
+    title: 'Codebase-aware generation',
     description:
-      'MCP-native tools that understand your codebase, brand identity, and design system. No generic output.',
+      'MCP-native tools read your design tokens, component library, and brand config. Output fits your system, not a generic one.',
   },
   {
     icon: GitFork,
-    title: 'Multi-Provider AI',
+    title: 'Multi-provider routing',
     description:
-      '12+ AI providers, single API. Swap models without changing code. Automatic failover built in.',
+      '12+ AI providers behind a single interface. Swap models without touching your code; automatic failover keeps generation running.',
   },
 ];
 
-// Unified violet palette — no rainbow
 const iconColor = 'text-violet-400';
-const iconBg = 'bg-violet-500/15';
+const iconBg = 'bg-violet-500/10';
 
 export function CapabilitiesSection() {
   return (
@@ -53,10 +52,11 @@ export function CapabilitiesSection() {
             Capabilities
           </p>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.02em] text-[#FAFAFA] mb-4">
-            What makes it different
+            Built for production, not demos
           </h2>
           <p className="text-lg text-[#A1A1AA] max-w-2xl mx-auto">
-            AI generators produce code fast. We produce code that lasts.
+            Siza applies governance rules, design-system context, and quality checks that generic
+            generators skip.
           </p>
         </div>
 
@@ -66,14 +66,14 @@ export function CapabilitiesSection() {
             return (
               <div
                 key={cap.title}
-                className="group bg-[#18181B] border border-[#27272A] rounded-xl p-6 transition-all duration-200 ease-siza hover:border-violet-500/30 hover:shadow-card-hover"
+                className="group bg-[#18181B] border border-[#27272A] rounded-xl p-6 transition-colors duration-150 hover:border-violet-500/25"
               >
                 <div
-                  className={`w-10 h-10 flex items-center justify-center rounded-lg ${iconBg} mb-4 transition-transform duration-200 group-hover:scale-110`}
+                  className={`w-10 h-10 flex items-center justify-center rounded-lg ${iconBg} mb-4`}
                 >
                   <Icon className={`w-5 h-5 ${iconColor}`} />
                 </div>
-                <h3 className="text-lg font-semibold text-[#FAFAFA] mb-2">{cap.title}</h3>
+                <h3 className="text-base font-semibold text-[#FAFAFA] mb-2">{cap.title}</h3>
                 <p className="text-sm text-[#A1A1AA] leading-relaxed">{cap.description}</p>
               </div>
             );

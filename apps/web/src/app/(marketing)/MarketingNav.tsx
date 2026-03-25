@@ -6,12 +6,11 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
 const navLinks = [
-  { href: '/', label: 'Home' },
+  { href: '/docs', label: 'Docs' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/pricing', label: 'Pricing' },
-  { href: '/about', label: 'About' },
   { href: '/roadmap', label: 'Roadmap' },
-  { href: '/docs', label: 'Docs' },
+  { href: '/about', label: 'About' },
 ];
 
 export default function MarketingNav() {
@@ -32,9 +31,9 @@ export default function MarketingNav() {
             <Link
               key={link.href}
               href={link.href}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+              className={`px-3 py-1.5 text-sm rounded-md transition-colors duration-150 ${
                 pathname === link.href
-                  ? 'bg-violet-500/15 text-violet-300'
+                  ? 'bg-violet-500/10 text-violet-300'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -50,12 +49,12 @@ export default function MarketingNav() {
             asChild
             className="text-muted-foreground hover:text-foreground"
           >
-            <Link href="/signin">Sign In</Link>
+            <Link href="/signin">Sign in</Link>
           </Button>
           <Button
             size="sm"
             asChild
-            className="bg-violet-600 text-white hover:bg-violet-500 shadow-[0_0_16px_rgba(139,92,246,0.25)]"
+            className="bg-violet-600 text-white hover:bg-violet-500"
           >
             <Link href="/signup">Get Started</Link>
           </Button>

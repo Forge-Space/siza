@@ -23,29 +23,32 @@ const GROUP_ORDER: RepoGroup[] = ['Design & Brand', 'Governance & Quality', 'Gen
 
 const GROUP_META: Record<
   RepoGroup,
-  { label: string; sublabel: string; accent: string; border: string; bg: string; badge: string }
+  { label: string; sublabel: string; description: string; accent: string; border: string; bg: string; badge: string }
 > = {
   'Design & Brand': {
     label: 'Layer 1',
     sublabel: 'Design & Brand',
+    description: 'Design tokens, component primitives, and brand rules that all generated output must satisfy.',
     accent: 'text-rose-400',
-    border: 'border-rose-500/25',
+    border: 'border-rose-500/20',
     bg: 'bg-rose-500/5',
     badge: 'bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20',
   },
   'Governance & Quality': {
     label: 'Layer 2',
     sublabel: 'Governance & Quality',
+    description: 'Validation pipelines that enforce accessibility, diversity, and anti-generic standards on every generation.',
     accent: 'text-amber-400',
-    border: 'border-amber-500/25',
+    border: 'border-amber-500/20',
     bg: 'bg-amber-500/5',
     badge: 'bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20',
   },
   'Generation Engine': {
     label: 'Layer 3',
     sublabel: 'Generation Engine',
+    description: 'MCP tools and multi-provider routing that produce context-aware code and surface a quality scorecard.',
     accent: 'text-violet-400',
-    border: 'border-violet-500/25',
+    border: 'border-violet-500/20',
     bg: 'bg-violet-500/5',
     badge: 'bg-violet-500/10 text-violet-400 ring-1 ring-violet-500/20',
   },
@@ -65,12 +68,10 @@ function RepoNode({
       href={repo.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group flex flex-col gap-1.5 rounded-lg border ${border} bg-[#18181B] px-3.5 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-500/40 hover:shadow-[0_4px_16px_rgba(139,92,246,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#121214]`}
+      className={`group flex flex-col gap-1.5 rounded-lg border ${border} bg-[#18181B] px-3.5 py-3 transition-colors duration-150 hover:border-violet-500/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#121214]`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span
-          className={`text-[13px] font-semibold text-[#FAFAFA] transition-colors group-hover:${accent.replace('text-', 'text-')}`}
-        >
+        <span className={`text-[13px] font-semibold text-[#FAFAFA] group-hover:${accent.replace('text-', 'text-')}`}>
           {repo.name}
         </span>
         {repo.latestReleaseTag && (
@@ -89,15 +90,13 @@ function LayerConnector({ fromAccent }: { fromAccent: string }) {
     <div className="relative hidden lg:flex items-center justify-center py-1" aria-hidden>
       <div className="absolute inset-x-0 flex items-center justify-center">
         <div className="flex flex-col items-center gap-0.5">
-          {/* Dashed line */}
           <div className="flex flex-col items-center gap-[3px]">
             {Array.from({ length: 5 }).map((_, i) => (
               <span key={i} className="h-1 w-px rounded-full bg-[#3F3F46]" />
             ))}
           </div>
-          {/* Arrow head */}
           <svg
-            className={`h-3.5 w-3.5 ${fromAccent} opacity-70`}
+            className={`h-3.5 w-3.5 ${fromAccent} opacity-60`}
             viewBox="0 0 16 16"
             fill="currentColor"
           >
@@ -121,31 +120,28 @@ export function EcosystemSection({ snapshot }: EcosystemSectionProps) {
   return (
     <section id="ecosystem" className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
-        {/* Header */}
         <div className="text-center">
           <p className="mb-4 text-sm font-mono uppercase tracking-wider text-violet-400">
             Ecosystem
           </p>
           <h2 className="mb-4 text-3xl font-extrabold tracking-[-0.02em] text-[#FAFAFA] sm:text-4xl">
-            {snapshot.repoCount} repos. One vision.
+            {snapshot.repoCount} repositories. One governed pipeline.
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-[#A1A1AA]">
-            Three layers that compose into a full generation pipeline — from brand identity to
-            governed delivery.
+            Three composable layers connect brand identity to governed code delivery. Each layer
+            feeds the next; nothing ships without passing the layer above it.
           </p>
-          <p className="mt-3 text-xs font-mono uppercase tracking-[0.14em] text-[#A1A1AA]">
+          <p className="mt-3 text-xs font-mono uppercase tracking-[0.14em] text-[#52525B]">
             Last synced {formatDate(snapshot.lastSyncedAt)}
           </p>
         </div>
 
-        {/* Pipeline diagram */}
         <div className="relative mt-14">
-          {/* Vertical spine — desktop only, sits behind layers */}
           <div
             className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 lg:block"
             aria-hidden
           >
-            <div className="h-full w-full bg-gradient-to-b from-rose-500/20 via-amber-500/20 to-violet-500/20" />
+            <div className="h-full w-full bg-gradient-to-b from-rose-500/15 via-amber-500/15 to-violet-500/15" />
           </div>
 
           <div className="flex flex-col gap-2 lg:gap-0">
@@ -154,27 +150,29 @@ export function EcosystemSection({ snapshot }: EcosystemSectionProps) {
               const repos = byGroup[group];
               return (
                 <div key={group}>
-                  {/* Layer row */}
                   <div
                     className={`rounded-2xl border ${meta.border} ${meta.bg} p-5`}
                     role="region"
                     aria-label={meta.sublabel}
                   >
-                    {/* Layer header */}
-                    <div className="mb-4 flex items-center gap-3">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest ${meta.badge}`}
-                      >
-                        {meta.label}
-                      </span>
-                      <span
-                        className={`text-xs font-semibold uppercase tracking-wider ${meta.accent}`}
-                      >
-                        {meta.sublabel}
-                      </span>
+                    <div className="mb-3 flex items-start gap-3">
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest ${meta.badge}`}
+                        >
+                          {meta.label}
+                        </span>
+                        <span
+                          className={`text-xs font-semibold uppercase tracking-wider ${meta.accent}`}
+                        >
+                          {meta.sublabel}
+                        </span>
+                      </div>
                     </div>
+                    <p className="mb-4 text-xs text-[#71717A] leading-relaxed max-w-2xl">
+                      {meta.description}
+                    </p>
 
-                    {/* Repo nodes — flex row, wrap on mobile */}
                     <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                       {repos.map((repo) => (
                         <RepoNode
@@ -187,7 +185,6 @@ export function EcosystemSection({ snapshot }: EcosystemSectionProps) {
                     </div>
                   </div>
 
-                  {/* Connector between layers */}
                   {idx < GROUP_ORDER.length - 1 && <LayerConnector fromAccent={meta.accent} />}
                 </div>
               );
@@ -195,7 +192,6 @@ export function EcosystemSection({ snapshot }: EcosystemSectionProps) {
           </div>
         </div>
 
-        {/* Footer stats */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-[#52525B]">
           <span>{snapshot.releasedRepoCount} packages released</span>
           <span className="text-[#27272A]">·</span>
