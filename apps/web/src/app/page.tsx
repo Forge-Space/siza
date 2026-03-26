@@ -42,7 +42,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
       <LandingNav />
-      <main id="main-content" className="relative z-10">
+      <main id="main-content" className="relative z-10 pt-14">
         <HeroSection />
         <StatsBar snapshot={snapshot} />
         <CapabilitiesSection />

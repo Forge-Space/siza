@@ -66,7 +66,7 @@ export default function RoadmapClientPage({ repoCount }: RoadmapClientPageProps)
         <h1 className="mb-4 text-5xl font-bold tracking-tight md:text-6xl">Roadmap</h1>
         <p className="mx-auto mb-8 max-w-xl text-muted-foreground">
           Where Siza is headed. Built in public, shaped by developer feedback, and aligned with the
-          live Forge Space ecosystem.
+          live Siza ecosystem.
         </p>
         <div className="space-y-4">
           <PhaseNavigator phases={phases} activePhase={activePhase} onSelect={scrollToPhase} />

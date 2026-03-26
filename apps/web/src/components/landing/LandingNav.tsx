@@ -3,27 +3,27 @@ import { CONTAINER } from './constants';
 
 export function LandingNav() {
   const navLinks = [
-    { label: 'About', href: '/about' },
-    { label: 'Roadmap', href: '/roadmap' },
-    { label: 'Pricing', href: '/pricing' },
     { label: 'Docs', href: '/docs' },
     { label: 'Gallery', href: '/gallery' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'Roadmap', href: '/roadmap' },
+    { label: 'About', href: '/about' },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
+    <nav className="fixed left-0 right-0 top-0 z-50 h-14 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className={`${CONTAINER} h-full flex items-center justify-between`}>
         <a href="/" className="flex items-center gap-2">
-          <Image src="/monogram.svg" alt="Siza" width={24} height={24} priority />
-          <span className="font-display font-bold text-lg">siza</span>
+          <Image src="/monogram.svg" alt="Siza" width={22} height={22} priority />
+          <span className="font-display font-bold text-lg tracking-tight text-foreground">Siza</span>
         </a>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden sm:flex items-center gap-1">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="px-3 py-1.5 text-sm rounded-md text-muted-foreground hover:text-foreground transition-colors duration-150"
             >
               {link.label}
             </a>
@@ -44,7 +44,7 @@ export function LandingNav() {
             Get Started
           </a>
 
-          <details className="relative md:hidden">
+          <details className="relative sm:hidden">
             <summary
               aria-label="Open menu"
               className="list-none p-2 text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden"

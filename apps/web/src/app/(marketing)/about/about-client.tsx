@@ -179,7 +179,7 @@ export default function AboutPageClient({ snapshot }: AboutPageClientProps) {
       <section className="px-6 py-16">
         <div className="relative z-10 mx-auto max-w-5xl">
           <FadeIn className="mb-10 text-center">
-            <h2 className="mb-3 text-3xl font-bold tracking-tight">The Forge Space Ecosystem</h2>
+            <h2 className="mb-3 text-3xl font-bold tracking-tight">The Siza Ecosystem</h2>
             <p className="mx-auto max-w-xl text-muted-foreground">
               Siza ships as part of an 11-repository product ecosystem with{' '}
               {snapshot.releasedRepoCount} tagged releases and shared governance standards.
@@ -256,13 +256,13 @@ export default function AboutPageClient({ snapshot }: AboutPageClientProps) {
         <FadeIn className="relative z-10 mx-auto max-w-3xl text-center">
           <p className="mb-6 text-muted-foreground">
             Siza is built by <span className="font-medium text-foreground">Lucas Santana</span> as
-            part of the Forge Space initiative.
+            part of the Siza initiative.
           </p>
           <div className="flex justify-center gap-4">
             <Button variant="outline" size="sm" asChild>
               <a href="https://github.com/Forge-Space" target="_blank" rel="noopener noreferrer">
                 <Github className="mr-2 h-4 w-4" />
-                Forge Space
+                Siza on GitHub
               </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
