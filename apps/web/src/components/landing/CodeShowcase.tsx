@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Check, ChevronRight } from 'lucide-react';
 import { CONTAINER, SECTION_PADDING } from './constants';
+import { highlightBlock } from './highlight';
 
 interface DiffEntry {
   path: string;
@@ -210,8 +211,8 @@ function CodeTooltip({ entry }: { entry: DiffEntry }) {
         <ChevronRight className={`w-3 h-3 ${hl.text} flex-shrink-0`} />
         <span className={`text-[11px] font-mono font-medium ${hl.text}`}>{entry.path}</span>
       </div>
-      <pre className="p-3 font-mono text-[11px] leading-[1.6] text-[#A1A1AA] overflow-x-auto whitespace-pre">
-        {entry.codePreview}
+      <pre className="p-3 font-mono text-[11px] leading-[1.6] overflow-x-auto whitespace-pre">
+        {highlightBlock(entry.codePreview ?? '')}
       </pre>
     </div>
   );

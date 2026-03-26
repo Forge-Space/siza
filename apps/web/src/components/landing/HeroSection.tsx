@@ -3,6 +3,7 @@
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { CONTAINER } from './constants';
+import { highlightLine, lineStartColor } from './highlight';
 
 const DEMO_STEPS = [
   {
@@ -111,35 +112,35 @@ function AnimatedCodeDemo() {
         <span className="ml-2 text-xs text-[#71717A] font-mono">Terminal</span>
       </div>
       <div className="p-5 font-mono text-[13px] leading-relaxed min-h-[220px]">
-        {displayed.map((line, i) => (
-          <div
-            key={i}
-            className={
-              line.startsWith('  ✓')
-                ? 'text-emerald-400'
-                : line.startsWith('  >')
-                  ? 'text-violet-400'
-                  : line.startsWith('$')
-                    ? 'text-[#FAFAFA]'
-                    : 'text-[#A1A1AA]'
-            }
-          >
-            {line || '\u00A0'}
-          </div>
-        ))}
+        {displayed.map((line, i) => {
+          const isCheck = line.startsWith('  ✓');
+          const isPrompt = line.startsWith('  >');
+          const isCmd = line.startsWith('$');
+          return (
+            <div key={i}>
+              {isCheck ? (
+                <span className="text-emerald-400">{line}</span>
+              ) : isPrompt ? (
+                <span className="text-violet-400">{line}</span>
+              ) : isCmd ? (
+                <span style={{ color: '#FAFAFA' }}>{line}</span>
+              ) : (
+                highlightLine(line)
+              )}
+            </div>
+          );
+        })}
         {partialLine !== undefined && (
-          <div
-            className={
-              partialLine.startsWith('  ✓')
-                ? 'text-emerald-400'
-                : partialLine.startsWith('  >')
-                  ? 'text-violet-400'
-                  : partialLine.startsWith('$')
-                    ? 'text-[#FAFAFA]'
-                    : 'text-[#A1A1AA]'
-            }
-          >
-            {partialLine}
+          <div>
+            {currentLine.startsWith('  ✓') ? (
+              <span className="text-emerald-400">{partialLine}</span>
+            ) : currentLine.startsWith('  >') ? (
+              <span className="text-violet-400">{partialLine}</span>
+            ) : currentLine.startsWith('$') ? (
+              <span style={{ color: '#FAFAFA' }}>{partialLine}</span>
+            ) : (
+              <span style={{ color: lineStartColor(currentLine) }}>{partialLine}</span>
+            )}
             <span className="inline-block w-[2px] h-[14px] bg-violet-400 align-middle ml-[1px] animate-[cursor-blink_1s_step-end_infinite]" />
           </div>
         )}
