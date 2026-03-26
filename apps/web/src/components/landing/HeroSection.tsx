@@ -41,11 +41,14 @@ const DEMO_STEPS = [
   },
 ];
 
+const INITIAL_DISPLAYED = [DEMO_STEPS[0].lines[0]];
+const INITIAL_LINE_IDX = 1;
+
 function AnimatedCodeDemo() {
   const [stepIdx, setStepIdx] = useState(0);
-  const [lineIdx, setLineIdx] = useState(0);
+  const [lineIdx, setLineIdx] = useState(INITIAL_LINE_IDX);
   const [charIdx, setCharIdx] = useState(0);
-  const [displayed, setDisplayed] = useState<string[]>([]);
+  const [displayed, setDisplayed] = useState<string[]>(INITIAL_DISPLAYED);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -69,9 +72,9 @@ function AnimatedCodeDemo() {
             if (isLastStep) {
               timeoutRef.current = setTimeout(() => {
                 setStepIdx(0);
-                setLineIdx(0);
+                setLineIdx(INITIAL_LINE_IDX);
                 setCharIdx(0);
-                setDisplayed([]);
+                setDisplayed(INITIAL_DISPLAYED);
               }, 3200);
             } else {
               setStepIdx((s) => s + 1);
