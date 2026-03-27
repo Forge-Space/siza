@@ -27,7 +27,7 @@ function setupMocks(counts: {
   onboardingRows: Array<{ id: string }>;
   projectRows: Array<{ owner_id: string }>;
   feedbackRows: Array<{ user_feedback: string | null }>;
-  revisions: number;
+  windowGenerations: Array<{ parent_generation_id?: string | null; ai_provider?: string | null }>;
   mcpTotal: number;
   mcp30d: number;
 }) {
@@ -44,7 +44,7 @@ function setupMocks(counts: {
     { data: counts.onboardingRows, error: null, count: null },
     { data: counts.projectRows, error: null, count: null },
     { data: counts.feedbackRows, error: null, count: null },
-    { count: counts.revisions, error: null, data: null },
+    { data: counts.windowGenerations, error: null, count: null },
     { count: counts.mcpTotal, error: null, data: null },
     { count: counts.mcp30d, error: null, data: null },
   ];
@@ -95,6 +95,23 @@ describe('GET /api/metrics', () => {
       SUPABASE_SERVICE_ROLE_KEY: 'service-key',
       METRICS_API_KEY: VALID_KEY,
     };
+    setupMocks({
+      profiles: 0,
+      profiles7d: 0,
+      profiles30d: 0,
+      generations: 0,
+      gen24h: 0,
+      gen7d: 0,
+      completed: 0,
+      projects: 0,
+      activeRows: [],
+      onboardingRows: [],
+      projectRows: [],
+      feedbackRows: [],
+      windowGenerations: [],
+      mcpTotal: 0,
+      mcp30d: 0,
+    });
   });
 
   afterEach(() => {
@@ -152,7 +169,20 @@ describe('GET /api/metrics', () => {
         { user_feedback: 'thumbs_up' },
         { user_feedback: 'thumbs_down' },
       ],
-      revisions: 40,
+      windowGenerations: [
+        ...Array.from({ length: 40 }, () => ({
+          parent_generation_id: 'parent',
+          ai_provider: 'google',
+        })),
+        ...Array.from({ length: 80 }, () => ({
+          parent_generation_id: null,
+          ai_provider: 'mcp-gateway',
+        })),
+        ...Array.from({ length: 80 }, () => ({
+          parent_generation_id: null,
+          ai_provider: 'google',
+        })),
+      ],
       mcpTotal: 120,
       mcp30d: 60,
     });
@@ -172,6 +202,14 @@ describe('GET /api/metrics', () => {
         satisfaction: { responses: 3, positive: 2, rate: 67 },
       },
       projects: { total: 30 },
+      quality: {
+        windowDays: 30,
+        totalGenerations: 200,
+        revisionRate: 20,
+        satisfactionRate: 67,
+        satisfactionVotes: 3,
+        mcpCoverage: 40,
+      },
       adoption: {
         gate50: { qualifiedUsers: 2, requiredUsers: 50, validated: false },
         onboarding: { completedUsers: 4, completionRate: 10 },
@@ -205,7 +243,7 @@ describe('GET /api/metrics', () => {
       onboardingRows: [],
       projectRows: [],
       feedbackRows: [],
-      revisions: 0,
+      windowGenerations: [],
       mcpTotal: 0,
       mcp30d: 0,
     });
@@ -229,7 +267,7 @@ describe('GET /api/metrics', () => {
       onboardingRows: [],
       projectRows: [],
       feedbackRows: [],
-      revisions: 0,
+      windowGenerations: [],
       mcpTotal: 0,
       mcp30d: 0,
     });
@@ -239,8 +277,66 @@ describe('GET /api/metrics', () => {
     expect(body.generations.successRate).toBe(0);
     expect(body.generations.revisions.rate).toBe(0);
     expect(body.generations.satisfaction.rate).toBe(0);
+    expect(body.quality).toMatchObject({
+      windowDays: 30,
+      totalGenerations: 0,
+      revisionRate: 0,
+      satisfactionRate: null,
+      satisfactionVotes: 0,
+      mcpCoverage: 0,
+    });
     expect(body.adoption.gate50.validated).toBe(false);
     expect(body.routing.mcp.coverageRate).toBe(0);
+  });
+
+  it('returns 503 when Supabase service configuration is missing', async () => {
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
+
+    expect(res.status).toBe(503);
+    const body = await res.json();
+    expect(body.error).toBe('Metrics service unavailable');
+  });
+
+  it('honors the windowDays query parameter for legacy quality metrics', async () => {
+    setupMocks({
+      profiles: 42,
+      profiles7d: 5,
+      profiles30d: 15,
+      generations: 200,
+      gen24h: 10,
+      gen7d: 50,
+      completed: 180,
+      projects: 30,
+      activeRows: [],
+      onboardingRows: [],
+      projectRows: [],
+      feedbackRows: [{ user_feedback: 'thumbs_up' }, { user_feedback: 'thumbs_down' }],
+      windowGenerations: [
+        { parent_generation_id: 'parent', ai_provider: 'mcp-gateway' },
+        { parent_generation_id: null, ai_provider: 'google' },
+      ],
+      mcpTotal: 120,
+      mcp30d: 60,
+    });
+
+    const res = await GET(
+      new Request('http://localhost:3000/api/metrics?windowDays=7', {
+        headers: { authorization: `Bearer ${VALID_KEY}` },
+      })
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.quality).toMatchObject({
+      windowDays: 7,
+      totalGenerations: 2,
+      revisionRate: 50,
+      satisfactionRate: 50,
+      satisfactionVotes: 2,
+      mcpCoverage: 50,
+    });
   });
 
   it('returns 500 when a database query fails', async () => {

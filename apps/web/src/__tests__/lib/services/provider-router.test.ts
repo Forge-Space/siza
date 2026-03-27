@@ -99,6 +99,52 @@ describe('routeGeneration', () => {
       expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(true);
     });
 
+    it('falls back to Anthropic when direct-provider fallback hits a quota error', async () => {
+      const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
+      const { generateWithProvider } = require('@/lib/services/generation');
+
+      process.env.ANTHROPIC_API_KEY = 'server-anthropic-key';
+
+      mcpStream.mockImplementation(async function* () {
+        if (Date.now() < 0) {
+          yield { type: 'start', timestamp: 0 };
+        }
+        throw new Error('Gateway down');
+      });
+
+      generateWithProvider.mockImplementation(async function* (options: any) {
+        if (options.provider === 'google') {
+          yield { type: 'error', message: 'quota exceeded 429', timestamp: 1 };
+          return;
+        }
+
+        yield { type: 'chunk', content: 'anthropic-backup-code', timestamp: 2 };
+        yield { type: 'complete', timestamp: 3 };
+      });
+
+      const events = await collectEvents(
+        routeGeneration({
+          ...baseOpts,
+          mcpEnabled: true,
+          accessToken: 'tok-123',
+          allowDirectProviderFallback: true,
+        })
+      );
+
+      expect(events.some((e) => e.type === 'fallback' && e.provider === 'google')).toBe(true);
+      expect(events.some((e) => e.type === 'fallback' && e.provider === 'anthropic')).toBe(true);
+      expect(events.some((e) => e.type === 'chunk' && e.content === 'anthropic-backup-code')).toBe(
+        true
+      );
+      expect(generateWithProvider).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          provider: 'anthropic',
+          apiKey: undefined,
+        })
+      );
+    });
+
     it('returns an error on MCP failure when direct-provider fallback is disabled', async () => {
       const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
       const { generateWithProvider } = require('@/lib/services/generation');
