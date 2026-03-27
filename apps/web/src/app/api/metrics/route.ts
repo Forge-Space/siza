@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+import { parseWindowDays } from '@/lib/services/metrics.service';
+
 const REQUIRED_QUALIFIED_USERS = 50;
 const POSITIVE_FEEDBACK = 'thumbs_up';
 
@@ -69,37 +71,59 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = getServiceClient();
   const now = new Date();
+  const windowDays = parseWindowDays(new URL(request.url).searchParams.get('windowDays'));
   const last24h = new Date(now.getTime() - 86400000).toISOString();
   const last7d = new Date(now.getTime() - 7 * 86400000).toISOString();
   const last30d = new Date(now.getTime() - 30 * 86400000).toISOString();
-  const countRows = (table: string) =>
-    supabase.from(table).select('id', { count: 'exact', head: true });
-  const countRowsSince = (table: string, createdAt: string) =>
-    countRows(table).gte('created_at', createdAt);
-  const countRowsWhere = (table: string, column: string, value: string) =>
-    countRows(table).eq(column, value);
-  const countRowsWhereSince = (table: string, column: string, value: string, createdAt: string) =>
-    countRowsWhere(table, column, value).gte('created_at', createdAt);
+  const windowStart = new Date(now.getTime() - windowDays * 86400000).toISOString();
 
-  const results = await Promise.all([
-    countRows('profiles'),
-    countRowsSince('profiles', last7d),
-    countRowsSince('profiles', last30d),
-    countRows('generations'),
-    countRowsSince('generations', last24h),
-    countRowsSince('generations', last7d),
-    countRowsWhere('generations', 'status', 'completed'),
-    countRows('projects'),
-    supabase.from('generations').select('user_id').eq('status', 'completed'),
-    supabase.from('profiles').select('id').not('onboarding_completed_at', 'is', null),
-    supabase.from('projects').select('owner_id'),
-    supabase.from('generations').select('user_feedback').not('user_feedback', 'is', null),
-    countRows('generations').not('parent_generation_id', 'is', null),
-    countRowsWhere('generations', 'ai_provider', 'mcp-gateway'),
-    countRowsWhereSince('generations', 'ai_provider', 'mcp-gateway', last30d),
-  ]);
+  let results;
+
+  try {
+    const supabase = getServiceClient();
+    const countRows = (table: string) =>
+      supabase.from(table).select('id', { count: 'exact', head: true });
+    const countRowsSince = (table: string, createdAt: string) =>
+      countRows(table).gte('created_at', createdAt);
+    const countRowsWhere = (table: string, column: string, value: string) =>
+      countRows(table).eq(column, value);
+    const countRowsWhereSince = (table: string, column: string, value: string, createdAt: string) =>
+      countRowsWhere(table, column, value).gte('created_at', createdAt);
+
+    results = await Promise.all([
+      countRows('profiles'),
+      countRowsSince('profiles', last7d),
+      countRowsSince('profiles', last30d),
+      countRows('generations'),
+      countRowsSince('generations', last24h),
+      countRowsSince('generations', last7d),
+      countRowsWhere('generations', 'status', 'completed'),
+      countRows('projects'),
+      supabase.from('generations').select('user_id').eq('status', 'completed'),
+      supabase.from('profiles').select('id').not('onboarding_completed_at', 'is', null),
+      supabase.from('projects').select('owner_id'),
+      supabase
+        .from('generations')
+        .select('user_feedback')
+        .not('user_feedback', 'is', null)
+        .gte('created_at', windowStart),
+      supabase
+        .from('generations')
+        .select('parent_generation_id,ai_provider')
+        .gte('created_at', windowStart),
+      countRowsWhere('generations', 'ai_provider', 'mcp-gateway'),
+      countRowsWhereSince('generations', 'ai_provider', 'mcp-gateway', last30d),
+    ]);
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: 'Metrics service unavailable',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 503 }
+    );
+  }
 
   const errors = results.filter((result) => result.error);
   if (errors.length > 0) {
@@ -125,7 +149,7 @@ export async function GET(request: Request) {
     onboardingUsersResult,
     projectOwnersResult,
     feedbackRowsResult,
-    revisionsResult,
+    windowGenerationsResult,
     mcpTotalResult,
     mcp30dResult,
   ] = results;
@@ -133,9 +157,16 @@ export async function GET(request: Request) {
   const usersTotal = totalUsers.count ?? 0;
   const generationsTotal = totalGenerations.count ?? 0;
   const completedTotal = completedGens.count ?? 0;
-  const revisionsTotal = revisionsResult.count ?? 0;
   const mcpTotal = mcpTotalResult.count ?? 0;
   const mcp30d = mcp30dResult.count ?? 0;
+  const windowGenerations = asRows(windowGenerationsResult.data);
+  const totalWindowGenerations = windowGenerations.length;
+  const revisionsTotal = windowGenerations.filter(
+    (row) => row.parent_generation_id !== null && row.parent_generation_id !== undefined
+  ).length;
+  const windowMcpTotal = windowGenerations.filter(
+    (row) => row.ai_provider === 'mcp-gateway'
+  ).length;
 
   const generationUsers = toIdSet(completedGenerationUsers.data, 'user_id');
   const onboardingUsers = toIdSet(onboardingUsersResult.data, 'id');
@@ -174,6 +205,15 @@ export async function GET(request: Request) {
     },
     projects: {
       total: totalProjects.count ?? 0,
+    },
+    quality: {
+      windowDays,
+      totalGenerations: totalWindowGenerations,
+      revisionRate: roundRate(revisionsTotal, totalWindowGenerations),
+      satisfactionRate:
+        satisfactionResponses > 0 ? roundRate(positiveFeedback, satisfactionResponses) : null,
+      satisfactionVotes: satisfactionResponses,
+      mcpCoverage: roundRate(windowMcpTotal, totalWindowGenerations),
     },
     adoption: {
       gate50: {

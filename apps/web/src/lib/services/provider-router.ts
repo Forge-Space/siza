@@ -73,23 +73,11 @@ async function* streamDirectProviderFallback(
   provider: AIProvider,
   model: string
 ): AsyncGenerator<GenerationEvent> {
-  for await (const event of generateWithProvider({
+  yield* routeViaProvider({
+    ...opts,
     provider,
     model,
-    prompt: opts.prompt,
-    framework: opts.framework,
-    componentLibrary: opts.componentLibrary,
-    style: opts.style,
-    typescript: opts.typescript,
-    apiKey: opts.userApiKey,
-    contextAddition: opts.contextAddition,
-    imageBase64: opts.imageBase64,
-    imageMimeType: opts.imageMimeType,
-  })) {
-    if (event.type !== 'complete') {
-      yield event;
-    }
-  }
+  });
 }
 
 async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
