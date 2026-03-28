@@ -1,0 +1,44 @@
+name: Bug report
+description: Report a reproducible product or platform problem that belongs in delivery work.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use Discussions for exploratory questions or solution debates.
+        Use this form when the bug is actionable and belongs in the Siza delivery backlog.
+  - type: input
+    id: affected_scope
+    attributes:
+      label: Affected area
+      description: Which Siza surface or subsystem is affected?
+      placeholder: apps/web generate flow
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is broken or currently wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction or failing flow
+      description: Minimal steps, request flow, or scenario that reproduces the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected_outcome
+    attributes:
+      label: Expected outcome
+      description: What should happen after this is fixed?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Logs, screenshots, traces, environment notes, or related links.
+

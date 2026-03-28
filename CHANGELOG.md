@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Reworked Siza GitHub intake to match the Forge Space Discussions -> Issues -> Projects contract.
+- Replaced stale personal-repo issue links with the active `Forge-Space/siza` Discussions surface and the shared Forge Space security policy.
+- Replaced the oversized legacy issue templates with a focused repo-local set: shared baseline issue forms plus Siza-specific Documentation and Performance issue forms.
+
 ### Fixed
 - Removed stale duplicate metrics API unit test (`apps/web/src/__tests__/lib/api/metrics-route.test.ts`) that targeted the old service-based route contract and conflicted with the current Supabase-backed metrics route tests.
 

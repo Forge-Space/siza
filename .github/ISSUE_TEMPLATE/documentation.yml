@@ -1,0 +1,56 @@
+name: Documentation
+description: Track actionable documentation improvements for users, contributors, or operators.
+title: "[Docs] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use Discussions for open-ended questions.
+        Use this form when the documentation work is concrete and belongs in the delivery backlog.
+  - type: input
+    id: affected_scope
+    attributes:
+      label: Documentation area
+      description: Which docs surface needs work?
+      placeholder: apps/docs quick start
+    validations:
+      required: true
+  - type: dropdown
+    id: request_type
+    attributes:
+      label: Request type
+      options:
+        - New documentation
+        - Update existing documentation
+        - Fix an error
+        - Improve clarity
+        - Add examples or troubleshooting
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing, inaccurate, or hard to understand?
+    validations:
+      required: true
+  - type: textarea
+    id: expected_outcome
+    attributes:
+      label: Expected outcome
+      description: What should be true once the docs are improved?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List objective checks for done.
+    validations:
+      required: true
+  - type: input
+    id: related_discussion
+    attributes:
+      label: Related discussion or issue
+      description: Link upstream context when relevant.
+

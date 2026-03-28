@@ -498,6 +498,21 @@ Covers: quick start, self-hosting, configuration, MCP integration, API reference
 - [**Issue Templates**](https://github.com/Forge-Space/siza/issues/new/choose) — bug reports, feature requests, security reports
 - [**Contributing Guide**](CONTRIBUTING.md) — how to contribute code and docs
 
+## GitHub Workflow
+
+Siza follows the shared Forge Space GitHub work-management contract:
+
+- Discussions for questions, RFCs, ideas, and design review
+- Issues for actionable delivery work
+- Projects for roadmap visibility and cross-repo reporting
+
+Siza keeps two repo-specific issue forms on top of the shared baseline:
+
+- Documentation
+- Performance issue
+
+Security reports should go through the shared private security policy rather than a public issue.
+
 ## Contributing
 
 We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
