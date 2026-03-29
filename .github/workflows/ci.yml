@@ -35,7 +35,7 @@ jobs:
         run: npx tsx scripts/check-route-coverage.ts --ci
       - run: npm run test -- --filter=!@siza/desktop -- --coverage
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./apps/web/coverage/coverage-final.json
