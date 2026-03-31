@@ -54,11 +54,11 @@
     "husky": "^9.1.7",
     "knip": "^5.87.0",
     "lint-staged": "^16.4.0",
-    "npm-check-updates": "^19.6.3",
+    "npm-check-updates": "^19.6.6",
     "prettier": "^3.8.1",
-    "turbo": "^2.8.17",
+    "turbo": "^2.9.1",
     "typescript": "^5.7.0",
-    "wrangler": "^4.74.0"
+    "wrangler": "^4.78.0"
   },
   "overrides": {
     "dompurify": "^3.3.2",
@@ -76,7 +76,7 @@
   },
   "packageManager": "npm@10.9.2",
   "dependencies": {
-    "@react-email/components": "^1.0.9",
-    "@supabase/supabase-js": "^2.99.2"
+    "@react-email/components": "^1.0.10",
+    "@supabase/supabase-js": "^2.101.0"
   }
 }
