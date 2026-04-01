@@ -1,0 +1,63 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches: [main, dev, release/*, feat/*, feature/*]
+  pull_request:
+    branches: [main, dev, release/*]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN_PRESENT: ${{ secrets.SONAR_TOKEN != '' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: Forge-Space/.github/.github/actions/setup-node@6fbe56bc610ddf84b70f213c752b95196bcadd95
+
+      - name: Run tests with coverage
+        run: npm run test -- --filter=!@siza/desktop -- --coverage
+        continue-on-error: true
+
+      - name: Generate desktop coverage
+        run: cd apps/desktop && npm run test -- --coverage
+        continue-on-error: true
+
+      - name: Verify coverage files
+        run: |
+          echo "API coverage:"
+          [ -f apps/api/coverage/lcov.info ] && echo "✓ Found" || echo "✗ Not found"
+          echo "Web coverage:"
+          [ -f apps/web/coverage/lcov.info ] && echo "✓ Found" || echo "✗ Not found"
+          echo "Desktop coverage:"
+          [ -f apps/desktop/coverage/lcov.info ] && echo "✓ Found" || echo "✗ Not found"
+
+      - name: Validate Sonar token policy
+        if: env.SONAR_TOKEN_PRESENT != 'true' && github.actor != 'dependabot[bot]'
+        run: |
+          echo "::error::SONAR_TOKEN is required for non-Dependabot runs."
+          exit 1
+
+      - name: Skip Sonar scan for Dependabot without token
+        if: env.SONAR_TOKEN_PRESENT != 'true' && github.actor == 'dependabot[bot]'
+        run: echo "Skipping SonarCloud scan for Dependabot context."
+
+      - name: SonarCloud Scan
+        if: env.SONAR_TOKEN_PRESENT == 'true'
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          args: -Dsonar.qualitygate.wait=true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
