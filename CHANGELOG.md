@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **SonarCloud issues** — resolved static analysis bugs and vulnerabilities: string sort comparators in feature-flag and skills components, hardcoded test credentials, workflow-level GitHub Actions permissions, regex operator precedence in E2E tests, and conditional logic in route scaffold generator.
 - **SonarCloud coverage configuration** — added `sonar.typescript.lcov.reportPaths` to point to coverage reports, excluded non-testable files (migrations, layouts, entry points, E2E tests) from coverage gates, and added unit tests for `useFeatureFlag` and `useFeatureFlags` hooks to improve new code coverage.
 - Removed stale duplicate metrics API unit test (`apps/web/src/__tests__/lib/api/metrics-route.test.ts`) that targeted the old service-based route contract and conflicted with the current Supabase-backed metrics route tests.
+- Added `reporter: ['text', 'lcov']` to desktop vitest coverage config to generate lcov.info for SonarCloud coverage reporting.
 
 ## [0.49.1] — 2026-03-19
 
