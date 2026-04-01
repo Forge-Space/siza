@@ -57,7 +57,9 @@ describe('useFeatureFlags', () => {
     (useFeatureFlagContext as jest.Mock).mockReturnValue({
       flags: { FLAG_A: true, FLAG_B: false },
     });
-    (features.getFeatureFlag as jest.Mock).mockReturnValue(false);
+    (features.getFeatureFlag as jest.Mock).mockImplementation((name: string) => {
+      return name === 'ENABLE_CENTRALIZED_FEATURE_FLAGS' ? true : false;
+    });
 
     const { result } = renderHook(() => useFeatureFlags(['FLAG_A', 'FLAG_B']));
     expect(result.current).toEqual({ FLAG_A: true, FLAG_B: false });
@@ -78,6 +80,7 @@ describe('useFeatureFlags', () => {
       flags: { CENTRALIZED_FLAG: true },
     });
     (features.getFeatureFlag as jest.Mock).mockImplementation((name: string) => {
+      if (name === 'ENABLE_CENTRALIZED_FEATURE_FLAGS') return true;
       return name === 'ENV_FLAG' ? true : false;
     });
 
