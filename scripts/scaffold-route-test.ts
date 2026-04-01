@@ -214,7 +214,7 @@ for (const method of methods) {
   const isWrite = ['POST', 'PATCH', 'PUT'].includes(method);
   const contextArg = hasDynamic ? `, makeContext()` : '';
   const reqArg = isWrite ? `makeRequest('${method}', { /* TODO */ })` : `makeRequest()`;
-  const successStatus = method === 'POST' ? 201 : method === 'DELETE' ? 200 : 200;
+  const successStatus = method === 'POST' ? 201 : method === 'DELETE' ? 204 : 200;
 
   const authGuard =
     hasAuthBarrel || hasAuthDirect

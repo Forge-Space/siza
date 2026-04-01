@@ -22,7 +22,10 @@ export function useFeatureFlags(
 ): Partial<Record<FeatureFlagName, boolean>> {
   const { flags } = useFeatureFlagContext();
   const centralizedEnabled = getFeatureFlag('ENABLE_CENTRALIZED_FEATURE_FLAGS');
-  const serializedKey = names.slice().sort().join('|');
+  const serializedKey = names
+    .slice()
+    .sort((a, b) => a.localeCompare(b))
+    .join('|');
 
   return useMemo(() => {
     if (names.length === 0 || serializedKey === '') return {};
