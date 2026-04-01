@@ -19,7 +19,7 @@ export const TEST_CONFIG = {
   },
   USER: {
     EMAIL: process.env.TEST_USER_EMAIL || 'test@example.com',
-    PASSWORD: process.env.TEST_USER_PASSWORD || 'test-password-123',
+    PASSWORD: process.env.TEST_USER_PASSWORD || 'fake-test-password',
   },
   ENCRYPTION: {
     KEY: process.env.TEST_ENCRYPTION_KEY || 'a'.repeat(32),

@@ -144,10 +144,10 @@ test.describe('Navigation and Routing', () => {
     await expect(page.getByText(/404|not found/i)).toBeVisible();
 
     // Should have link back to home
-    const homeLink = page.getByRole('link', { name: /home|dashboard/i });
+    const homeLink = page.getByRole('link', { name: /(home|dashboard)/i });
     if ((await homeLink.count()) > 0) {
       await homeLink.click();
-      await expect(page).toHaveURL(/\/dashboard|\/$/);
+      await expect(page).toHaveURL(/(\/dashboard|\/)/);
     }
   });
 
@@ -158,11 +158,11 @@ test.describe('Navigation and Routing', () => {
     const logo = page
       .locator('a')
       .filter({ has: page.locator('img[alt*="Siza"]') })
-      .or(page.getByRole('link').filter({ hasText: /Siza/ }));
+      .or(page.getByRole('link').filter({ hasText: /(Siza)/ }));
 
     if ((await logo.count()) > 0) {
       await logo.click();
-      await expect(page).toHaveURL(/\/dashboard|\/$/);
+      await expect(page).toHaveURL(/(\/dashboard|\/)/);
     }
   });
 

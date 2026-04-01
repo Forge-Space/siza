@@ -177,7 +177,9 @@ export function SkillsMarketplaceClient() {
     }
   };
 
-  const allTags = Array.from(new Set(skills.flatMap((s) => s.tags ?? []))).sort();
+  const allTags = Array.from(new Set(skills.flatMap((s) => s.tags ?? []))).sort((a, b) =>
+    a.localeCompare(b)
+  );
 
   return (
     <div className="space-y-6">
