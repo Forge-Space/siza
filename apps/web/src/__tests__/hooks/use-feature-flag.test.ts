@@ -1,89 +1,96 @@
 import { renderHook } from '@testing-library/react';
 import { useFeatureFlag, useFeatureFlags } from '@/hooks/use-feature-flag';
-
-const mockGetFeatureFlag = jest.fn();
-const mockUseFeatureFlagContext = jest.fn();
-
-jest.mock('@/lib/features/flags', () => ({
-  getFeatureFlag: (...args: unknown[]) => mockGetFeatureFlag(...args),
-}));
+import * as features from '@/lib/features/flags';
 
 jest.mock('@/lib/features/provider', () => ({
-  useFeatureFlagContext: () => mockUseFeatureFlagContext(),
+  useFeatureFlagContext: jest.fn(),
 }));
+
+jest.mock('@/lib/features/flags');
+
+const { useFeatureFlagContext } = require('@/lib/features/provider');
 
 describe('useFeatureFlag', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseFeatureFlagContext.mockReturnValue({ flags: {} });
   });
 
-  it('returns value from getFeatureFlag when centralized is disabled', () => {
-    // ENABLE_CENTRALIZED_FEATURE_FLAGS = false, ENABLE_USAGE_LIMITS = true
-    mockGetFeatureFlag.mockImplementation((name: string) => {
-      if (name === 'ENABLE_CENTRALIZED_FEATURE_FLAGS') return false;
-      if (name === 'ENABLE_USAGE_LIMITS') return true;
-      return false;
+  it('returns flag from centralized context when enabled', () => {
+    (useFeatureFlagContext as jest.Mock).mockReturnValue({
+      flags: { TEST_FLAG: true },
     });
+    (features.getFeatureFlag as jest.Mock).mockReturnValue(true);
 
-    const { result } = renderHook(() => useFeatureFlag('ENABLE_USAGE_LIMITS'));
-
+    const { result } = renderHook(() => useFeatureFlag('TEST_FLAG'));
     expect(result.current).toBe(true);
   });
 
-  it('returns value from context when centralized is enabled and flag exists', () => {
-    mockUseFeatureFlagContext.mockReturnValue({
-      flags: { ENABLE_USAGE_LIMITS: false },
+  it('returns flag from getFeatureFlag when centralized is disabled', () => {
+    (useFeatureFlagContext as jest.Mock).mockReturnValue({
+      flags: {},
     });
-    mockGetFeatureFlag.mockImplementation((name: string) => {
-      if (name === 'ENABLE_CENTRALIZED_FEATURE_FLAGS') return true;
-      return true;
+    (features.getFeatureFlag as jest.Mock).mockImplementation((name: string) => {
+      return name === 'TEST_FLAG' ? true : false;
     });
 
-    const { result } = renderHook(() => useFeatureFlag('ENABLE_USAGE_LIMITS'));
+    const { result } = renderHook(() => useFeatureFlag('TEST_FLAG'));
+    expect(result.current).toBe(true);
+  });
 
+  it('returns false when flag is disabled', () => {
+    (useFeatureFlagContext as jest.Mock).mockReturnValue({
+      flags: { TEST_FLAG: false },
+    });
+    (features.getFeatureFlag as jest.Mock).mockReturnValue(true);
+
+    const { result } = renderHook(() => useFeatureFlag('TEST_FLAG'));
     expect(result.current).toBe(false);
-  });
-
-  it('falls back to getFeatureFlag when centralized enabled but flag not in context', () => {
-    mockUseFeatureFlagContext.mockReturnValue({ flags: {} });
-    mockGetFeatureFlag.mockImplementation((name: string) => {
-      if (name === 'ENABLE_CENTRALIZED_FEATURE_FLAGS') return true;
-      if (name === 'ENABLE_USAGE_LIMITS') return true;
-      return false;
-    });
-
-    const { result } = renderHook(() => useFeatureFlag('ENABLE_USAGE_LIMITS'));
-
-    expect(result.current).toBe(true);
   });
 });
 
 describe('useFeatureFlags', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseFeatureFlagContext.mockReturnValue({ flags: {} });
-    mockGetFeatureFlag.mockImplementation((name: string) => {
-      if (name === 'ENABLE_CENTRALIZED_FEATURE_FLAGS') return false;
-      if (name === 'ENABLE_USAGE_LIMITS') return true;
-      if (name === 'ENABLE_STRIPE_BILLING') return false;
-      return false;
-    });
   });
 
-  it('returns partial record for requested flag names', () => {
-    const { result } = renderHook(() =>
-      useFeatureFlags(['ENABLE_USAGE_LIMITS', 'ENABLE_STRIPE_BILLING'])
-    );
-
-    expect(result.current).toEqual({
-      ENABLE_USAGE_LIMITS: true,
-      ENABLE_STRIPE_BILLING: false,
+  it('returns multiple flags', () => {
+    (useFeatureFlagContext as jest.Mock).mockReturnValue({
+      flags: { FLAG_A: true, FLAG_B: false },
     });
+    (features.getFeatureFlag as jest.Mock).mockImplementation((name: string) => {
+      return name === 'ENABLE_CENTRALIZED_FEATURE_FLAGS' ? true : false;
+    });
+
+    const { result } = renderHook(() => useFeatureFlags(['FLAG_A', 'FLAG_B']));
+    expect(result.current).toEqual({ FLAG_A: true, FLAG_B: false });
   });
 
-  it('returns empty object for empty names array', () => {
+  it('returns empty object for empty names', () => {
+    (useFeatureFlagContext as jest.Mock).mockReturnValue({
+      flags: {},
+    });
+    (features.getFeatureFlag as jest.Mock).mockReturnValue(false);
+
     const { result } = renderHook(() => useFeatureFlags([]));
     expect(result.current).toEqual({});
+  });
+
+  it('merges centralized and feature flags correctly', () => {
+    (useFeatureFlagContext as jest.Mock).mockReturnValue({
+      flags: { CENTRALIZED_FLAG: true },
+    });
+    (features.getFeatureFlag as jest.Mock).mockImplementation((name: string) => {
+      if (name === 'ENABLE_CENTRALIZED_FEATURE_FLAGS') return true;
+      return name === 'ENV_FLAG' ? true : false;
+    });
+
+    const { result } = renderHook(() =>
+      useFeatureFlags(['CENTRALIZED_FLAG', 'ENV_FLAG', 'UNKNOWN_FLAG'])
+    );
+    expect(result.current).toEqual({
+      CENTRALIZED_FLAG: true,
+      ENV_FLAG: true,
+      UNKNOWN_FLAG: false,
+    });
   });
 });
