@@ -77,6 +77,7 @@
   },
   "packageManager": "npm@10.9.2",
   "dependencies": {
+    "@react-email/body": "^0.3.0",
     "@react-email/components": "^1.0.10",
     "@supabase/supabase-js": "^2.101.0"
   }
