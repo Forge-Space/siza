@@ -41,10 +41,8 @@ jobs:
         uses: github/codeql-action/init@0d579ffd059c29b07949a3cce3983f0780820c98
         with:
           languages: ${{ matrix.language }}
+          build-mode: none
           queries: +security-and-quality
-
-      - name: Build project
-        run: npx turbo build --filter=!@siza/desktop
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@0d579ffd059c29b07949a3cce3983f0780820c98
