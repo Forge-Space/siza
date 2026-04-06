@@ -86,7 +86,7 @@
     "postcss": "^8.5.8",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.8.3",
+    "typescript": "^6.0.2",
     "wrangler": "^4.78.0"
   }
 }
