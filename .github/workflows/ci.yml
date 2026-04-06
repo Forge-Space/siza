@@ -106,6 +106,8 @@ jobs:
         run: echo 'Skipping E2E — dependabot PRs lack secrets access'
       - uses: Forge-Space/.github/.github/actions/setup-node@6fbe56bc610ddf84b70f213c752b95196bcadd95
         if: github.actor != 'dependabot[bot]'
+        with:
+          install-command: ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm ci
       - run: npx playwright install --with-deps chromium
         if: github.actor != 'dependabot[bot]'
       - name: Build web app
