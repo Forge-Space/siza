@@ -1,0 +1,44 @@
+name: Epic
+description: Track a multi-deliverable initiative that will decompose into issues.
+title: "[Epic] "
+body:
+  - type: input
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: What initiative outcome are we aiming for?
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What larger problem or opportunity justifies this epic?
+    validations:
+      required: true
+  - type: textarea
+    id: child_deliverables
+    attributes:
+      label: Expected child deliverables
+      description: List the issues, phases, or workstreams this epic should decompose into.
+    validations:
+      required: true
+  - type: textarea
+    id: repos_impacted
+    attributes:
+      label: Repositories or systems impacted
+      description: List the repositories, packages, or services involved.
+    validations:
+      required: true
+  - type: textarea
+    id: exit_criteria
+    attributes:
+      label: Exit criteria
+      description: What must be true before this epic can be considered complete?
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: Target milestone or timeframe
+      description: Optional roadmap target, milestone, or iteration.

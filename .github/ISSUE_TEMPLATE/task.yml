@@ -1,0 +1,43 @@
+name: Task
+description: Track a bounded operational, documentation, or maintenance task.
+title: "[Task] "
+body:
+  - type: input
+    id: objective
+    attributes:
+      label: Objective
+      description: What must be done?
+    validations:
+      required: true
+  - type: input
+    id: affected_scope
+    attributes:
+      label: Affected repository or scope
+      description: Which repository, package, or cross-repo area owns this task?
+      placeholder: Forge-Space/forgespace-web
+    validations:
+      required: true
+  - type: textarea
+    id: in_scope
+    attributes:
+      label: In scope
+      description: What work belongs in this task?
+    validations:
+      required: true
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of scope
+      description: What should explicitly not be done here?
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List objective checks for done.
+    validations:
+      required: true
+  - type: input
+    id: linked_context
+    attributes:
+      label: Linked issue or discussion
+      description: Link upstream issue, discussion, or RFC when relevant.
