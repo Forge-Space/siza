@@ -108,7 +108,7 @@ jobs:
         if: github.actor != 'dependabot[bot]'
         with:
           install-command: ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: cd apps/web && npx playwright install --with-deps chromium
         if: github.actor != 'dependabot[bot]'
       - name: Build web app
         if: github.actor != 'dependabot[bot]'
