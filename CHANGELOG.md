@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.50.0] — 2026-04-06
 
 ### Fixed
 - **SonarCloud issues** — resolved static analysis bugs and vulnerabilities: string sort comparators in feature-flag and skills components, hardcoded test credentials, workflow-level GitHub Actions permissions, regex operator precedence in E2E tests, and conditional logic in route scaffold generator.
@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed stale duplicate metrics API unit test (`apps/web/src/__tests__/lib/api/metrics-route.test.ts`) that targeted the old service-based route contract and conflicted with the current Supabase-backed metrics route tests.
 - Added `reporter: ['text', 'lcov']` to desktop vitest coverage config to generate lcov.info for SonarCloud coverage reporting.
 - Set SonarCloud workflow to non-blocking on push (quality gate enforced by GitHub App on PRs; main branch analysis runs but doesn't block pushes).
+
+### Changed
+- **Stripe SDK upgrade** — 20.4.1 → 22.0.0
+- **TypeScript** — 5.9.3 → 6.0.2
+- **ESLint** — 9 → 10.2.0
+- **Knip** — 5.87.0 → 6.3.0
+- **18 dependency updates** — minor-and-patch group version bumps
+
+## [Unreleased]
+
+### Fixed
+
+### Changed
+
+### Added
 
 ## [0.49.1] — 2026-03-19
 
