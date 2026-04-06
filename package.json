@@ -49,16 +49,16 @@
     "@commitlint/config-conventional": "^20.5.0",
     "@forgespace/core": "^1.13.0",
     "@types/crypto-js": "^4.2.2",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.5.2",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "knip": "^5.87.0",
     "lint-staged": "^16.4.0",
     "npm-check-updates": "^19.6.6",
     "prettier": "^3.8.1",
-    "turbo": "^2.9.1",
+    "turbo": "^2.9.4",
     "typescript": "^5.7.0",
-    "wrangler": "^4.78.0"
+    "wrangler": "^4.80.0"
   },
   "overrides": {
     "dompurify": "^3.3.2",
@@ -78,7 +78,7 @@
   "packageManager": "npm@10.9.2",
   "dependencies": {
     "@react-email/body": "^0.3.0",
-    "@react-email/components": "^1.0.10",
-    "@supabase/supabase-js": "^2.101.0"
+    "@react-email/components": "^1.0.11",
+    "@supabase/supabase-js": "^2.101.1"
   }
 }
