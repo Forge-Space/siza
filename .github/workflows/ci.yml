@@ -100,7 +100,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [build]
-    if: github.actor != 'dependabot[bot]'
     steps:
       - name: Skip E2E for dependabot
         if: github.actor == 'dependabot[bot]'
