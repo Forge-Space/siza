@@ -40,7 +40,6 @@ export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialog
   useLayoutEffect(() => {
     if (open && currentKey) {
       // Reset form fields when dialog opens — intentional synchronous reset
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setApiKey('');
       setShowApiKey(false);
     }
