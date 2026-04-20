@@ -21,11 +21,11 @@
     "wrangler:dev": "wrangler dev"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.82.0",
-    "@forgespace/siza-gen": "^0.14.1",
+    "@anthropic-ai/sdk": "^0.90.0",
+    "@forgespace/siza-gen": "^0.15.0",
     "@google/generative-ai": "^0.24.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@supabase/supabase-js": "^2.101.1",
+    "@supabase/supabase-js": "^2.104.0",
     "@types/supertest": "^7.2.0",
     "array-flatten": "3.0.0",
     "cors": "^2.8.5",
@@ -52,7 +52,7 @@
     "ts-jest": "^29.4.9",
     "tsx": "^4.19.2",
     "typescript": "^6.0.2",
-    "wrangler": "^4.80.0"
+    "wrangler": "^4.84.0"
   },
   "engines": {
     "node": ">=20"

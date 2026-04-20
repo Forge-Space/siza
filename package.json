@@ -52,14 +52,14 @@
     "@types/node": "^25.5.2",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
-    "knip": "^6.3.0",
+    "knip": "^6.5.0",
     "lint-staged": "^16.4.0",
     "npm-check-updates": "^20.0.0",
     "prettier": "^3.8.1",
-    "vite": "^8.0.5",
+    "vite": "^8.0.9",
     "turbo": "^2.9.4",
     "typescript": "^6.0.2",
-    "wrangler": "^4.80.0"
+    "wrangler": "^4.84.0"
   },
   "overrides": {
     "dompurify": "^3.3.2",
@@ -81,7 +81,7 @@
   "dependencies": {
     "@react-email/body": "^0.3.0",
     "@react-email/components": "^1.0.11",
-    "@supabase/supabase-js": "^2.101.1"
+    "@supabase/supabase-js": "^2.104.0"
   },
   "optionalDependencies": {
     "@next/swc-linux-x64-gnu": "16.2.4"
