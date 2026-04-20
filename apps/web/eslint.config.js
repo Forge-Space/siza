@@ -84,6 +84,10 @@ export default [
       'react/prop-types': 'off',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+      // react-hooks v7+ introduced this as 'error'; disabling repo-wide pending a
+      // dedicated refactor PR. Many existing effects legitimately set state as
+      // part of load-on-mount patterns which would require wider restructuring.
+      'react-hooks/set-state-in-effect': 'off',
 
       // General rules
       'no-console': 'off', // Allow console statements

@@ -51,6 +51,9 @@ export default [
       'react/prop-types': 'off',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+      // react-hooks v7+ introduced this as 'error'; disable repo-wide pending a
+      // dedicated refactor PR (load-on-mount patterns need wider restructuring).
+      'react-hooks/set-state-in-effect': 'off',
       'no-console': 'off',
       'no-undef': 'off',
       'prefer-const': 'error',
