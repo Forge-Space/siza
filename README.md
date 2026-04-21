@@ -1,3 +1,13 @@
+> ## ⚠️ DISCONTINUED — 2026-04-20
+>
+> **The Siza product has been discontinued.** This repository is archived and read-only as of 2026-04-20. No further development, releases, or support will occur. Existing installations will continue to function but receive no updates.
+>
+> - npm packages (`@forgespace/siza-gen`, `siza`) are deprecated as of v0.15.0 / v0.3.0 respectively.
+> - Open PRs and issues have been closed without merge.
+> - For historical context, see commit history.
+
+---
+
 <div align="center">
   <a href="https://forgespace.co">
     <img src="https://brand.forgespace.co/logos/wordmark.svg" alt="Forge Space" height="48">
